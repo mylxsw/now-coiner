@@ -22,10 +22,13 @@ enum MenuAnchorResolver {
 
     static func closeAllAppWindows(excluding excluded: [NSWindow] = []) {
         let excludedSet = Set(excluded.map { ObjectIdentifier($0) })
-
         NSApp.windows
             .filter { $0.isVisible }
             .filter { !excludedSet.contains(ObjectIdentifier($0)) }
             .forEach { $0.orderOut(nil) }
+    }
+
+    static func endMenuTracking() {
+        NSApp.sendAction(#selector(NSMenu.cancelTracking), to: nil, from: nil)
     }
 }

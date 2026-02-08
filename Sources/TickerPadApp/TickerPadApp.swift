@@ -73,28 +73,40 @@ struct TickerPadApp: App {
     }
 
     private func openSearchFromMenu() {
-        let anchorX = MenuAnchorResolver.currentAnchor()
+        let anchor = MenuAnchorResolver.currentAnchor()
+        shortcutMonitor?.stop()
+
+        MenuAnchorResolver.endMenuTracking()
         MenuAnchorResolver.closeAllAppWindows()
 
         settingsPanelController.close()
-        searchPanelController.show(anchor: anchorX, panelSize: CGSize(width: 300, height: 460)) {
-            SearchPanelView(viewModel: viewModel, onClose: {
-                searchPanelController.close()
-            })
-            .preferredColorScheme(preferredColorScheme)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
+            searchPanelController.show(anchor: anchor, panelSize: CGSize(width: 300, height: 460)) {
+                SearchPanelView(viewModel: viewModel, onClose: {
+                    searchPanelController.close()
+                    shortcutMonitor?.start()
+                })
+                .preferredColorScheme(preferredColorScheme)
+            }
         }
     }
 
     private func openSettingsFromMenu() {
-        let anchorX = MenuAnchorResolver.currentAnchor()
+        let anchor = MenuAnchorResolver.currentAnchor()
+        shortcutMonitor?.stop()
+
+        MenuAnchorResolver.endMenuTracking()
         MenuAnchorResolver.closeAllAppWindows()
 
         searchPanelController.close()
-        settingsPanelController.show(anchor: anchorX, panelSize: CGSize(width: 340, height: 500)) {
-            SettingsView(viewModel: viewModel, onClose: {
-                settingsPanelController.close()
-            })
-            .preferredColorScheme(preferredColorScheme)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
+            settingsPanelController.show(anchor: anchor, panelSize: CGSize(width: 340, height: 500)) {
+                SettingsView(viewModel: viewModel, onClose: {
+                    settingsPanelController.close()
+                    shortcutMonitor?.start()
+                })
+                .preferredColorScheme(preferredColorScheme)
+            }
         }
     }
 

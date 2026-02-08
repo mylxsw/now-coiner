@@ -13,7 +13,15 @@ final class AnchoredPanelController {
         @ViewBuilder content: () -> Content
     ) {
         let panel = ensurePanel(size: panelSize)
-        panel.contentView = NSHostingView(rootView: AnyView(content()))
+
+        let host = NSHostingView(rootView: AnyView(
+            content()
+                .frame(width: panelSize.width, height: panelSize.height, alignment: .top)
+                .ignoresSafeArea()
+        ))
+        host.frame = NSRect(origin: .zero, size: panelSize)
+        host.autoresizingMask = [.width, .height]
+        panel.contentView = host
 
         let targetFrame = computeFrame(anchor: anchor, size: panelSize)
         let startFrame = NSRect(x: targetFrame.origin.x, y: targetFrame.origin.y + 6, width: targetFrame.width, height: targetFrame.height)
@@ -23,10 +31,9 @@ final class AnchoredPanelController {
         panel.makeKeyAndOrderFront(nil)
         panel.makeMain()
 
-        // Give AppKit one cycle, then force key again so NSTextField input is reliable.
         DispatchQueue.main.async {
             panel.makeKeyAndOrderFront(nil)
-            panel.makeFirstResponder(panel.contentView)
+            panel.makeFirstResponder(host)
         }
 
         NSAnimationContext.runAnimationGroup { context in
@@ -54,7 +61,7 @@ final class AnchoredPanelController {
 
         let created = InputFriendlyPanel(
             contentRect: NSRect(x: 0, y: 0, width: size.width, height: size.height),
-            styleMask: [.borderless, .fullSizeContentView],
+            styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
@@ -79,7 +86,6 @@ final class AnchoredPanelController {
         let screen = anchor.screen ?? NSScreen.main ?? NSScreen.screens.first
         let visible = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: size.width, height: size.height)
 
-        // Tight gap under menu bar.
         let y = visible.maxY - size.height - 2
         let x = max(visible.minX + 6, min(anchor.x - size.width / 2, visible.maxX - size.width - 6))
         return NSRect(x: x, y: y, width: size.width, height: size.height)

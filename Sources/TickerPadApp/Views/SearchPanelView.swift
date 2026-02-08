@@ -5,7 +5,6 @@ struct SearchPanelView: View {
     @ObservedObject var viewModel: TickerViewModel
     let onClose: () -> Void
     @StateObject private var searchVM: SearchViewModel
-    @FocusState private var searchFocused: Bool
 
     init(viewModel: TickerViewModel, onClose: @escaping () -> Void) {
         self.viewModel = viewModel
@@ -22,14 +21,14 @@ struct SearchPanelView: View {
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(TickerPadColors.textSecondary)
 
-                TextField("搜索币种名称或代号", text: $searchVM.query)
-                    .textFieldStyle(.plain)
-                    .foregroundStyle(TickerPadColors.textPrimary)
-                    .font(.system(size: 14, weight: .regular))
-                    .focused($searchFocused)
-                    .onChange(of: searchVM.query) {
+                AppKitTextField(
+                    text: $searchVM.query,
+                    placeholder: "搜索币种名称或代号",
+                    onTextChanged: {
                         searchVM.handleQueryChange()
                     }
+                )
+                .frame(height: 22)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
@@ -50,10 +49,6 @@ struct SearchPanelView: View {
         .frame(width: 300, height: 460)
         .background(TickerPadColors.panel)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .task {
-            try? await Task.sleep(for: .milliseconds(120))
-            searchFocused = true
-        }
     }
 
     private var titleBar: some View {
