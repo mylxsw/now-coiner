@@ -33,15 +33,27 @@ public actor WatchlistStore {
     }
 }
 
+public struct DetailCacheEntry: Codable, Equatable, Sendable {
+    public let detail: CoinDetail
+    public let fetchedAt: Date
+
+    public init(detail: CoinDetail, fetchedAt: Date) {
+        self.detail = detail
+        self.fetchedAt = fetchedAt
+    }
+}
+
 public actor CoinCacheStore {
     private let coinStore: JSONFileStore<[Coin]>
     private let priceStore: JSONFileStore<[String: CoinPrice]>
     private let sparklineStore: JSONFileStore<[String: SparklineData]>
+    private let detailStore: JSONFileStore<[String: DetailCacheEntry]>
 
-    public init(coinURL: URL, priceURL: URL, sparklineURL: URL) {
+    public init(coinURL: URL, priceURL: URL, sparklineURL: URL, detailURL: URL) {
         self.coinStore = JSONFileStore(url: coinURL)
         self.priceStore = JSONFileStore(url: priceURL)
         self.sparklineStore = JSONFileStore(url: sparklineURL)
+        self.detailStore = JSONFileStore(url: detailURL)
     }
 
     public func loadCoins() -> [Coin] {
@@ -66,5 +78,13 @@ public actor CoinCacheStore {
 
     public func saveSparklines(_ values: [String: SparklineData]) {
         try? sparklineStore.save(values)
+    }
+
+    public func loadDetails() -> [String: DetailCacheEntry] {
+        (try? detailStore.load()) ?? [:]
+    }
+
+    public func saveDetails(_ values: [String: DetailCacheEntry]) {
+        try? detailStore.save(values)
     }
 }

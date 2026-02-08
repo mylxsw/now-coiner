@@ -8,6 +8,7 @@ public struct AppStoragePaths: Sendable {
     public let coinListFile: URL
     public let pricesFile: URL
     public let sparklinesFile: URL
+    public let detailsFile: URL
 
     public init(fileManager: FileManager = .default, appName: String = "TickerPad") {
         let base = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
@@ -18,6 +19,7 @@ public struct AppStoragePaths: Sendable {
         coinListFile = cacheDirectory.appendingPathComponent("coins_list.json")
         pricesFile = cacheDirectory.appendingPathComponent("prices.json")
         sparklinesFile = cacheDirectory.appendingPathComponent("sparklines.json")
+        detailsFile = cacheDirectory.appendingPathComponent("details.json")
     }
 
     public func createDirectoriesIfNeeded(fileManager: FileManager = .default) throws {

@@ -7,6 +7,9 @@ struct TickerPadApp: App {
     @State private var showingSearch = false
     @State private var showingSettings = false
 
+    @State private var shortcutMonitor: GlobalShortcutMonitor?
+    @State private var floatingPanelController = FloatingPanelController()
+
     init() {
         let container = AppContainer.makeDefault()
         _viewModel = StateObject(wrappedValue: container.viewModel)
@@ -19,8 +22,11 @@ struct TickerPadApp: App {
                 showingSearch: $showingSearch,
                 showingSettings: $showingSettings
             )
+            .preferredColorScheme(preferredColorScheme)
             .task {
                 await viewModel.load()
+                configureGlobalShortcut()
+                LaunchAtLoginManager.apply(enabled: viewModel.settings.launchAtLogin)
             }
             .sheet(isPresented: $showingSearch) {
                 SearchPanelView(viewModel: viewModel)
@@ -28,10 +34,49 @@ struct TickerPadApp: App {
             .sheet(isPresented: $showingSettings) {
                 SettingsView(viewModel: viewModel)
             }
+            .onDisappear {
+                Task {
+                    await viewModel.shutdown()
+                }
+                shortcutMonitor?.stop()
+            }
+            .onChange(of: viewModel.settings.globalShortcut) { _, newValue in
+                shortcutMonitor?.update(shortcutText: newValue)
+            }
+            .onChange(of: viewModel.settings.launchAtLogin) { _, newValue in
+                LaunchAtLoginManager.apply(enabled: newValue)
+            }
         } label: {
             MenuBarTickerView(viewModel: viewModel)
         }
         .menuBarExtraStyle(.window)
+    }
+
+    private func configureGlobalShortcut() {
+        if let shortcutMonitor {
+            shortcutMonitor.update(shortcutText: viewModel.settings.globalShortcut)
+            return
+        }
+
+        let monitor = GlobalShortcutMonitor {
+            floatingPanelController.toggle {
+                ShortcutPanelRootView(viewModel: viewModel)
+            }
+        }
+        monitor.update(shortcutText: viewModel.settings.globalShortcut)
+        monitor.start()
+        self.shortcutMonitor = monitor
+    }
+
+    private var preferredColorScheme: ColorScheme? {
+        switch viewModel.settings.appearanceMode {
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        case .system:
+            return nil
+        }
     }
 }
 
@@ -42,12 +87,6 @@ private struct MenuBarTickerView: View {
         Text(labelText)
             .font(.system(size: 12, weight: .regular))
             .lineLimit(1)
-            .task {
-                while true {
-                    try? await Task.sleep(for: .seconds(viewModel.settings.refreshInterval.seconds))
-                    await viewModel.refreshSimplePrices()
-                }
-            }
     }
 
     private var labelText: String {
@@ -66,5 +105,37 @@ private struct MenuBarTickerView: View {
                 style: viewModel.settings.menuBarDisplayStyle
             )
         }.joined(separator: " | ")
+    }
+}
+
+private struct ShortcutPanelRootView: View {
+    @ObservedObject var viewModel: TickerViewModel
+    @State private var showingSearch = false
+    @State private var showingSettings = false
+
+    var body: some View {
+        MainPanelView(
+            viewModel: viewModel,
+            showingSearch: $showingSearch,
+            showingSettings: $showingSettings
+        )
+        .preferredColorScheme(preferredColorScheme)
+        .sheet(isPresented: $showingSearch) {
+            SearchPanelView(viewModel: viewModel)
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView(viewModel: viewModel)
+        }
+    }
+
+    private var preferredColorScheme: ColorScheme? {
+        switch viewModel.settings.appearanceMode {
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        case .system:
+            return nil
+        }
     }
 }

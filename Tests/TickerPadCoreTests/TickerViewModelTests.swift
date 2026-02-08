@@ -11,6 +11,7 @@ final class TickerViewModelTests: XCTestCase {
         )
         let gecko = MockCoinGeckoService(coins: [coin], markets: [market])
         let binance = MockBinanceService(prices: ["BTCUSDT": 101])
+        let webSocket = StubWebSocketManager()
 
         let dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString, isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
@@ -20,12 +21,14 @@ final class TickerViewModelTests: XCTestCase {
         let cache = CoinCacheStore(
             coinURL: dir.appendingPathComponent("coins.json"),
             priceURL: dir.appendingPathComponent("prices.json"),
-            sparklineURL: dir.appendingPathComponent("sparklines.json")
-        )
+            sparklineURL: dir.appendingPathComponent("sparklines.json"),
+                detailURL: dir.appendingPathComponent("details.json")
+            )
 
         let vm = TickerViewModel(
             coinGecko: gecko,
             binance: binance,
+            webSocketManager: webSocket,
             settingsStore: settings,
             watchlistStore: watchlist,
             cacheStore: cache
@@ -36,14 +39,18 @@ final class TickerViewModelTests: XCTestCase {
 
         XCTAssertFalse(vm.watchlist.isEmpty)
 
+        let pinBefore = vm.watchlist.first(where: { $0.coinID == "bitcoin" })?.isPinned ?? false
         await vm.togglePin(coinID: "bitcoin")
-        XCTAssertTrue(vm.watchlist.first(where: { $0.coinID == "bitcoin" })?.isPinned ?? false)
+        let pinAfter = vm.watchlist.first(where: { $0.coinID == "bitcoin" })?.isPinned ?? false
+        XCTAssertNotEqual(pinBefore, pinAfter)
 
         await vm.moveCoinToTop(coinID: "bitcoin")
         XCTAssertEqual(vm.watchlist.first?.coinID, "bitcoin")
 
         await vm.removeCoin(coinID: "bitcoin")
         XCTAssertFalse(vm.watchlist.contains(where: { $0.coinID == "bitcoin" }))
+
+        await vm.shutdown()
     }
 }
 

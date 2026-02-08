@@ -6,6 +6,7 @@ struct MainPanelView: View {
     @ObservedObject var viewModel: TickerViewModel
     @Binding var showingSearch: Bool
     @Binding var showingSettings: Bool
+    @State private var detailCoinID: CoinDetailSheetItem?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -15,7 +16,7 @@ struct MainPanelView: View {
             if viewModel.visibleRows.isEmpty {
                 emptyView
             } else {
-                List {
+                List(selection: selectionBinding) {
                     ForEach(viewModel.visibleRows) { row in
                         CoinRowView(
                             row: row,
@@ -27,6 +28,9 @@ struct MainPanelView: View {
                             onPinToggle: {
                                 Task { await viewModel.togglePin(coinID: row.coin.id) }
                             },
+                            onOpenDetail: {
+                                detailCoinID = CoinDetailSheetItem(coinID: row.coin.id)
+                            },
                             onMoveTop: {
                                 Task { await viewModel.moveCoinToTop(coinID: row.coin.id) }
                             },
@@ -35,8 +39,12 @@ struct MainPanelView: View {
                             },
                             onOpenTradingView: {
                                 openTradingView(for: row.coin)
+                            },
+                            onOpenExchange: {
+                                openExchange(for: row.coin)
                             }
                         )
+                        .tag(row.coin.id)
                         .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
@@ -47,22 +55,31 @@ struct MainPanelView: View {
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
+                .onMoveCommand(perform: handleMoveCommand)
+                .onDeleteCommand(perform: removeSelected)
+                .onExitCommand {
+                    viewModel.selectedCoinID = nil
+                }
+                .background {
+                    Button("Open Selected Detail", action: openSelectedDetail)
+                        .keyboardShortcut(.return, modifiers: [])
+                        .hidden()
+                }
+                .accessibilityLabel("Crypto Watchlist")
             }
         }
         .frame(width: 320, height: 420)
         .background(Color(hex: "1C1C1E"))
-        .task {
-            while true {
-                try? await Task.sleep(for: .seconds(60))
-                await viewModel.refreshSimplePrices()
-            }
+        .sheet(item: $detailCoinID) { item in
+            CoinDetailView(viewModel: viewModel, coinID: item.coinID)
         }
-        .task {
-            while true {
-                try? await Task.sleep(for: .seconds(300))
-                await viewModel.refreshMarketData(includeSparkline: true)
-            }
-        }
+    }
+
+    private var selectionBinding: Binding<String?> {
+        Binding(
+            get: { viewModel.selectedCoinID },
+            set: { viewModel.selectedCoinID = $0 }
+        )
     }
 
     private var header: some View {
@@ -70,6 +87,7 @@ struct MainPanelView: View {
             Text("TickerPad")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(.white)
+                .accessibilityAddTraits(.isHeader)
 
             Spacer()
 
@@ -81,6 +99,7 @@ struct MainPanelView: View {
                     .foregroundStyle(Color(hex: "8E8E93"))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Add Coin")
 
             Button {
                 showingSettings = true
@@ -90,6 +109,7 @@ struct MainPanelView: View {
                     .foregroundStyle(Color(hex: "8E8E93"))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Open Settings")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -107,8 +127,41 @@ struct MainPanelView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
+    private func handleMoveCommand(_ direction: MoveCommandDirection) {
+        switch direction {
+        case .down:
+            viewModel.selectNextRow()
+        case .up:
+            viewModel.selectPreviousRow()
+        default:
+            break
+        }
+    }
+
+    private func removeSelected() {
+        guard let selected = viewModel.selectedCoinID else { return }
+        Task {
+            await viewModel.removeCoin(coinID: selected)
+        }
+    }
+
+    private func openSelectedDetail() {
+        guard let selected = viewModel.selectedCoinForDetail() else { return }
+        detailCoinID = CoinDetailSheetItem(coinID: selected)
+    }
+
     private func openTradingView(for coin: Coin) {
         guard let url = ExchangeURLBuilder.tradingView(symbol: coin.symbol, exchange: viewModel.settings.defaultExchange) else { return }
         NSWorkspace.shared.open(url)
     }
+
+    private func openExchange(for coin: Coin) {
+        guard let url = ExchangeURLBuilder.exchange(symbol: coin.symbol, coinID: coin.id, exchange: viewModel.settings.defaultExchange) else { return }
+        NSWorkspace.shared.open(url)
+    }
+}
+
+private struct CoinDetailSheetItem: Identifiable {
+    let coinID: String
+    var id: String { coinID }
 }

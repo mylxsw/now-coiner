@@ -1,33 +1,57 @@
 # Architecture
 
-## Layers
+## 1. View Layer (`TickerPadApp`)
 
-1. Views (`TickerPadApp`)
-- `TickerPadApp.swift`: MenuBarExtra 入口。
-- `MainPanelView.swift`: 币种列表主面板。
-- `SearchPanelView.swift`: 本地缓存币种搜索与添加。
-- `SettingsView.swift`: 设置项编辑。
+- `TickerPadApp.swift`
+  - 菜单栏入口与生命周期。
+  - 启动加载、设置同步、全局快捷键注册。
+- `MainPanelView.swift`
+  - watchlist 列表、上下文菜单、详情入口、键盘导航。
+- `SearchPanelView.swift`
+  - 本地币种检索与添加。
+- `SettingsView.swift`
+  - 用户配置读写。
+- `CoinDetailView.swift`
+  - 详情展示与图表。
 
-2. ViewModels (`TickerPadCore/ViewModels`)
-- `TickerViewModel`: 统一协调网络数据、watchlist、缓存与用户操作。
-- `SearchViewModel`: 搜索输入防抖与结果过滤。
+## 2. ViewModel Layer (`TickerPadCore/ViewModels`)
 
-3. Services (`TickerPadCore/Services`)
-- `CoinGeckoService` / `BinanceService`: API 访问实现。
-- `HTTPClient` 协议抽象，便于测试替换。
+- `TickerViewModel`
+  - 聚合应用状态（coins/watchlist/prices/sparklines/settings）。
+  - 编排运行时任务：WebSocket、轮询、缓存。
+  - 提供 UI 操作命令：add/remove/move/pin/settings/detail/keyboard-selection。
+- `SearchViewModel`
+  - 300ms 防抖 + 过滤。
 
-4. Storage (`TickerPadCore/Storage`)
-- `AppStoragePaths`: 应用数据路径约定。
-- `JSONFileStore`: 泛型 JSON 存储。
-- `SettingsStore` / `WatchlistStore` / `CoinCacheStore`: 业务仓储。
+## 3. Service Layer (`TickerPadCore/Services`)
 
-5. Domain + Utils
-- `Models/*`: PRD 对应实体。
-- `PriceFormatter` / `SearchFilter` / `ExchangeURLBuilder` / `ExponentialBackoff`。
+- `CoinGeckoService`
+  - `coins/list`
+  - `coins/markets`
+  - `simple/price`
+  - `coins/{id}`
+- `BinanceService`
+  - `ticker/price`
+- `BinanceWebSocketManager`
+  - `miniTicker` 流接收
+  - ping 保活
+  - 断线指数退避重连
+- `WebSocketMessageParser`
+  - 统一解析合并流/直连流 payload。
 
-## Design Principles
+## 4. Storage Layer (`TickerPadCore/Storage`)
 
-- 协议优先：服务层通过协议解耦，ViewModel 不依赖具体网络实现。
-- 可测试：核心逻辑集中在 `TickerPadCore`，UI 层只做展示和事件转发。
-- 持久化边界清晰：`Store` 负责 I/O，ViewModel 仅组合调用。
-- 低耦合模块：格式化、URL 拼装、搜索过滤都独立成纯函数模块。
+- `AppStoragePaths`
+  - 管理 Application Support 路径。
+- `JSONFileStore<T>`
+  - 通用 JSON 读写。
+- `SettingsStore / WatchlistStore / CoinCacheStore`
+  - 领域仓储。
+  - 详情缓存使用 `DetailCacheEntry`，TTL 10 分钟。
+
+## 5. Key Design Decisions
+
+- 协议解耦：`CoinGeckoServicing` / `BinanceServicing` / `WebSocketManaging` 便于替换与测试。
+- 状态单向流动：网络/存储 -> ViewModel -> SwiftUI 视图。
+- 运行时任务统一收敛到 ViewModel，避免视图层重复轮询。
+- 易测逻辑下沉到 `TickerPadCore`（格式化、过滤、URL 构建、退避、解析器）。

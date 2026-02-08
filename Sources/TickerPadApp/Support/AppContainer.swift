@@ -14,12 +14,14 @@ struct AppContainer {
         let cacheStore = CoinCacheStore(
             coinURL: paths.coinListFile,
             priceURL: paths.pricesFile,
-            sparklineURL: paths.sparklinesFile
+            sparklineURL: paths.sparklinesFile,
+            detailURL: paths.detailsFile
         )
 
         let viewModel = TickerViewModel(
             coinGecko: CoinGeckoService(),
             binance: BinanceService(),
+            webSocketManager: BinanceWebSocketManager(),
             settingsStore: settingsStore,
             watchlistStore: watchlistStore,
             cacheStore: cacheStore

@@ -1,23 +1,20 @@
 # TickerPad
 
-TickerPad 是一个基于 macOS 菜单栏的加密货币价格追踪应用实现，按 `REQUIREMENTS.md` 的 MVVM 架构落地：
+TickerPad 是一个基于 macOS 菜单栏的加密货币价格追踪应用实现，按 `REQUIREMENTS.md` 的 MVVM 架构落地。
 
-- `TickerPadCore`：领域模型、服务层、存储层、ViewModel、纯逻辑工具。
-- `TickerPadApp`：SwiftUI 菜单栏 UI（主面板、搜索面板、设置面板、右键菜单）。
-
-## 目录结构
+## 模块结构
 
 ```text
 Sources/
   TickerPadCore/
-    Models/
-    Services/
-    Storage/
-    Utils/
-    ViewModels/
+    Models/      # 领域模型
+    Services/    # CoinGecko / Binance / WebSocket
+    Storage/     # JSON 持久化仓储
+    Utils/       # 格式化、搜索、URL、退避
+    ViewModels/  # 核心状态与业务编排
   TickerPadApp/
-    Support/
-    Views/
+    Support/     # 应用容器、快捷键、浮动面板、开机自启
+    Views/       # 主面板、搜索、设置、详情、行视图
 Tests/
   TickerPadCoreTests/
 ```
@@ -25,18 +22,33 @@ Tests/
 ## 已实现功能
 
 - 菜单栏多币种 ticker 文本展示（样式可配置）。
-- 主面板币种列表与选中态。
-- 右键上下文操作：Pin/Unpin、Move to top、TradingView 跳转、Remove。
-- 搜索面板 + 300ms 防抖本地过滤 + 添加币种。
-- 设置页：计价货币、菜单栏样式、涨跌颜色、刷新间隔、默认交易所。
-- CoinGecko REST：`coins/list`、`coins/markets`、`simple/price`、`coins/{id}`。
-- Binance REST：`ticker/price`。
-- 本地持久化：`settings/watchlist/cache(coins/prices/sparklines)`。
-- 默认 watchlist 种子数据（BTC/ETH/BNB/SOL/UNI/ATOM/ALGO）。
+- 主面板币种列表、选中态、拖拽排序、Pin/Unpin、删除、置顶。
+- 主面板键盘导航：`↑/↓` 选择、`Return` 打开详情、`Delete` 删除选中项。
+- 搜索面板：300ms 防抖、本地过滤、添加币种。
+- 币种详情页：基础信息、7 天图表、市场数据、外链、开发者数据。
+- 币种详情 10 分钟 TTL 缓存（内存 + 本地落盘）。
+- 行内 Sparkline（Swift Charts）。
+- 右键菜单：Pin、About、Move to top、TradingView、Exchange、Remove。
+- 实时更新链路：
+  - Binance WebSocket `miniTicker`（支持断线重连 + 指数退避 + ping）。
+  - CoinGecko `simple/price` 周期性刷新补充字段。
+  - CoinGecko `coins/markets` 每 5 分钟刷新 Sparkline。
+- 设置项：
+  - 开机自启
+  - 全局快捷键
+  - 计价货币
+  - 菜单栏样式
+  - 外观模式（浅色/深色/系统）
+  - 涨跌配色
+  - 刷新间隔
+  - 默认数据源
+  - 默认交易所
+- 全局快捷键唤起/隐藏浮动主面板。
+- 本地持久化：`settings/watchlist/cache(coins/prices/sparklines/details)`。
 
 ## 测试覆盖
 
-`Tests/TickerPadCoreTests` 包含：
+`TickerPadCoreTests` 包含 13 个测试：
 
 - `PriceFormatterTests`
 - `ExchangeURLBuilderTests`
@@ -44,6 +56,9 @@ Tests/
 - `ExponentialBackoffTests`
 - `JSONFileStoreTests`
 - `TickerViewModelTests`
+- `TickerRealtimeTests`
+- `WebSocketMessageParserTests`
+- `TickerDetailCacheTests`
 
 ## 运行与测试
 
@@ -54,11 +69,19 @@ swift run TickerPadApp
 
 ## 环境变量
 
-- `COINGECKO_API_KEY`：可选。若设置，会自动作为 `x-cg-demo-api-key` 请求头发送。
+- `COINGECKO_API_KEY`（可选）：设置后自动作为 `x-cg-demo-api-key` 请求头发送。
 
-## 后续建议（对齐 PRD 进阶阶段）
+## 数据目录
 
-- 接入 Binance WebSocket 实时流与断线重连（目前为 REST + 定时刷新）。
-- 增加 Sparkline 图表（Swift Charts）与详情页 UI。
-- 增加全局快捷键与开机自启。
-- 增加浅色模式细节和更完整的可访问性支持。
+运行后会写入：
+
+```text
+~/Library/Application Support/TickerPad/
+  settings.json
+  watchlist.json
+  cache/
+    coins_list.json
+    prices.json
+    sparklines.json
+    details.json
+```

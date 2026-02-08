@@ -39,23 +39,38 @@ public final class TickerViewModel: ObservableObject {
 
     private let coinGecko: CoinGeckoServicing
     private let binance: BinanceServicing
+    private let webSocketManager: WebSocketManaging
     private let settingsStore: SettingsStore
     private let watchlistStore: WatchlistStore
     private let cacheStore: CoinCacheStore
 
+    private var realtimeTask: Task<Void, Never>?
+    private var simpleRefreshTask: Task<Void, Never>?
+    private var sparklineRefreshTask: Task<Void, Never>?
+
+    private var detailCache: [String: DetailCacheEntry] = [:]
+
     public init(
         coinGecko: CoinGeckoServicing,
         binance: BinanceServicing,
+        webSocketManager: WebSocketManaging,
         settingsStore: SettingsStore,
         watchlistStore: WatchlistStore,
         cacheStore: CoinCacheStore
     ) {
         self.coinGecko = coinGecko
         self.binance = binance
+        self.webSocketManager = webSocketManager
         self.settingsStore = settingsStore
         self.watchlistStore = watchlistStore
         self.cacheStore = cacheStore
         self.settings = .default
+    }
+
+    deinit {
+        realtimeTask?.cancel()
+        simpleRefreshTask?.cancel()
+        sparklineRefreshTask?.cancel()
     }
 
     public var visibleRows: [CoinRowState] {
@@ -84,6 +99,7 @@ public final class TickerViewModel: ObservableObject {
         watchlist = await watchlistStore.load()
         prices = await cacheStore.loadPrices()
         sparklines = await cacheStore.loadSparklines()
+        detailCache = await cacheStore.loadDetails()
 
         let cachedCoins = await cacheStore.loadCoins()
         if !cachedCoins.isEmpty {
@@ -95,16 +111,34 @@ public final class TickerViewModel: ObservableObject {
         if watchlist.isEmpty {
             let defaults = ["bitcoin", "ethereum", "binancecoin", "solana", "uniswap", "cosmos", "algorand"]
             watchlist = defaults.enumerated().map { idx, id in
-                WatchlistItem(coinID: id, sortOrder: idx)
+                WatchlistItem(coinID: id, sortOrder: idx, isPinned: idx < 3)
             }
             await watchlistStore.save(watchlist)
         }
 
+        if selectedCoinID == nil {
+            selectedCoinID = watchlist.first?.coinID
+        }
+
         await refreshMarketData(includeSparkline: true)
+        await configureRuntimeTasks()
+    }
+
+    public func shutdown() async {
+        realtimeTask?.cancel()
+        realtimeTask = nil
+
+        simpleRefreshTask?.cancel()
+        simpleRefreshTask = nil
+
+        sparklineRefreshTask?.cancel()
+        sparklineRefreshTask = nil
+
+        await webSocketManager.disconnect()
     }
 
     public func refreshMarketData(includeSparkline: Bool = false) async {
-        let ids = watchlist.map(\ .coinID)
+        let ids = watchlist.map(\.coinID)
         guard !ids.isEmpty else { return }
 
         do {
@@ -129,7 +163,7 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public func refreshSimplePrices() async {
-        let ids = watchlist.map(\ .coinID)
+        let ids = watchlist.map(\.coinID)
         guard !ids.isEmpty else { return }
 
         do {
@@ -145,7 +179,7 @@ public final class TickerViewModel: ObservableObject {
                 current.priceChangePercent24h = data.change24h ?? current.priceChangePercent24h
                 current.marketCap = data.marketCap
                 current.totalVolume = data.volume24h
-                current.lastUpdated = .now
+                current.lastUpdated = Date()
                 prices[coinID] = current
             }
             await cacheStore.savePrices(prices)
@@ -181,6 +215,22 @@ public final class TickerViewModel: ObservableObject {
         }
     }
 
+    public func fetchCoinDetail(coinID: String) async -> CoinDetail? {
+        if let cached = detailCache[coinID], Date().timeIntervalSince(cached.fetchedAt) < 600 {
+            return cached.detail
+        }
+
+        do {
+            let detail = try await coinGecko.fetchDetail(coinID: coinID, vsCurrency: settings.vsCurrency)
+            detailCache[coinID] = DetailCacheEntry(detail: detail, fetchedAt: Date())
+            await cacheStore.saveDetails(detailCache)
+            return detail
+        } catch {
+            errorMessage = error.localizedDescription
+            return nil
+        }
+    }
+
     public func addCoin(_ coin: Coin) async {
         if !coins.contains(where: { $0.id == coin.id }) {
             coins.append(coin)
@@ -191,13 +241,21 @@ public final class TickerViewModel: ObservableObject {
         let item = WatchlistItem(coinID: coin.id, sortOrder: watchlist.count)
         watchlist.append(item)
         await watchlistStore.save(watchlist)
+        if selectedCoinID == nil {
+            selectedCoinID = coin.id
+        }
         await refreshMarketData(includeSparkline: false)
+        await configureRuntimeTasks()
     }
 
     public func removeCoin(coinID: String) async {
         watchlist.removeAll { $0.coinID == coinID }
         reindexWatchlist()
+        if selectedCoinID == coinID {
+            selectedCoinID = watchlist.first?.coinID
+        }
         await watchlistStore.save(watchlist)
+        await configureRuntimeTasks()
     }
 
     public func moveCoinToTop(coinID: String) async {
@@ -225,10 +283,66 @@ public final class TickerViewModel: ObservableObject {
         update(&next)
         settings = next
         await settingsStore.save(next)
+        await configureRuntimeTasks()
     }
 
     public func selectionToggle(coinID: String) {
         selectedCoinID = selectedCoinID == coinID ? nil : coinID
+    }
+
+    public func selectNextRow() {
+        let ordered = watchlist.sorted(by: { $0.sortOrder < $1.sortOrder }).map(\.coinID)
+        guard !ordered.isEmpty else {
+            selectedCoinID = nil
+            return
+        }
+
+        guard let current = selectedCoinID,
+              let index = ordered.firstIndex(of: current) else {
+            selectedCoinID = ordered.first
+            return
+        }
+
+        let nextIndex = min(index + 1, ordered.count - 1)
+        selectedCoinID = ordered[nextIndex]
+    }
+
+    public func selectPreviousRow() {
+        let ordered = watchlist.sorted(by: { $0.sortOrder < $1.sortOrder }).map(\.coinID)
+        guard !ordered.isEmpty else {
+            selectedCoinID = nil
+            return
+        }
+
+        guard let current = selectedCoinID,
+              let index = ordered.firstIndex(of: current) else {
+            selectedCoinID = ordered.first
+            return
+        }
+
+        let previousIndex = max(index - 1, 0)
+        selectedCoinID = ordered[previousIndex]
+    }
+
+    public func selectedCoinForDetail() -> String? {
+        selectedCoinID
+    }
+
+    public func applyWebSocketTick(_ tick: WebSocketTick) {
+        guard let coinID = coins.first(where: { $0.binanceSymbol?.uppercased() == tick.symbol.uppercased() })?.id else {
+            return
+        }
+
+        var current = prices[coinID] ?? CoinPrice(
+            coinID: coinID,
+            currentPrice: tick.currentPrice,
+            priceChange24h: 0,
+            priceChangePercent24h: 0
+        )
+
+        current.currentPrice = tick.currentPrice
+        current.lastUpdated = Date()
+        prices[coinID] = current
     }
 
     private func refreshCoinListIfNeeded(force: Bool) async {
@@ -239,6 +353,56 @@ public final class TickerViewModel: ObservableObject {
             await cacheStore.saveCoins(values)
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    private func configureRuntimeTasks() async {
+        simpleRefreshTask?.cancel()
+        simpleRefreshTask = Task { [weak self] in
+            guard let self else { return }
+            while !Task.isCancelled {
+                let sleepSeconds: TimeInterval = self.settings.refreshInterval == .realtime ? 60 : self.settings.refreshInterval.seconds
+                try? await Task.sleep(for: .seconds(sleepSeconds))
+                guard !Task.isCancelled else { return }
+                if self.settings.defaultDataSource == .binance, self.settings.refreshInterval != .realtime {
+                    await self.refreshBinancePrices()
+                } else {
+                    await self.refreshSimplePrices()
+                }
+            }
+        }
+
+        sparklineRefreshTask?.cancel()
+        sparklineRefreshTask = Task { [weak self] in
+            guard let self else { return }
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(300))
+                guard !Task.isCancelled else { return }
+                await self.refreshMarketData(includeSparkline: true)
+            }
+        }
+
+        realtimeTask?.cancel()
+        realtimeTask = nil
+
+        if settings.refreshInterval == .realtime {
+            let symbols = watchlist.compactMap { item in
+                coins.first(where: { $0.id == item.coinID })?.binanceSymbol
+            }
+
+            await webSocketManager.connect(symbols: symbols)
+
+            realtimeTask = Task { [weak self] in
+                guard let self else { return }
+                for await tick in webSocketManager.ticks {
+                    if Task.isCancelled { return }
+                    await MainActor.run {
+                        self.applyWebSocketTick(tick)
+                    }
+                }
+            }
+        } else {
+            await webSocketManager.disconnect()
         }
     }
 

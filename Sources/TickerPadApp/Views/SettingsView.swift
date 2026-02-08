@@ -29,6 +29,13 @@ struct SettingsView: View {
                         Text("CNY").tag("cny")
                         Text("JPY").tag("jpy")
                     }
+
+                    TextField("全局快捷键", text: Binding(
+                        get: { viewModel.settings.globalShortcut },
+                        set: { value in
+                            Task { await viewModel.updateSettings { $0.globalShortcut = value } }
+                        }
+                    ))
                 }
 
                 Section("显示") {
@@ -51,6 +58,17 @@ struct SettingsView: View {
                     )) {
                         Text("绿涨红跌").tag(PriceColorScheme.greenUpRedDown)
                         Text("红涨绿跌").tag(PriceColorScheme.redUpGreenDown)
+                    }
+
+                    Picker("外观模式", selection: Binding(
+                        get: { viewModel.settings.appearanceMode },
+                        set: { value in
+                            Task { await viewModel.updateSettings { $0.appearanceMode = value } }
+                        }
+                    )) {
+                        Text("浅色").tag(AppearanceMode.light)
+                        Text("深色").tag(AppearanceMode.dark)
+                        Text("跟随系统").tag(AppearanceMode.system)
                     }
                 }
 
@@ -77,6 +95,16 @@ struct SettingsView: View {
                         Text("Binance").tag(Exchange.binance)
                         Text("Coinbase").tag(Exchange.coinbase)
                         Text("OKX").tag(Exchange.okx)
+                    }
+
+                    Picker("默认数据源", selection: Binding(
+                        get: { viewModel.settings.defaultDataSource },
+                        set: { value in
+                            Task { await viewModel.updateSettings { $0.defaultDataSource = value } }
+                        }
+                    )) {
+                        Text("CoinGecko").tag(DataSource.coinGecko)
+                        Text("Binance").tag(DataSource.binance)
                     }
                 }
             }
