@@ -9,6 +9,6 @@ enum TickerPadColors {
     static let green = Color(hex: "34C759")
     static let red = Color(hex: "FF453A")
     static let blue = Color(hex: "007AFF")
-    static let selectionFill = Color(hex: "9333EA33")
+    static let selectionFill = Color(hex: "339333EA")
     static let selectionStroke = Color(hex: "9333EA")
 }

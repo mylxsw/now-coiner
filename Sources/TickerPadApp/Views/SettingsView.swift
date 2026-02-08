@@ -3,19 +3,29 @@ import TickerPadCore
 
 struct SettingsView: View {
     @ObservedObject var viewModel: TickerViewModel
+    let onClose: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
             HStack {
                 Text("设置")
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(TickerPadColors.textPrimary)
                 Spacer()
+                Button(action: onClose) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(TickerPadColors.textSecondary)
+                        .frame(width: 20, height: 20)
+                        .background(TickerPadColors.secondaryPanel)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
 
-            Divider().overlay(Color(hex: "2C2C2E"))
+            Divider().overlay(TickerPadColors.divider)
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -131,27 +141,13 @@ struct SettingsView: View {
                             .labelsHidden()
                             .frame(width: 130)
                         }
-
-                        PickerRow(title: "默认数据源") {
-                            Picker("", selection: Binding(
-                                get: { viewModel.settings.defaultDataSource },
-                                set: { value in
-                                    Task { await viewModel.updateSettings { $0.defaultDataSource = value } }
-                                }
-                            )) {
-                                Text("CoinGecko").tag(DataSource.coinGecko)
-                                Text("Binance").tag(DataSource.binance)
-                            }
-                            .labelsHidden()
-                            .frame(width: 130)
-                        }
                     }
                 }
                 .padding(12)
             }
         }
-        .frame(width: 320, height: 440)
-        .background(Color(hex: "1C1C1E"))
+        .frame(width: 340, height: 500)
+        .background(TickerPadColors.panel)
     }
 
     @ViewBuilder
@@ -159,13 +155,13 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(Color(hex: "8E8E93"))
+                .foregroundStyle(TickerPadColors.textSecondary)
 
             content()
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(hex: "2C2C2E"))
+        .background(TickerPadColors.secondaryPanel)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
@@ -177,7 +173,7 @@ private struct ToggleRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .foregroundStyle(.white)
+                .foregroundStyle(TickerPadColors.textPrimary)
                 .font(.system(size: 14))
             Spacer()
             Toggle("", isOn: $isOn)
@@ -193,7 +189,7 @@ private struct PickerRow<Content: View>: View {
     var body: some View {
         HStack {
             Text(title)
-                .foregroundStyle(.white)
+                .foregroundStyle(TickerPadColors.textPrimary)
                 .font(.system(size: 14))
             Spacer()
             content()
@@ -208,7 +204,7 @@ private struct TextFieldRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .foregroundStyle(.white)
+                .foregroundStyle(TickerPadColors.textPrimary)
                 .font(.system(size: 14))
             Spacer()
             TextField("⌘⇧C", text: $text)

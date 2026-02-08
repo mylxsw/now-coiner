@@ -3,16 +3,20 @@ import TickerPadCore
 
 struct SearchPanelView: View {
     @ObservedObject var viewModel: TickerViewModel
+    let onClose: () -> Void
     @StateObject private var searchVM: SearchViewModel
-    @Environment(\.dismiss) private var dismiss
+    @FocusState private var searchFocused: Bool
 
-    init(viewModel: TickerViewModel) {
+    init(viewModel: TickerViewModel, onClose: @escaping () -> Void) {
         self.viewModel = viewModel
+        self.onClose = onClose
         _searchVM = StateObject(wrappedValue: SearchViewModel(allCoins: viewModel.coins))
     }
 
     var body: some View {
         VStack(spacing: 0) {
+            titleBar
+
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 14, weight: .medium))
@@ -22,6 +26,7 @@ struct SearchPanelView: View {
                     .textFieldStyle(.plain)
                     .foregroundStyle(TickerPadColors.textPrimary)
                     .font(.system(size: 14, weight: .regular))
+                    .focused($searchFocused)
                     .onChange(of: searchVM.query) {
                         searchVM.handleQueryChange()
                     }
@@ -42,10 +47,34 @@ struct SearchPanelView: View {
                 .padding(.vertical, 8)
             }
         }
-        .frame(width: 280, height: 420)
+        .frame(width: 300, height: 460)
         .background(TickerPadColors.panel)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .onExitCommand(perform: dismiss.callAsFunction)
+        .task {
+            try? await Task.sleep(for: .milliseconds(120))
+            searchFocused = true
+        }
+    }
+
+    private var titleBar: some View {
+        HStack {
+            Text("添加币种")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(TickerPadColors.textPrimary)
+            Spacer()
+            Button(action: onClose) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .frame(width: 20, height: 20)
+                    .background(TickerPadColors.secondaryPanel)
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(TickerPadColors.secondaryPanel)
     }
 
     private func row(coin: Coin) -> some View {

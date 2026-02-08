@@ -4,14 +4,14 @@ import TickerPadCore
 
 struct MainPanelView: View {
     @ObservedObject var viewModel: TickerViewModel
-    @Binding var showingSearch: Bool
-    @Binding var showingSettings: Bool
+    let onOpenSearch: () -> Void
+    let onOpenSettings: () -> Void
     @State private var detailCoinID: CoinDetailSheetItem?
 
     var body: some View {
         VStack(spacing: 0) {
             header
-            Divider().overlay(Color(hex: "2C2C2E"))
+            Divider().overlay(TickerPadColors.divider)
 
             if viewModel.visibleRows.isEmpty {
                 emptyView
@@ -54,7 +54,7 @@ struct MainPanelView: View {
             }
         }
         .frame(width: 320, height: 420)
-        .background(Color(hex: "1C1C1E"))
+        .background(TickerPadColors.panel)
         .onMoveCommand(perform: handleMoveCommand)
         .onDeleteCommand(perform: removeSelected)
         .onExitCommand {
@@ -83,27 +83,23 @@ struct MainPanelView: View {
         HStack(spacing: 8) {
             Text("TickerPad")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(TickerPadColors.textPrimary)
                 .accessibilityAddTraits(.isHeader)
 
             Spacer()
 
-            Button {
-                showingSearch = true
-            } label: {
+            Button(action: onOpenSearch) {
                 Image(systemName: "plus")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color(hex: "8E8E93"))
+                    .foregroundStyle(TickerPadColors.textSecondary)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Add Coin")
 
-            Button {
-                showingSettings = true
-            } label: {
+            Button(action: onOpenSettings) {
                 Image(systemName: "gearshape")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color(hex: "8E8E93"))
+                    .foregroundStyle(TickerPadColors.textSecondary)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Open Settings")
@@ -115,10 +111,10 @@ struct MainPanelView: View {
     private var emptyView: some View {
         VStack(spacing: 10) {
             Text("暂无币种")
-                .foregroundStyle(.white)
+                .foregroundStyle(TickerPadColors.textPrimary)
                 .font(.system(size: 14, weight: .semibold))
             Text("点击右上角 + 添加你关注的币种")
-                .foregroundStyle(Color(hex: "8E8E93"))
+                .foregroundStyle(TickerPadColors.textSecondary)
                 .font(.system(size: 11))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -4,11 +4,11 @@ import TickerPadCore
 @main
 struct TickerPadApp: App {
     @StateObject private var viewModel: TickerViewModel
-    @State private var showingSearch = false
-    @State private var showingSettings = false
 
     @State private var shortcutMonitor: GlobalShortcutMonitor?
     @State private var floatingPanelController = FloatingPanelController()
+    @State private var searchPanelController = AnchoredPanelController()
+    @State private var settingsPanelController = AnchoredPanelController()
     @State private var didBootstrap = false
 
     init() {
@@ -20,20 +20,12 @@ struct TickerPadApp: App {
         MenuBarExtra {
             MainPanelView(
                 viewModel: viewModel,
-                showingSearch: $showingSearch,
-                showingSettings: $showingSettings
+                onOpenSearch: openSearchFromMenu,
+                onOpenSettings: openSettingsFromMenu
             )
             .preferredColorScheme(preferredColorScheme)
             .task {
                 await bootstrapIfNeeded()
-            }
-            .popover(isPresented: $showingSearch, arrowEdge: .top) {
-                SearchPanelView(viewModel: viewModel)
-                    .preferredColorScheme(preferredColorScheme)
-            }
-            .popover(isPresented: $showingSettings, arrowEdge: .top) {
-                SettingsView(viewModel: viewModel)
-                    .preferredColorScheme(preferredColorScheme)
             }
             .onChange(of: viewModel.settings.globalShortcut) { _, newValue in
                 shortcutMonitor?.update(shortcutText: newValue)
@@ -68,12 +60,42 @@ struct TickerPadApp: App {
 
         let monitor = GlobalShortcutMonitor {
             floatingPanelController.toggle {
-                ShortcutPanelRootView(viewModel: viewModel)
+                ShortcutPanelRootView(
+                    viewModel: viewModel,
+                    onOpenSearch: openSearchFromMenu,
+                    onOpenSettings: openSettingsFromMenu
+                )
             }
         }
         monitor.update(shortcutText: viewModel.settings.globalShortcut)
         monitor.start()
         self.shortcutMonitor = monitor
+    }
+
+    private func openSearchFromMenu() {
+        let anchorX = MenuAnchorResolver.currentAnchor()
+        MenuAnchorResolver.closeAllAppWindows()
+
+        settingsPanelController.close()
+        searchPanelController.show(anchor: anchorX, panelSize: CGSize(width: 300, height: 460)) {
+            SearchPanelView(viewModel: viewModel, onClose: {
+                searchPanelController.close()
+            })
+            .preferredColorScheme(preferredColorScheme)
+        }
+    }
+
+    private func openSettingsFromMenu() {
+        let anchorX = MenuAnchorResolver.currentAnchor()
+        MenuAnchorResolver.closeAllAppWindows()
+
+        searchPanelController.close()
+        settingsPanelController.show(anchor: anchorX, panelSize: CGSize(width: 340, height: 500)) {
+            SettingsView(viewModel: viewModel, onClose: {
+                settingsPanelController.close()
+            })
+            .preferredColorScheme(preferredColorScheme)
+        }
     }
 
     private var preferredColorScheme: ColorScheme? {
@@ -122,24 +144,16 @@ private struct MenuBarTickerView: View {
 
 private struct ShortcutPanelRootView: View {
     @ObservedObject var viewModel: TickerViewModel
-    @State private var showingSearch = false
-    @State private var showingSettings = false
+    let onOpenSearch: () -> Void
+    let onOpenSettings: () -> Void
 
     var body: some View {
         MainPanelView(
             viewModel: viewModel,
-            showingSearch: $showingSearch,
-            showingSettings: $showingSettings
+            onOpenSearch: onOpenSearch,
+            onOpenSettings: onOpenSettings
         )
         .preferredColorScheme(preferredColorScheme)
-        .popover(isPresented: $showingSearch, arrowEdge: .top) {
-            SearchPanelView(viewModel: viewModel)
-                .preferredColorScheme(preferredColorScheme)
-        }
-        .popover(isPresented: $showingSettings, arrowEdge: .top) {
-            SettingsView(viewModel: viewModel)
-                .preferredColorScheme(preferredColorScheme)
-        }
     }
 
     private var preferredColorScheme: ColorScheme? {
