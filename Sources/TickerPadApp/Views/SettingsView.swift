@@ -148,6 +148,11 @@ struct SettingsView: View {
         }
         .frame(width: 340, height: 500)
         .background(TickerPadColors.panel)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(TickerPadColors.divider.opacity(0.6), lineWidth: 1)
+        )
     }
 
     @ViewBuilder

@@ -16,14 +16,21 @@ final class AnchoredPanelController {
         panel.contentView = NSHostingView(rootView: AnyView(content()))
 
         let targetFrame = computeFrame(anchor: anchor, size: panelSize)
-        let startFrame = NSRect(x: targetFrame.origin.x, y: targetFrame.origin.y + 8, width: targetFrame.width, height: targetFrame.height)
+        let startFrame = NSRect(x: targetFrame.origin.x, y: targetFrame.origin.y + 6, width: targetFrame.width, height: targetFrame.height)
 
         panel.setFrame(startFrame, display: false)
         panel.alphaValue = 0
         panel.makeKeyAndOrderFront(nil)
+        panel.makeMain()
+
+        // Give AppKit one cycle, then force key again so NSTextField input is reliable.
+        DispatchQueue.main.async {
+            panel.makeKeyAndOrderFront(nil)
+            panel.makeFirstResponder(panel.contentView)
+        }
 
         NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.16
+            context.duration = 0.14
             context.timingFunction = CAMediaTimingFunction(name: .easeOut)
             panel.animator().alphaValue = 1
             panel.animator().setFrame(targetFrame, display: true)
@@ -47,13 +54,11 @@ final class AnchoredPanelController {
 
         let created = InputFriendlyPanel(
             contentRect: NSRect(x: 0, y: 0, width: size.width, height: size.height),
-            styleMask: [.titled, .fullSizeContentView],
+            styleMask: [.borderless, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
         created.identifier = NSUserInterfaceItemIdentifier(Self.windowIdentifier)
-        created.titleVisibility = .hidden
-        created.titlebarAppearsTransparent = true
         created.isFloatingPanel = true
         created.level = .floating
         created.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
@@ -62,9 +67,9 @@ final class AnchoredPanelController {
         created.isOpaque = false
         created.hasShadow = true
         created.hidesOnDeactivate = false
-        created.standardWindowButton(.closeButton)?.isHidden = true
-        created.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        created.standardWindowButton(.zoomButton)?.isHidden = true
+        created.ignoresMouseEvents = false
+        created.becomesKeyOnlyIfNeeded = false
+        created.isMovableByWindowBackground = false
 
         self.panel = created
         return created
@@ -74,8 +79,9 @@ final class AnchoredPanelController {
         let screen = anchor.screen ?? NSScreen.main ?? NSScreen.screens.first
         let visible = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: size.width, height: size.height)
 
-        let y = visible.maxY - size.height - 4
-        let x = max(visible.minX + 8, min(anchor.x - size.width / 2, visible.maxX - size.width - 8))
+        // Tight gap under menu bar.
+        let y = visible.maxY - size.height - 2
+        let x = max(visible.minX + 6, min(anchor.x - size.width / 2, visible.maxX - size.width - 6))
         return NSRect(x: x, y: y, width: size.width, height: size.height)
     }
 }
