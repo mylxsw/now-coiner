@@ -14,32 +14,27 @@ struct CoinRowView: View {
     let onOpenTradingView: () -> Void
     let onOpenExchange: () -> Void
 
+    @State private var isHovered = false
+
     var body: some View {
         HStack(spacing: 12) {
-            Circle()
-                .fill(iconColor)
-                .frame(width: 32, height: 32)
-                .overlay(
-                    Text(iconText)
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.white)
-                )
+            iconView
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(row.coin.symbol.uppercased())
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(TickerPadColors.textPrimary)
                 Text(row.coin.name)
                     .font(.system(size: 11, weight: .regular))
-                    .foregroundStyle(Color(hex: "8E8E93"))
+                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .lineLimit(1)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer()
-
-            VStack(alignment: .trailing, spacing: 2) {
+            VStack(alignment: .trailing, spacing: 3) {
                 Text(priceText)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(TickerPadColors.textPrimary)
 
                 Text(changeText)
                     .font(.system(size: 11, weight: .medium))
@@ -47,19 +42,21 @@ struct CoinRowView: View {
 
                 if let sparkline = row.sparkline?.prices, sparkline.count >= 2 {
                     MiniSparklineView(prices: sparkline, color: changeColor)
-                        .frame(width: 50, height: 18)
+                        .frame(width: 86, height: 18)
                 }
             }
         }
         .padding(.vertical, 10)
         .padding(.horizontal, 12)
-        .background(row.isSelected ? Color(hex: "9333EA33") : Color.clear)
+        .background(backgroundFill)
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(row.isSelected ? Color(hex: "9333EA") : Color.clear, lineWidth: 1)
+                .stroke(borderColor, lineWidth: row.isSelected ? 1 : 0.5)
         )
-        .contentShape(Rectangle())
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .contentShape(RoundedRectangle(cornerRadius: 8))
         .onTapGesture(perform: onTap)
+        .onHover { isHovered = $0 }
         .contextMenu {
             Button(row.isPinned ? "Unpin" : "Pin", action: onPinToggle)
             Button("About \(row.coin.name)", action: onOpenDetail)
@@ -73,6 +70,41 @@ struct CoinRowView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilitySummary)
         .accessibilityHint("Press Return to open detail, Delete to remove when selected")
+    }
+
+    private var backgroundFill: Color {
+        if row.isSelected {
+            return TickerPadColors.selectionFill
+        }
+        return isHovered ? TickerPadColors.secondaryPanel.opacity(0.45) : Color.clear
+    }
+
+    private var borderColor: Color {
+        row.isSelected ? TickerPadColors.selectionStroke : TickerPadColors.divider.opacity(0.15)
+    }
+
+    private var iconView: some View {
+        Circle()
+            .fill(iconFill)
+            .frame(width: 32, height: 32)
+            .overlay(
+                Text(iconText)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(.white)
+            )
+    }
+
+    private var iconFill: AnyShapeStyle {
+        if row.coin.symbol.lowercased() == "sol" {
+            return AnyShapeStyle(
+                LinearGradient(
+                    colors: [Color(hex: "9945FF"), Color(hex: "14F195")],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+        }
+        return AnyShapeStyle(iconColor)
     }
 
     private var priceText: String {
@@ -105,14 +137,14 @@ struct CoinRowView: View {
 
     private var changeColor: Color {
         guard let value = row.price?.priceChangePercent24h else {
-            return Color(hex: "8E8E93")
+            return TickerPadColors.textSecondary
         }
 
         switch colorScheme {
         case .greenUpRedDown:
-            return value >= 0 ? Color(hex: "34C759") : Color(hex: "FF453A")
+            return value >= 0 ? TickerPadColors.green : TickerPadColors.red
         case .redUpGreenDown:
-            return value >= 0 ? Color(hex: "FF453A") : Color(hex: "34C759")
+            return value >= 0 ? TickerPadColors.red : TickerPadColors.green
         }
     }
 
@@ -148,8 +180,21 @@ private struct MiniSparklineView: View {
                 y: .value("Price", value)
             )
             .interpolationMethod(.catmullRom)
-            .lineStyle(StrokeStyle(lineWidth: 1.5))
+            .lineStyle(StrokeStyle(lineWidth: 1.6, lineCap: .round))
             .foregroundStyle(color)
+
+            AreaMark(
+                x: .value("Index", index),
+                y: .value("Price", value)
+            )
+            .interpolationMethod(.catmullRom)
+            .foregroundStyle(
+                LinearGradient(
+                    colors: [color.opacity(0.18), color.opacity(0.02)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
         }
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)

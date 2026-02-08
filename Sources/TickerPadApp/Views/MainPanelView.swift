@@ -16,70 +16,67 @@ struct MainPanelView: View {
             if viewModel.visibleRows.isEmpty {
                 emptyView
             } else {
-                List(selection: selectionBinding) {
-                    ForEach(viewModel.visibleRows) { row in
-                        CoinRowView(
-                            row: row,
-                            currencyCode: viewModel.settings.vsCurrency,
-                            colorScheme: viewModel.settings.priceColorScheme,
-                            onTap: {
-                                viewModel.selectionToggle(coinID: row.coin.id)
-                            },
-                            onPinToggle: {
-                                Task { await viewModel.togglePin(coinID: row.coin.id) }
-                            },
-                            onOpenDetail: {
-                                detailCoinID = CoinDetailSheetItem(coinID: row.coin.id)
-                            },
-                            onMoveTop: {
-                                Task { await viewModel.moveCoinToTop(coinID: row.coin.id) }
-                            },
-                            onRemove: {
-                                Task { await viewModel.removeCoin(coinID: row.coin.id) }
-                            },
-                            onOpenTradingView: {
-                                openTradingView(for: row.coin)
-                            },
-                            onOpenExchange: {
-                                openExchange(for: row.coin)
-                            }
-                        )
-                        .tag(row.coin.id)
-                        .listRowInsets(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
+                ScrollView {
+                    LazyVStack(spacing: 6) {
+                        ForEach(viewModel.visibleRows) { row in
+                            CoinRowView(
+                                row: row,
+                                currencyCode: viewModel.settings.vsCurrency,
+                                colorScheme: viewModel.settings.priceColorScheme,
+                                onTap: {
+                                    viewModel.selectionToggle(coinID: row.coin.id)
+                                },
+                                onPinToggle: {
+                                    Task { await viewModel.togglePin(coinID: row.coin.id) }
+                                },
+                                onOpenDetail: {
+                                    detailCoinID = CoinDetailSheetItem(coinID: row.coin.id)
+                                },
+                                onMoveTop: {
+                                    Task { await viewModel.moveCoinToTop(coinID: row.coin.id) }
+                                },
+                                onRemove: {
+                                    Task { await viewModel.removeCoin(coinID: row.coin.id) }
+                                },
+                                onOpenTradingView: {
+                                    openTradingView(for: row.coin)
+                                },
+                                onOpenExchange: {
+                                    openExchange(for: row.coin)
+                                }
+                            )
+                        }
                     }
-                    .onMove { source, destination in
-                        Task { await viewModel.moveCoin(from: source, to: destination) }
-                    }
-                }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-                .onMoveCommand(perform: handleMoveCommand)
-                .onDeleteCommand(perform: removeSelected)
-                .onExitCommand {
-                    viewModel.selectedCoinID = nil
-                }
-                .background {
-                    Button("Open Selected Detail", action: openSelectedDetail)
-                        .keyboardShortcut(.return, modifiers: [])
-                        .hidden()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 8)
                 }
                 .accessibilityLabel("Crypto Watchlist")
             }
         }
         .frame(width: 320, height: 420)
         .background(Color(hex: "1C1C1E"))
-        .sheet(item: $detailCoinID) { item in
+        .onMoveCommand(perform: handleMoveCommand)
+        .onDeleteCommand(perform: removeSelected)
+        .onExitCommand {
+            viewModel.selectedCoinID = nil
+        }
+        .background {
+            Button("Open Selected Detail", action: openSelectedDetail)
+                .keyboardShortcut(.return, modifiers: [])
+                .hidden()
+        }
+        .popover(item: $detailCoinID, arrowEdge: .top) { item in
             CoinDetailView(viewModel: viewModel, coinID: item.coinID)
+                .preferredColorScheme(resolvedColorScheme)
         }
     }
 
-    private var selectionBinding: Binding<String?> {
-        Binding(
-            get: { viewModel.selectedCoinID },
-            set: { viewModel.selectedCoinID = $0 }
-        )
+    private var resolvedColorScheme: ColorScheme? {
+        switch viewModel.settings.appearanceMode {
+        case .light: return .light
+        case .dark: return .dark
+        case .system: return nil
+        }
     }
 
     private var header: some View {

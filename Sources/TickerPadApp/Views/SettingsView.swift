@@ -3,118 +3,217 @@ import TickerPadCore
 
 struct SettingsView: View {
     @ObservedObject var viewModel: TickerViewModel
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("通用") {
-                    Toggle("开机自启动", isOn: Binding(
-                        get: { viewModel.settings.launchAtLogin },
-                        set: { value in
-                            Task { await viewModel.updateSettings { $0.launchAtLogin = value } }
-                        }
-                    ))
-
-                    Picker("计价货币", selection: Binding(
-                        get: { viewModel.settings.vsCurrency },
-                        set: { value in
-                            Task { await viewModel.updateSettings { $0.vsCurrency = value } }
-                            Task { await viewModel.refreshMarketData(includeSparkline: true) }
-                        }
-                    )) {
-                        Text("USD").tag("usd")
-                        Text("EUR").tag("eur")
-                        Text("GBP").tag("gbp")
-                        Text("CNY").tag("cny")
-                        Text("JPY").tag("jpy")
-                    }
-
-                    TextField("全局快捷键", text: Binding(
-                        get: { viewModel.settings.globalShortcut },
-                        set: { value in
-                            Task { await viewModel.updateSettings { $0.globalShortcut = value } }
-                        }
-                    ))
-                }
-
-                Section("显示") {
-                    Picker("菜单栏样式", selection: Binding(
-                        get: { viewModel.settings.menuBarDisplayStyle },
-                        set: { value in
-                            Task { await viewModel.updateSettings { $0.menuBarDisplayStyle = value } }
-                        }
-                    )) {
-                        ForEach(MenuBarStyle.allCases, id: \.self) { item in
-                            Text(item.title).tag(item)
-                        }
-                    }
-
-                    Picker("涨跌颜色", selection: Binding(
-                        get: { viewModel.settings.priceColorScheme },
-                        set: { value in
-                            Task { await viewModel.updateSettings { $0.priceColorScheme = value } }
-                        }
-                    )) {
-                        Text("绿涨红跌").tag(PriceColorScheme.greenUpRedDown)
-                        Text("红涨绿跌").tag(PriceColorScheme.redUpGreenDown)
-                    }
-
-                    Picker("外观模式", selection: Binding(
-                        get: { viewModel.settings.appearanceMode },
-                        set: { value in
-                            Task { await viewModel.updateSettings { $0.appearanceMode = value } }
-                        }
-                    )) {
-                        Text("浅色").tag(AppearanceMode.light)
-                        Text("深色").tag(AppearanceMode.dark)
-                        Text("跟随系统").tag(AppearanceMode.system)
-                    }
-                }
-
-                Section("数据") {
-                    Picker("刷新间隔", selection: Binding(
-                        get: { viewModel.settings.refreshInterval },
-                        set: { value in
-                            Task { await viewModel.updateSettings { $0.refreshInterval = value } }
-                        }
-                    )) {
-                        Text("实时").tag(RefreshInterval.realtime)
-                        Text("10 秒").tag(RefreshInterval.seconds10)
-                        Text("30 秒").tag(RefreshInterval.seconds30)
-                        Text("1 分钟").tag(RefreshInterval.minute1)
-                        Text("5 分钟").tag(RefreshInterval.minutes5)
-                    }
-
-                    Picker("默认交易所", selection: Binding(
-                        get: { viewModel.settings.defaultExchange },
-                        set: { value in
-                            Task { await viewModel.updateSettings { $0.defaultExchange = value } }
-                        }
-                    )) {
-                        Text("Binance").tag(Exchange.binance)
-                        Text("Coinbase").tag(Exchange.coinbase)
-                        Text("OKX").tag(Exchange.okx)
-                    }
-
-                    Picker("默认数据源", selection: Binding(
-                        get: { viewModel.settings.defaultDataSource },
-                        set: { value in
-                            Task { await viewModel.updateSettings { $0.defaultDataSource = value } }
-                        }
-                    )) {
-                        Text("CoinGecko").tag(DataSource.coinGecko)
-                        Text("Binance").tag(DataSource.binance)
-                    }
-                }
+        VStack(spacing: 0) {
+            HStack {
+                Text("设置")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                Spacer()
             }
-            .navigationTitle("设置")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("关闭") { dismiss() }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+
+            Divider().overlay(Color(hex: "2C2C2E"))
+
+            ScrollView {
+                VStack(spacing: 12) {
+                    settingsSection(title: "通用") {
+                        ToggleRow(title: "开机自启动", isOn: Binding(
+                            get: { viewModel.settings.launchAtLogin },
+                            set: { value in
+                                Task { await viewModel.updateSettings { $0.launchAtLogin = value } }
+                            }
+                        ))
+
+                        PickerRow(title: "计价货币") {
+                            Picker("", selection: Binding(
+                                get: { viewModel.settings.vsCurrency },
+                                set: { value in
+                                    Task { await viewModel.updateSettings { $0.vsCurrency = value } }
+                                    Task { await viewModel.refreshMarketData(includeSparkline: true) }
+                                }
+                            )) {
+                                Text("USD").tag("usd")
+                                Text("EUR").tag("eur")
+                                Text("GBP").tag("gbp")
+                                Text("CNY").tag("cny")
+                                Text("JPY").tag("jpy")
+                            }
+                            .labelsHidden()
+                            .frame(width: 130)
+                        }
+
+                        TextFieldRow(title: "全局快捷键", text: Binding(
+                            get: { viewModel.settings.globalShortcut },
+                            set: { value in
+                                Task { await viewModel.updateSettings { $0.globalShortcut = value } }
+                            }
+                        ))
+                    }
+
+                    settingsSection(title: "显示") {
+                        PickerRow(title: "菜单栏样式") {
+                            Picker("", selection: Binding(
+                                get: { viewModel.settings.menuBarDisplayStyle },
+                                set: { value in
+                                    Task { await viewModel.updateSettings { $0.menuBarDisplayStyle = value } }
+                                }
+                            )) {
+                                ForEach(MenuBarStyle.allCases, id: \.self) { item in
+                                    Text(item.title).tag(item)
+                                }
+                            }
+                            .labelsHidden()
+                            .frame(width: 160)
+                        }
+
+                        PickerRow(title: "涨跌颜色") {
+                            Picker("", selection: Binding(
+                                get: { viewModel.settings.priceColorScheme },
+                                set: { value in
+                                    Task { await viewModel.updateSettings { $0.priceColorScheme = value } }
+                                }
+                            )) {
+                                Text("绿涨红跌").tag(PriceColorScheme.greenUpRedDown)
+                                Text("红涨绿跌").tag(PriceColorScheme.redUpGreenDown)
+                            }
+                            .labelsHidden()
+                            .frame(width: 140)
+                        }
+
+                        PickerRow(title: "外观模式") {
+                            Picker("", selection: Binding(
+                                get: { viewModel.settings.appearanceMode },
+                                set: { value in
+                                    Task { await viewModel.updateSettings { $0.appearanceMode = value } }
+                                }
+                            )) {
+                                Text("浅色").tag(AppearanceMode.light)
+                                Text("深色").tag(AppearanceMode.dark)
+                                Text("跟随系统").tag(AppearanceMode.system)
+                            }
+                            .labelsHidden()
+                            .frame(width: 140)
+                        }
+                    }
+
+                    settingsSection(title: "数据") {
+                        PickerRow(title: "刷新间隔") {
+                            Picker("", selection: Binding(
+                                get: { viewModel.settings.refreshInterval },
+                                set: { value in
+                                    Task { await viewModel.updateSettings { $0.refreshInterval = value } }
+                                }
+                            )) {
+                                Text("实时").tag(RefreshInterval.realtime)
+                                Text("10 秒").tag(RefreshInterval.seconds10)
+                                Text("30 秒").tag(RefreshInterval.seconds30)
+                                Text("1 分钟").tag(RefreshInterval.minute1)
+                                Text("5 分钟").tag(RefreshInterval.minutes5)
+                            }
+                            .labelsHidden()
+                            .frame(width: 130)
+                        }
+
+                        PickerRow(title: "默认交易所") {
+                            Picker("", selection: Binding(
+                                get: { viewModel.settings.defaultExchange },
+                                set: { value in
+                                    Task { await viewModel.updateSettings { $0.defaultExchange = value } }
+                                }
+                            )) {
+                                Text("Binance").tag(Exchange.binance)
+                                Text("Coinbase").tag(Exchange.coinbase)
+                                Text("OKX").tag(Exchange.okx)
+                            }
+                            .labelsHidden()
+                            .frame(width: 130)
+                        }
+
+                        PickerRow(title: "默认数据源") {
+                            Picker("", selection: Binding(
+                                get: { viewModel.settings.defaultDataSource },
+                                set: { value in
+                                    Task { await viewModel.updateSettings { $0.defaultDataSource = value } }
+                                }
+                            )) {
+                                Text("CoinGecko").tag(DataSource.coinGecko)
+                                Text("Binance").tag(DataSource.binance)
+                            }
+                            .labelsHidden()
+                            .frame(width: 130)
+                        }
+                    }
                 }
+                .padding(12)
             }
         }
-        .frame(width: 420, height: 360)
+        .frame(width: 320, height: 440)
+        .background(Color(hex: "1C1C1E"))
+    }
+
+    @ViewBuilder
+    private func settingsSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color(hex: "8E8E93"))
+
+            content()
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(hex: "2C2C2E"))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+private struct ToggleRow: View {
+    let title: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .foregroundStyle(.white)
+                .font(.system(size: 14))
+            Spacer()
+            Toggle("", isOn: $isOn)
+                .labelsHidden()
+        }
+    }
+}
+
+private struct PickerRow<Content: View>: View {
+    let title: String
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .foregroundStyle(.white)
+                .font(.system(size: 14))
+            Spacer()
+            content()
+        }
+    }
+}
+
+private struct TextFieldRow: View {
+    let title: String
+    @Binding var text: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .foregroundStyle(.white)
+                .font(.system(size: 14))
+            Spacer()
+            TextField("⌘⇧C", text: $text)
+                .textFieldStyle(.roundedBorder)
+                .frame(width: 140)
+        }
     }
 }

@@ -9,6 +9,7 @@ struct TickerPadApp: App {
 
     @State private var shortcutMonitor: GlobalShortcutMonitor?
     @State private var floatingPanelController = FloatingPanelController()
+    @State private var didBootstrap = false
 
     init() {
         let container = AppContainer.makeDefault()
@@ -24,21 +25,15 @@ struct TickerPadApp: App {
             )
             .preferredColorScheme(preferredColorScheme)
             .task {
-                await viewModel.load()
-                configureGlobalShortcut()
-                LaunchAtLoginManager.apply(enabled: viewModel.settings.launchAtLogin)
+                await bootstrapIfNeeded()
             }
-            .sheet(isPresented: $showingSearch) {
+            .popover(isPresented: $showingSearch, arrowEdge: .top) {
                 SearchPanelView(viewModel: viewModel)
+                    .preferredColorScheme(preferredColorScheme)
             }
-            .sheet(isPresented: $showingSettings) {
+            .popover(isPresented: $showingSettings, arrowEdge: .top) {
                 SettingsView(viewModel: viewModel)
-            }
-            .onDisappear {
-                Task {
-                    await viewModel.shutdown()
-                }
-                shortcutMonitor?.stop()
+                    .preferredColorScheme(preferredColorScheme)
             }
             .onChange(of: viewModel.settings.globalShortcut) { _, newValue in
                 shortcutMonitor?.update(shortcutText: newValue)
@@ -48,8 +43,21 @@ struct TickerPadApp: App {
             }
         } label: {
             MenuBarTickerView(viewModel: viewModel)
+                .task {
+                    await bootstrapIfNeeded()
+                }
         }
         .menuBarExtraStyle(.window)
+    }
+
+    @MainActor
+    private func bootstrapIfNeeded() async {
+        guard !didBootstrap else { return }
+        didBootstrap = true
+
+        await viewModel.load()
+        configureGlobalShortcut()
+        LaunchAtLoginManager.apply(enabled: viewModel.settings.launchAtLogin)
     }
 
     private func configureGlobalShortcut() {
@@ -86,7 +94,9 @@ private struct MenuBarTickerView: View {
     var body: some View {
         Text(labelText)
             .font(.system(size: 12, weight: .regular))
+            .monospacedDigit()
             .lineLimit(1)
+            .truncationMode(.tail)
     }
 
     private var labelText: String {
@@ -95,7 +105,7 @@ private struct MenuBarTickerView: View {
             return "TickerPad"
         }
 
-        return rows.compactMap { row in
+        let parts: [String] = rows.compactMap { (row: CoinRowState) -> String? in
             guard let price = row.price else { return nil }
             return PriceFormatter.menuBarText(
                 symbol: row.coin.symbol,
@@ -104,7 +114,9 @@ private struct MenuBarTickerView: View {
                 currencyCode: viewModel.settings.vsCurrency,
                 style: viewModel.settings.menuBarDisplayStyle
             )
-        }.joined(separator: " | ")
+        }
+
+        return parts.isEmpty ? "TickerPad" : parts.joined(separator: " | ")
     }
 }
 
@@ -120,11 +132,13 @@ private struct ShortcutPanelRootView: View {
             showingSettings: $showingSettings
         )
         .preferredColorScheme(preferredColorScheme)
-        .sheet(isPresented: $showingSearch) {
+        .popover(isPresented: $showingSearch, arrowEdge: .top) {
             SearchPanelView(viewModel: viewModel)
+                .preferredColorScheme(preferredColorScheme)
         }
-        .sheet(isPresented: $showingSettings) {
+        .popover(isPresented: $showingSettings, arrowEdge: .top) {
             SettingsView(viewModel: viewModel)
+                .preferredColorScheme(preferredColorScheme)
         }
     }
 
