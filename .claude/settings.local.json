@@ -5,7 +5,10 @@
       "Bash(cat:*)",
       "WebFetch(domain:www.coingecko.com)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:algotrading101.com)"
+      "WebFetch(domain:algotrading101.com)",
+      "Bash(swift build:*)",
+      "WebSearch",
+      "Bash(swift test:*)"
     ]
   }
 }

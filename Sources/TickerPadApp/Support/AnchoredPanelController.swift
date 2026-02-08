@@ -28,26 +28,32 @@ final class AnchoredPanelController {
 
         panel.setFrame(startFrame, display: false)
         panel.alphaValue = 0
-        panel.makeKeyAndOrderFront(nil)
-        panel.makeMain()
 
-        DispatchQueue.main.async {
-            panel.makeKeyAndOrderFront(nil)
-            panel.makeFirstResponder(host)
-        }
+        // Promote activation policy so the OS delivers keyboard events to this
+        // process. Accessory-policy apps don't receive key events even when
+        // activated — the policy itself must be .regular.
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+        panel.makeKeyAndOrderFront(nil)
 
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.14
             context.timingFunction = CAMediaTimingFunction(name: .easeOut)
             panel.animator().alphaValue = 1
             panel.animator().setFrame(targetFrame, display: true)
+        } completionHandler: {
+            DispatchQueue.main.async {
+                panel.makeKeyAndOrderFront(nil)
+                // Restore accessory policy after the panel is firmly key.
+                // The panel retains key window status after the switch.
+                NSApp.setActivationPolicy(.accessory)
+            }
         }
-
-        NSApp.activate(ignoringOtherApps: true)
     }
 
     func close() {
         panel?.orderOut(nil)
+        NSApp.setActivationPolicy(.accessory)
     }
 
     var window: NSWindow? {

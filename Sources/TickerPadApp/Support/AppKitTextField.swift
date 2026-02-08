@@ -34,11 +34,21 @@ struct AppKitTextField: NSViewRepresentable {
         field.textColor = NSColor.white
         field.font = NSFont.systemFont(ofSize: 14, weight: .regular)
 
-        DispatchQueue.main.async {
-            field.window?.makeFirstResponder(field)
-        }
+        // Retry until the window is key and accepts first responder.
+        // The panel may not be key yet when makeNSView runs.
+        scheduleFirstResponder(for: field)
 
         return field
+    }
+
+    private func scheduleFirstResponder(for field: NSTextField, attempts: Int = 10) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            if let window = field.window, window.isKeyWindow {
+                window.makeFirstResponder(field)
+            } else if attempts > 1 {
+                self.scheduleFirstResponder(for: field, attempts: attempts - 1)
+            }
+        }
     }
 
     func updateNSView(_ nsView: NSTextField, context: Context) {
@@ -47,8 +57,9 @@ struct AppKitTextField: NSViewRepresentable {
         }
 
         DispatchQueue.main.async {
-            if nsView.window?.firstResponder !== nsView.currentEditor() {
-                nsView.window?.makeFirstResponder(nsView)
+            guard let window = nsView.window, window.isKeyWindow else { return }
+            if window.firstResponder !== nsView.currentEditor() {
+                window.makeFirstResponder(nsView)
             }
         }
     }
