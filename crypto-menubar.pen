@@ -1,0 +1,2861 @@
+{
+  "version": "2.6",
+  "children": [
+    {
+      "type": "frame",
+      "id": "MjDfi",
+      "x": 900,
+      "y": 0,
+      "name": "TickerPad - Main Panel",
+      "clip": true,
+      "width": 320,
+      "fill": "#1C1C1E",
+      "cornerRadius": 12,
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "VjLOx",
+          "name": "header",
+          "width": "fill_container",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#2C2C2E"
+          },
+          "padding": [
+            12,
+            16
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "jROdg",
+              "name": "headerTitle",
+              "fill": "#FFFFFF",
+              "content": "TickerPad",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "cNjFD",
+              "name": "headerActions",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "AzSBn",
+                  "name": "addBtn",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "plus",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8E8E93"
+                },
+                {
+                  "type": "icon_font",
+                  "id": "XnHtZ",
+                  "name": "settingsBtn",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "settings",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8E8E93"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "jltn9",
+          "name": "Crypto List",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            8,
+            0
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "w8GK6",
+              "name": "BTC Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "SVpOD",
+                  "name": "btcIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#F7931A",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "spCEq",
+                      "name": "btcIconText",
+                      "fill": "#FFFFFF",
+                      "content": "₿",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "g7RCc",
+                  "name": "btcInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "zKiYr",
+                      "name": "btcName",
+                      "fill": "#FFFFFF",
+                      "content": "BTC",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "mPDpw",
+                      "name": "btcFullName",
+                      "fill": "#8E8E93",
+                      "content": "Bitcoin",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "c9FI4",
+                  "name": "btcPriceInfo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "zyFXf",
+                      "name": "btcPrice",
+                      "fill": "#FFFFFF",
+                      "content": "$16,903.83",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "AO3C8",
+                      "name": "btcChange",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "1EHwZ",
+                          "name": "btcArrow",
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#34C759"
+                        },
+                        {
+                          "type": "text",
+                          "id": "nWLCI",
+                          "name": "btcPercent",
+                          "fill": "#34C759",
+                          "content": "1.68%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "y17Cp",
+              "name": "ETH Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Ntrl7",
+                  "name": "ethIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#627EEA",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "w6Jjs",
+                      "name": "ethIconText",
+                      "fill": "#FFFFFF",
+                      "content": "Ξ",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "pwaEe",
+                  "name": "ethInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "K9MSL",
+                      "name": "ethName",
+                      "fill": "#FFFFFF",
+                      "content": "ETH",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "RGMBm",
+                      "name": "ethFullName",
+                      "fill": "#8E8E93",
+                      "content": "Ethereum",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "gsmK9",
+                  "name": "ethPriceInfo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "VjgFv",
+                      "name": "ethPrice",
+                      "fill": "#FFFFFF",
+                      "content": "$1,223.83",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "mgzLc",
+                      "name": "ethChange",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "OmLwX",
+                          "name": "ethArrow",
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#34C759"
+                        },
+                        {
+                          "type": "text",
+                          "id": "PpWnh",
+                          "name": "ethPercent",
+                          "fill": "#34C759",
+                          "content": "1.11%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Os7pT",
+              "name": "BNB Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "RC14o",
+                  "name": "bnbIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#F3BA2F",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "zeXFn",
+                      "name": "bnbIconText",
+                      "fill": "#FFFFFF",
+                      "content": "B",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "RAZTs",
+                  "name": "bnbInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ij7y5",
+                      "name": "bnbName",
+                      "fill": "#FFFFFF",
+                      "content": "BNB",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "F4BZI",
+                      "name": "bnbFullName",
+                      "fill": "#8E8E93",
+                      "content": "BNB",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "mnDhe",
+                  "name": "bnbPriceInfo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "FzwsA",
+                      "name": "bnbPrice",
+                      "fill": "#FFFFFF",
+                      "content": "$273.20",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "A0BXA",
+                      "name": "bnbChange",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "YTFum",
+                          "name": "bnbArrow",
+                          "rotation": 180,
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FF3B30"
+                        },
+                        {
+                          "type": "text",
+                          "id": "TeT2k",
+                          "name": "bnbPercent",
+                          "fill": "#FF3B30",
+                          "content": "0.15%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "X53zQ",
+              "name": "SOL Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "USyBf",
+                  "name": "solIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": 45,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#9945FF",
+                        "position": 0
+                      },
+                      {
+                        "color": "#14F195",
+                        "position": 1
+                      }
+                    ]
+                  },
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "JJV5j",
+                      "name": "solIconText",
+                      "fill": "#FFFFFF",
+                      "content": "S",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "PyDla",
+                  "name": "solInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "shQhs",
+                      "name": "solName",
+                      "fill": "#FFFFFF",
+                      "content": "SOL",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "yHHUW",
+                      "name": "solFullName",
+                      "fill": "#8E8E93",
+                      "content": "Solana",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "c7dWp",
+                  "name": "solPriceInfo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gS07p",
+                      "name": "solPrice",
+                      "fill": "#FFFFFF",
+                      "content": "$13.72",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "0youC",
+                      "name": "solChange",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "3J0sF",
+                          "name": "solArrow",
+                          "rotation": 180,
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FF3B30"
+                        },
+                        {
+                          "type": "text",
+                          "id": "rc8TM",
+                          "name": "solPercent",
+                          "fill": "#FF3B30",
+                          "content": "4.07%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "8IpC9",
+              "name": "UNI Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "1AB6W",
+                  "name": "uniIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#FF007A",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "x6Lrb",
+                      "name": "uniIconText",
+                      "content": "🦄",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "am5dm",
+                  "name": "uniInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "ioVrz",
+                      "name": "uniName",
+                      "fill": "#FFFFFF",
+                      "content": "UNI",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "OYVqy",
+                      "name": "uniFullName",
+                      "fill": "#8E8E93",
+                      "content": "Uniswap",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Do0k4",
+                  "name": "uniPriceInfo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "UKcvj",
+                      "name": "uniPrice",
+                      "fill": "#FFFFFF",
+                      "content": "$5.91",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Pq5SQ",
+                      "name": "uniChange",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "9aTWj",
+                          "name": "uniArrow",
+                          "rotation": 180,
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FF3B30"
+                        },
+                        {
+                          "type": "text",
+                          "id": "h6VaZ",
+                          "name": "uniPercent",
+                          "fill": "#FF3B30",
+                          "content": "0.14%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "1IlJW",
+              "name": "ATOM Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "h1eX9",
+                  "name": "atomIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#2E3148",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "MRoaN",
+                      "name": "atomIconText",
+                      "fill": "#FFFFFF",
+                      "content": "⚛",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Ye0PP",
+                  "name": "atomInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gL4V0",
+                      "name": "atomName",
+                      "fill": "#FFFFFF",
+                      "content": "ATOM",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Y1CmM",
+                      "name": "atomFullName",
+                      "fill": "#8E8E93",
+                      "content": "Cosmos Hub",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "sVWOB",
+                  "name": "atomPriceInfo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "aGhPX",
+                      "name": "atomPrice",
+                      "fill": "#FFFFFF",
+                      "content": "$10.20",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JEpUQ",
+                      "name": "atomChange",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "1AjV1",
+                          "name": "atomArrow",
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#34C759"
+                        },
+                        {
+                          "type": "text",
+                          "id": "zf6Q8",
+                          "name": "atomPercent",
+                          "fill": "#34C759",
+                          "content": "0.72%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "PGGMg",
+              "name": "ALGO Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "KkxwD",
+                  "name": "algoIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#000000",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "YsUS8",
+                      "name": "algoIconText",
+                      "fill": "#FFFFFF",
+                      "content": "A",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NCqB8",
+                  "name": "algoInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "i4eFA",
+                      "name": "algoName",
+                      "fill": "#FFFFFF",
+                      "content": "ALGO",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "apMTC",
+                      "name": "algoFullName",
+                      "fill": "#8E8E93",
+                      "content": "Algorand",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "MTw3U",
+                  "name": "algoPriceInfo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "9cPXv",
+                      "name": "algoPrice",
+                      "fill": "#FFFFFF",
+                      "content": "$0.2757",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "KLctU",
+                      "name": "algoChange",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "n23KC",
+                          "name": "algoArrow",
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#34C759"
+                        },
+                        {
+                          "type": "text",
+                          "id": "BGCJs",
+                          "name": "algoPercent",
+                          "fill": "#34C759",
+                          "content": "1.27%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Y2daw",
+      "x": 1260,
+      "y": 0,
+      "name": "TickerPad - Search Panel",
+      "clip": true,
+      "width": 280,
+      "fill": "#1C1C1E",
+      "cornerRadius": 12,
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "tUORR",
+          "name": "searchHeader",
+          "width": "fill_container",
+          "fill": "#2C2C2E",
+          "gap": 8,
+          "padding": [
+            10,
+            12
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "LCBps",
+              "name": "searchIcon",
+              "width": 16,
+              "height": 16,
+              "iconFontName": "search",
+              "iconFontFamily": "lucide",
+              "fill": "#8E8E93"
+            },
+            {
+              "type": "text",
+              "id": "B1YXQ",
+              "name": "searchInput",
+              "fill": "#FFFFFF",
+              "content": "btc",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "RHi30",
+          "name": "Search Results",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            8,
+            0
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "0QyqW",
+              "name": "Bitcoin Search Result",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "M5UHI",
+                  "name": "btcSearchIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#F7931A",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "BHGxy",
+                      "name": "btcSearchIconText",
+                      "fill": "#FFFFFF",
+                      "content": "₿",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "oQnH6",
+                  "name": "btcSearchInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "zpwJB",
+                      "name": "btcSearchName",
+                      "fill": "#FFFFFF",
+                      "content": "Bitcoin",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "gF0Pz",
+                      "name": "btcSearchTicker",
+                      "fill": "#8E8E93",
+                      "content": "BTC",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "XxSBm",
+                  "name": "btcAddBtn",
+                  "fill": "#007AFF",
+                  "cornerRadius": 6,
+                  "padding": [
+                    6,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "aoy1V",
+                      "name": "btcAddText",
+                      "fill": "#FFFFFF",
+                      "content": "Add",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ylCgR",
+              "name": "Bitcoin Cash Result",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "UA6R5",
+                  "name": "bchIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#8DC351",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "p9GT4",
+                      "name": "bchIconText",
+                      "fill": "#FFFFFF",
+                      "content": "₿",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "IpX71",
+                  "name": "bchInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Yn8rU",
+                      "name": "bchName",
+                      "fill": "#FFFFFF",
+                      "content": "Bitcoin Cash",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "BRkcz",
+                      "name": "bchTicker",
+                      "fill": "#8E8E93",
+                      "content": "BCH",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "GipdH",
+                  "name": "bchAddBtn",
+                  "fill": "#007AFF",
+                  "cornerRadius": 6,
+                  "padding": [
+                    6,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "njPN8",
+                      "name": "bchAddText",
+                      "fill": "#FFFFFF",
+                      "content": "Add",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bGyFq",
+              "name": "Bitcoin SV Result",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "qC5Go",
+                  "name": "bsvIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#EAB300",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DDaoo",
+                      "name": "bsvIconText",
+                      "fill": "#FFFFFF",
+                      "content": "₿",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kqD21",
+                  "name": "bsvInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "H12oH",
+                      "name": "bsvName",
+                      "fill": "#FFFFFF",
+                      "content": "Bitcoin SV",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "TvHrc",
+                      "name": "bsvTicker",
+                      "fill": "#8E8E93",
+                      "content": "BSV",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Cx9cq",
+                  "name": "bsvAddBtn",
+                  "fill": "#007AFF",
+                  "cornerRadius": 6,
+                  "padding": [
+                    6,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "m4LxT",
+                      "name": "bsvAddText",
+                      "fill": "#FFFFFF",
+                      "content": "Add",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "m6kSi",
+              "name": "BitTorrent Result",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "i6uqc",
+                  "name": "bttIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#000000",
+                  "cornerRadius": 16,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#3C3C3E"
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "MJdyu",
+                      "name": "bttIconText",
+                      "fill": "#FFFFFF",
+                      "content": "B",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "9blJk",
+                  "name": "bttInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "VV86i",
+                      "name": "bttName",
+                      "fill": "#FFFFFF",
+                      "content": "BitTorrent",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "GJUgn",
+                      "name": "bttTicker",
+                      "fill": "#8E8E93",
+                      "content": "BTT",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "mCoNa",
+                  "name": "bttAddBtn",
+                  "fill": "#007AFF",
+                  "cornerRadius": 6,
+                  "padding": [
+                    6,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "hL5z5",
+                      "name": "bttAddText",
+                      "fill": "#FFFFFF",
+                      "content": "Add",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "RXOYC",
+              "name": "BIDAO Result",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "QwLPz",
+                  "name": "bidaoIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#F3BA2F",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "e7mKQ",
+                      "name": "bidaoIconText",
+                      "fill": "#000000",
+                      "content": "B",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "1xO4U",
+                  "name": "bidaoInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "FTxl7",
+                      "name": "bidaoName",
+                      "fill": "#FFFFFF",
+                      "content": "BIDAO",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "p0EiT",
+                      "name": "bidaoTicker",
+                      "fill": "#8E8E93",
+                      "content": "BIT",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "PZ2rM",
+                  "name": "bidaoAddBtn",
+                  "fill": "#007AFF",
+                  "cornerRadius": 6,
+                  "padding": [
+                    6,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "n449v",
+                      "name": "bidaoAddText",
+                      "fill": "#FFFFFF",
+                      "content": "Add",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "WR1y6",
+              "name": "Bitcoin Gold Result",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "egkJA",
+                  "name": "btgIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#EBA809",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "XJttn",
+                      "name": "btgIconText",
+                      "fill": "#FFFFFF",
+                      "content": "₿",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "nLs6O",
+                  "name": "btgInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "yrf4u",
+                      "name": "btgName",
+                      "fill": "#FFFFFF",
+                      "content": "Bitcoin Gold",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "djUoe",
+                      "name": "btgTicker",
+                      "fill": "#8E8E93",
+                      "content": "BTG",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "g2DuM",
+                  "name": "btgAddBtn",
+                  "fill": "#007AFF",
+                  "cornerRadius": 6,
+                  "padding": [
+                    6,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "h5StN",
+                      "name": "btgAddText",
+                      "fill": "#FFFFFF",
+                      "content": "Add",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bqpdB",
+              "name": "Bitkub Coin Result",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "sBQoR",
+                  "name": "kubIcon",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#47B56D",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "XRPw6",
+                      "name": "kubIconText",
+                      "fill": "#FFFFFF",
+                      "content": "K",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "pb7yP",
+                  "name": "kubInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Y38Cy",
+                      "name": "kubName",
+                      "fill": "#FFFFFF",
+                      "content": "Bitkub Coin",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WTe7a",
+                      "name": "kubTicker",
+                      "fill": "#8E8E93",
+                      "content": "KUB",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "i0iKq",
+                  "name": "kubAddBtn",
+                  "fill": "#007AFF",
+                  "cornerRadius": 6,
+                  "padding": [
+                    6,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "K4fyJ",
+                      "name": "kubAddText",
+                      "fill": "#FFFFFF",
+                      "content": "Add",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "SCGKb",
+      "x": 1260,
+      "y": 420,
+      "name": "TickerPad - Context Menu",
+      "clip": true,
+      "width": 180,
+      "fill": "#2C2C2E",
+      "cornerRadius": 8,
+      "layout": "vertical",
+      "padding": [
+        6,
+        0
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "wQkeb",
+          "name": "menuItem1",
+          "width": "fill_container",
+          "gap": 10,
+          "padding": [
+            8,
+            12
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "XjJc9",
+              "name": "menuIcon1",
+              "width": 14,
+              "height": 14,
+              "iconFontName": "pin",
+              "iconFontFamily": "lucide",
+              "fill": "#FFFFFF"
+            },
+            {
+              "type": "text",
+              "id": "1UtN6",
+              "name": "menuText1",
+              "fill": "#FFFFFF",
+              "content": "Pin",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "RUJu7",
+          "name": "menuItem2",
+          "width": "fill_container",
+          "gap": 10,
+          "padding": [
+            8,
+            12
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "Ie18i",
+              "name": "menuIcon2",
+              "width": 14,
+              "height": 14,
+              "iconFontName": "info",
+              "iconFontFamily": "lucide",
+              "fill": "#FFFFFF"
+            },
+            {
+              "type": "text",
+              "id": "mxzOf",
+              "name": "menuText2",
+              "fill": "#FFFFFF",
+              "content": "About BNB",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "fTX3X",
+          "name": "divider",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "#3C3C3E"
+        },
+        {
+          "type": "frame",
+          "id": "RTc5Q",
+          "name": "menuItem3",
+          "width": "fill_container",
+          "gap": 10,
+          "padding": [
+            8,
+            12
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "orXfg",
+              "name": "menuIcon3",
+              "width": 14,
+              "height": 14,
+              "iconFontName": "arrow-up",
+              "iconFontFamily": "lucide",
+              "fill": "#FFFFFF"
+            },
+            {
+              "type": "text",
+              "id": "99SZP",
+              "name": "menuText3",
+              "fill": "#FFFFFF",
+              "content": "Move to top",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "mwDkV",
+          "name": "menuItem4",
+          "width": "fill_container",
+          "gap": 10,
+          "padding": [
+            8,
+            12
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "YgT2R",
+              "name": "menuIcon4",
+              "width": 14,
+              "height": 14,
+              "iconFontName": "external-link",
+              "iconFontFamily": "lucide",
+              "fill": "#FFFFFF"
+            },
+            {
+              "type": "text",
+              "id": "hSISt",
+              "name": "menuText4",
+              "fill": "#FFFFFF",
+              "content": "View on TradingView",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "z26aC",
+          "name": "divider2",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "#3C3C3E"
+        },
+        {
+          "type": "frame",
+          "id": "MucEU",
+          "name": "menuItem5",
+          "width": "fill_container",
+          "gap": 10,
+          "padding": [
+            8,
+            12
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "xFceJ",
+              "name": "menuIcon5",
+              "width": 14,
+              "height": 14,
+              "iconFontName": "trash-2",
+              "iconFontFamily": "lucide",
+              "fill": "#FF453A"
+            },
+            {
+              "type": "text",
+              "id": "Cb4DE",
+              "name": "menuText5",
+              "fill": "#FF453A",
+              "content": "Remove from List",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "CznBv",
+      "x": 900,
+      "y": -50,
+      "name": "MacOS Menu Bar",
+      "width": 650,
+      "height": 24,
+      "fill": "#1C1C1ECC",
+      "gap": 16,
+      "padding": [
+        0,
+        12
+      ],
+      "justifyContent": "end",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "HCimC",
+          "name": "tickerDisplay",
+          "gap": 6,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "wuE7u",
+              "name": "btcTicker",
+              "fill": "#FFFFFF",
+              "content": "BTC $16,903.83",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "FwbjU",
+              "name": "divider1",
+              "fill": "#8E8E93",
+              "content": "|",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "Tb60T",
+              "name": "ethTicker",
+              "fill": "#FFFFFF",
+              "content": "ETH $1,223.83",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "FmAkA",
+          "name": "menuIcons",
+          "gap": 12,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "WsDQe",
+              "name": "wifiIcon",
+              "width": 14,
+              "height": 14,
+              "iconFontName": "wifi",
+              "iconFontFamily": "lucide",
+              "fill": "#FFFFFF"
+            },
+            {
+              "type": "icon_font",
+              "id": "baf0Y",
+              "name": "batteryIcon",
+              "width": 16,
+              "height": 16,
+              "iconFontName": "battery-full",
+              "iconFontFamily": "lucide",
+              "fill": "#FFFFFF"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "jjhhP",
+          "name": "timeText",
+          "fill": "#FFFFFF",
+          "content": "14:38",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "500"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ycICH",
+      "x": 1560,
+      "y": 0,
+      "name": "TickerPad - With Selection",
+      "clip": true,
+      "width": 320,
+      "fill": "#1C1C1E",
+      "cornerRadius": 12,
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "KQzGD",
+          "name": "headerV2",
+          "width": "fill_container",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#2C2C2E"
+          },
+          "padding": [
+            12,
+            16
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "TW6s0",
+              "name": "headerTitleV2",
+              "fill": "#FFFFFF",
+              "content": "TickerPad",
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "lCWmP",
+              "name": "headerActionsV2",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "N4gOL",
+                  "name": "addBtnV2",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "plus",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8E8E93"
+                },
+                {
+                  "type": "icon_font",
+                  "id": "zorix",
+                  "name": "settingsBtnV2",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "settings",
+                  "iconFontFamily": "lucide",
+                  "fill": "#8E8E93"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "BVYC6",
+          "name": "Crypto List V2",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            8,
+            0
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "dAoBR",
+              "name": "BTC Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "VNXjG",
+                  "name": "btcIconV2",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#F7931A",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "t7HUq",
+                      "name": "btcIconTextV2",
+                      "fill": "#FFFFFF",
+                      "content": "₿",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "o11Ce",
+                  "name": "btcInfoV2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Ugd9j",
+                      "name": "btcNameV2",
+                      "fill": "#FFFFFF",
+                      "content": "BTC",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "AIDJw",
+                      "name": "btcFullNameV2",
+                      "fill": "#8E8E93",
+                      "content": "Bitcoin",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ZSYqk",
+                  "name": "btcPriceInfoV2",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "I9LcY",
+                      "name": "btcPriceV2",
+                      "fill": "#FFFFFF",
+                      "content": "$16,779.76",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "KcOSI",
+                      "name": "btcChangeV2",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "BbOVf",
+                          "name": "btcArrowV2",
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#34C759"
+                        },
+                        {
+                          "type": "text",
+                          "id": "3jMBz",
+                          "name": "btcPercentV2",
+                          "fill": "#34C759",
+                          "content": "1.25%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "gz93f",
+              "name": "ETH Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "2Oeqy",
+                  "name": "ethIconV2",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#627EEA",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "oyU7g",
+                      "name": "ethIconTextV2",
+                      "fill": "#FFFFFF",
+                      "content": "Ξ",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "8QiV0",
+                  "name": "ethInfoV2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "lc6EM",
+                      "name": "ethNameV2",
+                      "fill": "#FFFFFF",
+                      "content": "ETH",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "wdIBC",
+                      "name": "ethFullNameV2",
+                      "fill": "#8E8E93",
+                      "content": "Ethereum",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "6EnpA",
+                  "name": "ethPriceInfoV2",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "8qcva",
+                      "name": "ethPriceV2",
+                      "fill": "#FFFFFF",
+                      "content": "$1,217.33",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "NNEW4",
+                      "name": "ethChangeV2",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "YUrRf",
+                          "name": "ethArrowV2",
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#34C759"
+                        },
+                        {
+                          "type": "text",
+                          "id": "CVfAn",
+                          "name": "ethPercentV2",
+                          "fill": "#34C759",
+                          "content": "1.02%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "2UuQe",
+              "name": "BNB Row Selected",
+              "width": "fill_container",
+              "fill": "#9333EA33",
+              "cornerRadius": 8,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#9333EA"
+              },
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "wbohm",
+                  "name": "bnbIconV2",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#F3BA2F",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "6BFyF",
+                      "name": "bnbIconTextV2",
+                      "fill": "#FFFFFF",
+                      "content": "B",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "J0b1u",
+                  "name": "bnbInfoV2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "14q8Q",
+                      "name": "bnbNameV2",
+                      "fill": "#FFFFFF",
+                      "content": "BNB",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "9gedR",
+                      "name": "bnbFullNameV2",
+                      "fill": "#8E8E93",
+                      "content": "BNB",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "dSvRH",
+                  "name": "bnbPriceInfoV2",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DUsnZ",
+                      "name": "bnbPriceV2",
+                      "fill": "#FFFFFF",
+                      "content": "$272.70",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "QWrh3",
+                      "name": "bnbChangeV2",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "CyGYK",
+                          "name": "bnbArrowV2",
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#F3BA2F"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Qs4WQ",
+                          "name": "bnbPercentV2",
+                          "fill": "#F3BA2F",
+                          "content": "0.8%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "hEsQN",
+              "name": "SOL Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "mXS99",
+                  "name": "solIconV2",
+                  "width": 32,
+                  "height": 32,
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": 45,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#9945FF",
+                        "position": 0
+                      },
+                      {
+                        "color": "#14F195",
+                        "position": 1
+                      }
+                    ]
+                  },
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gGWR0",
+                      "name": "solIconTextV2",
+                      "fill": "#FFFFFF",
+                      "content": "S",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "1O9lU",
+                  "name": "solInfoV2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "jRaT7",
+                      "name": "solNameV2",
+                      "fill": "#FFFFFF",
+                      "content": "SOL",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "MvyXq",
+                      "name": "solFullNameV2",
+                      "fill": "#8E8E93",
+                      "content": "Solana",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NVtth",
+                  "name": "solPriceInfoV2",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "4PRU3",
+                      "name": "solPriceV2",
+                      "fill": "#FFFFFF",
+                      "content": "$13.45",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "78uko",
+                      "name": "solChangeV2",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "pYkGC",
+                          "name": "solArrowV2",
+                          "rotation": 180,
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FF3B30"
+                        },
+                        {
+                          "type": "text",
+                          "id": "naWMU",
+                          "name": "solPercentV2",
+                          "fill": "#FF3B30",
+                          "content": "4.38%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Kjx9v",
+              "name": "UNI Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "w7G6p",
+                  "name": "uniIconV2",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#FF007A",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RyErC",
+                      "name": "uniIconTextV2",
+                      "content": "🦄",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "y1hjU",
+                  "name": "uniInfoV2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "aaJO1",
+                      "name": "uniNameV2",
+                      "fill": "#FFFFFF",
+                      "content": "UNI",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "JG7Wl",
+                      "name": "uniFullNameV2",
+                      "fill": "#8E8E93",
+                      "content": "Uniswap",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "z1rig",
+                  "name": "uniPriceInfoV2",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "2Lm1r",
+                      "name": "uniPriceV2",
+                      "fill": "#FFFFFF",
+                      "content": "$5.91",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "rnBSO",
+                      "name": "uniChangeV2",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "cQbOB",
+                          "name": "uniArrowV2",
+                          "rotation": 180,
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#FF3B30"
+                        },
+                        {
+                          "type": "text",
+                          "id": "ql5q0",
+                          "name": "uniPercentV2",
+                          "fill": "#FF3B30",
+                          "content": "6.92%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Zyray",
+              "name": "ATOM Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "KlNEE",
+                  "name": "atomIconV2",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#2E3148",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "UX9ss",
+                      "name": "atomIconTextV2",
+                      "fill": "#FFFFFF",
+                      "content": "⚛",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ZC3FL",
+                  "name": "atomInfoV2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "vVXsg",
+                      "name": "atomNameV2",
+                      "fill": "#FFFFFF",
+                      "content": "ATOM",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WXqEN",
+                      "name": "atomFullNameV2",
+                      "fill": "#8E8E93",
+                      "content": "Cosmos Hub",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "o0e1v",
+                  "name": "atomPriceInfoV2",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "K2R6l",
+                      "name": "atomPriceV2",
+                      "fill": "#FFFFFF",
+                      "content": "$10.17",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "jffBQ",
+                      "name": "atomChangeV2",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "zlWDI",
+                          "name": "atomArrowV2",
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#34C759"
+                        },
+                        {
+                          "type": "text",
+                          "id": "KhBfX",
+                          "name": "atomPercentV2",
+                          "fill": "#34C759",
+                          "content": "0.60%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "d0wdM",
+              "name": "ALGO Row",
+              "width": "fill_container",
+              "gap": 12,
+              "padding": [
+                10,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "TUOEy",
+                  "name": "algoIconV2",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "#000000",
+                  "cornerRadius": 16,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "fVif7",
+                      "name": "algoIconTextV2",
+                      "fill": "#FFFFFF",
+                      "content": "A",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "IZ3p6",
+                  "name": "algoInfoV2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "afqMj",
+                      "name": "algoNameV2",
+                      "fill": "#FFFFFF",
+                      "content": "ALGO",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "bF9ZR",
+                      "name": "algoFullNameV2",
+                      "fill": "#8E8E93",
+                      "content": "Algorand",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "pQqzv",
+                  "name": "algoPriceInfoV2",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "vuo33",
+                      "name": "algoPriceV2",
+                      "fill": "#FFFFFF",
+                      "content": "$0.2740",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bnidE",
+                      "name": "algoChangeV2",
+                      "gap": 4,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "mkQjJ",
+                          "name": "algoArrowV2",
+                          "width": 10,
+                          "height": 10,
+                          "iconFontName": "triangle",
+                          "iconFontFamily": "lucide",
+                          "fill": "#34C759"
+                        },
+                        {
+                          "type": "text",
+                          "id": "WOZ6P",
+                          "name": "algoPercentV2",
+                          "fill": "#34C759",
+                          "content": "1.14%",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

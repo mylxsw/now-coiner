@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3:*)",
+      "Bash(cat:*)",
+      "WebFetch(domain:www.coingecko.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:algotrading101.com)"
+    ]
+  }
+}

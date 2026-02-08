@@ -1,0 +1,265 @@
+import Foundation
+import Combine
+
+public struct CoinRowState: Identifiable, Equatable, Sendable {
+    public let id: String
+    public let coin: Coin
+    public var price: CoinPrice?
+    public var sparkline: SparklineData?
+    public var isPinned: Bool
+    public var isSelected: Bool
+
+    public init(
+        id: String,
+        coin: Coin,
+        price: CoinPrice?,
+        sparkline: SparklineData?,
+        isPinned: Bool,
+        isSelected: Bool
+    ) {
+        self.id = id
+        self.coin = coin
+        self.price = price
+        self.sparkline = sparkline
+        self.isPinned = isPinned
+        self.isSelected = isSelected
+    }
+}
+
+@MainActor
+public final class TickerViewModel: ObservableObject {
+    @Published public private(set) var settings: AppSettings
+    @Published public private(set) var coins: [Coin] = []
+    @Published public private(set) var watchlist: [WatchlistItem] = []
+    @Published public private(set) var prices: [String: CoinPrice] = [:]
+    @Published public private(set) var sparklines: [String: SparklineData] = [:]
+    @Published public var selectedCoinID: String?
+    @Published public private(set) var isLoading = false
+    @Published public private(set) var errorMessage: String?
+
+    private let coinGecko: CoinGeckoServicing
+    private let binance: BinanceServicing
+    private let settingsStore: SettingsStore
+    private let watchlistStore: WatchlistStore
+    private let cacheStore: CoinCacheStore
+
+    public init(
+        coinGecko: CoinGeckoServicing,
+        binance: BinanceServicing,
+        settingsStore: SettingsStore,
+        watchlistStore: WatchlistStore,
+        cacheStore: CoinCacheStore
+    ) {
+        self.coinGecko = coinGecko
+        self.binance = binance
+        self.settingsStore = settingsStore
+        self.watchlistStore = watchlistStore
+        self.cacheStore = cacheStore
+        self.settings = .default
+    }
+
+    public var visibleRows: [CoinRowState] {
+        watchlist.sorted(by: { $0.sortOrder < $1.sortOrder }).compactMap { item in
+            guard let coin = coins.first(where: { $0.id == item.coinID }) else { return nil }
+            return CoinRowState(
+                id: coin.id,
+                coin: coin,
+                price: prices[coin.id],
+                sparkline: sparklines[coin.id],
+                isPinned: item.isPinned,
+                isSelected: selectedCoinID == coin.id
+            )
+        }
+    }
+
+    public var menuBarRows: [CoinRowState] {
+        Array(visibleRows.filter(\.isPinned).prefix(5))
+    }
+
+    public func load() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        settings = await settingsStore.load()
+        watchlist = await watchlistStore.load()
+        prices = await cacheStore.loadPrices()
+        sparklines = await cacheStore.loadSparklines()
+
+        let cachedCoins = await cacheStore.loadCoins()
+        if !cachedCoins.isEmpty {
+            coins = cachedCoins
+        }
+
+        await refreshCoinListIfNeeded(force: cachedCoins.isEmpty)
+
+        if watchlist.isEmpty {
+            let defaults = ["bitcoin", "ethereum", "binancecoin", "solana", "uniswap", "cosmos", "algorand"]
+            watchlist = defaults.enumerated().map { idx, id in
+                WatchlistItem(coinID: id, sortOrder: idx)
+            }
+            await watchlistStore.save(watchlist)
+        }
+
+        await refreshMarketData(includeSparkline: true)
+    }
+
+    public func refreshMarketData(includeSparkline: Bool = false) async {
+        let ids = watchlist.map(\ .coinID)
+        guard !ids.isEmpty else { return }
+
+        do {
+            let markets = try await coinGecko.fetchMarkets(ids: ids, vsCurrency: settings.vsCurrency, includeSparkline: includeSparkline)
+            var nextCoins = coins
+            for market in markets {
+                if !nextCoins.contains(where: { $0.id == market.coin.id }) {
+                    nextCoins.append(market.coin)
+                }
+                prices[market.coin.id] = market.price
+                if let sparkline = market.sparkline {
+                    sparklines[market.coin.id] = sparkline
+                }
+            }
+            coins = nextCoins
+            await cacheStore.saveCoins(nextCoins)
+            await cacheStore.savePrices(prices)
+            await cacheStore.saveSparklines(sparklines)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    public func refreshSimplePrices() async {
+        let ids = watchlist.map(\ .coinID)
+        guard !ids.isEmpty else { return }
+
+        do {
+            let values = try await coinGecko.fetchSimplePrices(ids: ids, vsCurrency: settings.vsCurrency)
+            for (coinID, data) in values {
+                var current = prices[coinID] ?? CoinPrice(
+                    coinID: coinID,
+                    currentPrice: data.price,
+                    priceChange24h: 0,
+                    priceChangePercent24h: data.change24h ?? 0
+                )
+                current.currentPrice = data.price
+                current.priceChangePercent24h = data.change24h ?? current.priceChangePercent24h
+                current.marketCap = data.marketCap
+                current.totalVolume = data.volume24h
+                current.lastUpdated = .now
+                prices[coinID] = current
+            }
+            await cacheStore.savePrices(prices)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    public func refreshBinancePrices() async {
+        let symbolPairs = watchlist.compactMap { item in
+            coins.first(where: { $0.id == item.coinID })?.binanceSymbol
+        }
+        guard !symbolPairs.isEmpty else { return }
+
+        do {
+            let data = try await binance.fetchTickerPrices(symbols: symbolPairs)
+            let tuples: [(String, String)] = coins.compactMap { coin in
+                guard let symbol = coin.binanceSymbol else { return nil }
+                return (symbol, coin.id)
+            }
+            let mapping = Dictionary(uniqueKeysWithValues: tuples)
+
+            for (symbol, value) in data {
+                guard let id = mapping[symbol] else { continue }
+                var current = prices[id] ?? CoinPrice(coinID: id, currentPrice: value, priceChange24h: 0, priceChangePercent24h: 0)
+                current.currentPrice = value
+                current.lastUpdated = Date()
+                prices[id] = current
+            }
+            await cacheStore.savePrices(prices)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    public func addCoin(_ coin: Coin) async {
+        if !coins.contains(where: { $0.id == coin.id }) {
+            coins.append(coin)
+            await cacheStore.saveCoins(coins)
+        }
+
+        guard !watchlist.contains(where: { $0.coinID == coin.id }) else { return }
+        let item = WatchlistItem(coinID: coin.id, sortOrder: watchlist.count)
+        watchlist.append(item)
+        await watchlistStore.save(watchlist)
+        await refreshMarketData(includeSparkline: false)
+    }
+
+    public func removeCoin(coinID: String) async {
+        watchlist.removeAll { $0.coinID == coinID }
+        reindexWatchlist()
+        await watchlistStore.save(watchlist)
+    }
+
+    public func moveCoinToTop(coinID: String) async {
+        guard let index = watchlist.firstIndex(where: { $0.coinID == coinID }) else { return }
+        let item = watchlist.remove(at: index)
+        watchlist.insert(item, at: 0)
+        reindexWatchlist()
+        await watchlistStore.save(watchlist)
+    }
+
+    public func moveCoin(from source: IndexSet, to destination: Int) async {
+        watchlist = movedArray(watchlist, from: source, to: destination)
+        reindexWatchlist()
+        await watchlistStore.save(watchlist)
+    }
+
+    public func togglePin(coinID: String) async {
+        guard let index = watchlist.firstIndex(where: { $0.coinID == coinID }) else { return }
+        watchlist[index].isPinned.toggle()
+        await watchlistStore.save(watchlist)
+    }
+
+    public func updateSettings(_ update: (inout AppSettings) -> Void) async {
+        var next = settings
+        update(&next)
+        settings = next
+        await settingsStore.save(next)
+    }
+
+    public func selectionToggle(coinID: String) {
+        selectedCoinID = selectedCoinID == coinID ? nil : coinID
+    }
+
+    private func refreshCoinListIfNeeded(force: Bool) async {
+        guard force else { return }
+        do {
+            let values = try await coinGecko.fetchCoinList()
+            coins = values
+            await cacheStore.saveCoins(values)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func reindexWatchlist() {
+        for index in watchlist.indices {
+            watchlist[index].sortOrder = index
+        }
+    }
+
+    private func movedArray(_ array: [WatchlistItem], from source: IndexSet, to destination: Int) -> [WatchlistItem] {
+        var values = array
+        let moving = source.sorted().map { values[$0] }
+        for index in source.sorted(by: >) {
+            values.remove(at: index)
+        }
+
+        var target = destination
+        let removedBeforeTarget = source.filter { $0 < destination }.count
+        target -= removedBeforeTarget
+        target = max(0, min(target, values.count))
+        values.insert(contentsOf: moving, at: target)
+        return values
+    }
+}
