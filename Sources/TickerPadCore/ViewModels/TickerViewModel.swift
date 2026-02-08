@@ -74,17 +74,22 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public var visibleRows: [CoinRowState] {
-        watchlist.sorted(by: { $0.sortOrder < $1.sortOrder }).compactMap { item in
-            guard let coin = coins.first(where: { $0.id == item.coinID }) else { return nil }
-            return CoinRowState(
-                id: coin.id,
-                coin: coin,
-                price: prices[coin.id],
-                sparkline: sparklines[coin.id],
-                isPinned: item.isPinned,
-                isSelected: selectedCoinID == coin.id
-            )
-        }
+        watchlist
+            .sorted { a, b in
+                if a.isPinned != b.isPinned { return a.isPinned }
+                return a.sortOrder < b.sortOrder
+            }
+            .compactMap { item in
+                guard let coin = coins.first(where: { $0.id == item.coinID }) else { return nil }
+                return CoinRowState(
+                    id: coin.id,
+                    coin: coin,
+                    price: prices[coin.id],
+                    sparkline: sparklines[coin.id],
+                    isPinned: item.isPinned,
+                    isSelected: selectedCoinID == coin.id
+                )
+            }
     }
 
     public var menuBarRows: [CoinRowState] {
@@ -291,7 +296,7 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public func selectNextRow() {
-        let ordered = watchlist.sorted(by: { $0.sortOrder < $1.sortOrder }).map(\.coinID)
+        let ordered = visibleRows.map(\.id)
         guard !ordered.isEmpty else {
             selectedCoinID = nil
             return
@@ -308,7 +313,7 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public func selectPreviousRow() {
-        let ordered = watchlist.sorted(by: { $0.sortOrder < $1.sortOrder }).map(\.coinID)
+        let ordered = visibleRows.map(\.id)
         guard !ordered.isEmpty else {
             selectedCoinID = nil
             return

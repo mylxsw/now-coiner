@@ -21,9 +21,16 @@ struct CoinRowView: View {
             iconView
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(row.coin.symbol.uppercased())
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(TickerPadColors.textPrimary)
+                HStack(spacing: 4) {
+                    Text(row.coin.symbol.uppercased())
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(TickerPadColors.textPrimary)
+                    if row.isPinned {
+                        Image(systemName: "pin.fill")
+                            .font(.system(size: 9))
+                            .foregroundStyle(TickerPadColors.textSecondary)
+                    }
+                }
                 Text(row.coin.name)
                     .font(.system(size: 11, weight: .regular))
                     .foregroundStyle(TickerPadColors.textSecondary)
