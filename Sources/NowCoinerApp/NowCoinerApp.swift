@@ -40,6 +40,7 @@ struct NowCoinerApp: App {
             }
         } label: {
             MenuBarTickerView(viewModel: viewModel)
+                .id(viewModel.menuBarRows.map { $0.id + ($0.price?.currentPrice.description ?? "") }.joined()) // 强制刷新布局
                 .task {
                     await bootstrapIfNeeded()
                 }
@@ -195,31 +196,108 @@ private struct MenuBarTickerView: View {
     }
 
     private var iconModeLabel: some View {
-        let rows = Array(viewModel.menuBarRows.prefix(3))
-        let metrics = iconMetrics(for: rows.count)
-        return HStack(spacing: 3) {
-            if rows.isEmpty {
+        Group {
+            if let combinedImage {
+                Image(nsImage: combinedImage)
+            } else {
                 Text("NowCoiner")
                     .font(.system(size: 12, weight: .regular))
-                    .lineLimit(1)
-            } else {
-                ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
-                    HStack(spacing: 1.5) {
-                        menuBarIcon(for: row.coin, size: metrics.iconSize, textSize: metrics.iconTextSize)
-                        Text(iconModeValueText(for: row.price))
-                            .font(.system(size: metrics.valueFontSize, weight: .regular))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
-                    }
-                    if index < rows.count - 1 {
-                        Text(" ")
-                            .font(.system(size: metrics.valueFontSize))
-                    }
-                }
             }
         }
-        .lineLimit(1)
-        .truncationMode(.tail)
+        .onAppear {
+            // 初始加载
+            Task { @MainActor in
+                await refreshMenuBarIcons()
+                updateCombinedImage()
+            }
+        }
+        .onChange(of: viewModel.menuBarRows) { _, _ in
+            // 数据变化时更新
+            updateCombinedImage()
+        }
+        .onChange(of: iconMap) { _, _ in
+            // 图标加载后更新
+            updateCombinedImage()
+        }
+        .onChange(of: viewModel.settings.menuBarDisplayStyle) { _, _ in
+            updateCombinedImage()
+        }
+    }
+
+    @State private var combinedImage: NSImage?
+
+    private func updateCombinedImage() {
+        let rows = Array(viewModel.menuBarRows.prefix(3))
+        guard !rows.isEmpty else {
+            combinedImage = nil
+            return
+        }
+
+        let metrics = iconMetrics(for: rows.count)
+        combinedImage = drawCombinedImage(rows: rows, metrics: metrics)
+    }
+
+    private func drawCombinedImage(rows: [CoinRowState], metrics: (iconSize: CGFloat, iconTextSize: CGFloat, valueFontSize: CGFloat)) -> NSImage {
+        let spacing: CGFloat = 8
+        let innerSpacing: CGFloat = 4
+        
+        // 1. 准备数据和测量尺寸
+        var items: [(icon: NSImage, text: NSAttributedString, width: CGFloat)] = []
+        var totalWidth: CGFloat = 0
+        
+        for (index, row) in rows.enumerated() {
+            // 准备图标
+            let icon = iconMap[row.coin.id] ?? fallbackIconImage(for: row.coin, metrics: metrics)
+            
+            // 准备文字
+            let textString = iconModeValueText(for: row.price)
+            let font = NSFont.monospacedDigitSystemFont(ofSize: metrics.valueFontSize, weight: .regular)
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: NSColor.labelColor // 自动适配深浅色模式
+            ]
+            let attrText = NSAttributedString(string: textString, attributes: attributes)
+            let textSize = attrText.size()
+            
+            // 计算单个 Item 宽度
+            let itemWidth = metrics.iconSize + innerSpacing + textSize.width
+            items.append((icon, attrText, itemWidth))
+            
+            // 累加总宽度
+            totalWidth += itemWidth
+            if index < rows.count - 1 {
+                totalWidth += spacing
+            }
+        }
+        
+        // 2. 开始绘制
+        // 高度稍微多给一点点以容纳字体可能的溢出，通常18-22足够
+        let height: CGFloat = 22 
+        let image = NSImage(size: NSSize(width: totalWidth, height: height), flipped: false) { rect in
+            var currentX: CGFloat = 0
+            
+            for (index, item) in items.enumerated() {
+                // 绘制图标 (垂直居中)
+                let iconY = (height - metrics.iconSize) / 2
+                let iconRect = NSRect(x: currentX, y: iconY, width: metrics.iconSize, height: metrics.iconSize)
+                item.icon.draw(in: iconRect)
+                
+                // 绘制文字 (垂直居中)
+                let textY = (height - item.text.size().height) / 2 + 0.5 // +0.5 微调视觉平衡
+                let textRect = NSRect(x: currentX + metrics.iconSize + innerSpacing, y: textY, width: item.text.size().width, height: item.text.size().height)
+                item.text.draw(in: textRect)
+                
+                // 更新 X 坐标
+                currentX += item.width
+                if index < items.count - 1 {
+                    currentX += spacing
+                }
+            }
+            return true
+        }
+        
+        image.isTemplate = false
+        return image
     }
 
     private func iconModeValueText(for price: CoinPrice?) -> String {
@@ -252,41 +330,48 @@ private struct MenuBarTickerView: View {
                   let image = NSImage(data: data) else { continue }
             next[row.coin.id] = resizedMenuBarImage(from: image, size: size)
         }
-        iconMap = next
-    }
-
-    @ViewBuilder
-    private func menuBarIcon(for coin: Coin, size: CGFloat, textSize: CGFloat) -> some View {
-        if let image = iconMap[coin.id] {
-            Image(nsImage: image)
-                .frame(width: size, height: size)
-                .clipShape(Circle())
-        } else {
-            Circle()
-                .fill(Color(hex: "3A3A3C"))
-                .frame(width: size, height: size)
-                .overlay(
-                    Text(String(coin.symbol.uppercased().prefix(1)))
-                        .font(.system(size: textSize, weight: .bold))
-                        .foregroundStyle(.white)
-                )
+        // 只有当图标缓存真正改变时才更新，避免无限循环
+        if next != iconMap {
+            iconMap = next
         }
     }
 
-    private func resizedMenuBarImage(from source: NSImage, size: CGFloat) -> NSImage {
-        let targetSize = NSSize(width: size, height: size)
-        let output = NSImage(size: targetSize)
-        output.lockFocus()
-        NSGraphicsContext.current?.imageInterpolation = .high
-
-        let sourceRect = NSRect(origin: .zero, size: source.size)
-        let destinationRect = NSRect(origin: .zero, size: targetSize)
-        source.draw(in: destinationRect, from: sourceRect, operation: .sourceOver, fraction: 1.0)
-
-        output.unlockFocus()
-        output.isTemplate = false
-        return output
+    private func fallbackIconImage(for coin: Coin, metrics: (iconSize: CGFloat, iconTextSize: CGFloat, valueFontSize: CGFloat)) -> NSImage {
+        let size = metrics.iconSize
+        let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { rect in
+            NSColor(deviceRed: 60/255, green: 60/255, blue: 62/255, alpha: 1.0).set()
+            NSBezierPath(ovalIn: rect).fill()
+            
+            let letter = String(coin.symbol.uppercased().prefix(1))
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: metrics.iconTextSize, weight: .bold),
+                .foregroundColor: NSColor.white
+            ]
+            let string = NSAttributedString(string: letter, attributes: attributes)
+            let stringSize = string.size()
+            let drawPoint = NSPoint(
+                x: (size - stringSize.width) / 2,
+                y: (size - stringSize.height) / 2
+            )
+            string.draw(at: drawPoint)
+            return true
+        }
+        image.isTemplate = false
+        return image
     }
+
+    private func resizedMenuBarImage(from source: NSImage, size: CGFloat) -> NSImage {
+        let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { rect in
+            let path = NSBezierPath(ovalIn: rect)
+            path.addClip()
+            NSGraphicsContext.current?.imageInterpolation = .high
+            source.draw(in: rect, from: NSRect(origin: .zero, size: source.size), operation: .sourceOver, fraction: 1.0)
+            return true
+        }
+        image.isTemplate = false
+        return image
+    }
+
 
     private func iconMetrics(for count: Int) -> (iconSize: CGFloat, iconTextSize: CGFloat, valueFontSize: CGFloat) {
         switch count {
