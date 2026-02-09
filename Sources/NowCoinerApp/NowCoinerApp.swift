@@ -40,7 +40,6 @@ struct NowCoinerApp: App {
             }
         } label: {
             MenuBarTickerView(viewModel: viewModel)
-                .id(viewModel.menuBarRows.map { $0.id + ($0.price?.currentPrice.description ?? "") }.joined()) // 强制刷新布局
                 .task {
                     await bootstrapIfNeeded()
                 }
@@ -162,37 +161,17 @@ private struct MenuBarTickerView: View {
             if viewModel.settings.menuBarCoinDisplayMode == .icon {
                 iconModeLabel
             } else {
-                Text(labelText)
-                    .font(.system(size: 12, weight: .regular))
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+                MenuBarTickerTextView(
+                    rows: Array(viewModel.menuBarRows.prefix(3)),
+                    currencyCode: viewModel.settings.vsCurrency,
+                    style: viewModel.settings.menuBarDisplayStyle
+                )
             }
         }
         .task(id: menuBarPrefetchIdentity) {
             await CoinIconCache.shared.prefetch(coins: viewModel.menuBarRows.map(\.coin))
             await refreshMenuBarIcons()
         }
-    }
-
-    private var labelText: String {
-        let rows = Array(viewModel.menuBarRows.prefix(3))
-        if rows.isEmpty {
-            return "NowCoiner"
-        }
-
-        let parts: [String] = rows.compactMap { (row: CoinRowState) -> String? in
-            guard let price = row.price else { return nil }
-            return PriceFormatter.menuBarText(
-                symbol: row.coin.symbol,
-                price: price.currentPrice,
-                changePercent: price.priceChangePercent24h,
-                currencyCode: viewModel.settings.vsCurrency,
-                style: viewModel.settings.menuBarDisplayStyle
-            )
-        }
-
-        return parts.isEmpty ? "NowCoiner" : parts.joined(separator: " | ")
     }
 
     private var iconModeLabel: some View {
@@ -381,6 +360,75 @@ private struct MenuBarTickerView: View {
             return (iconSize: 14.5, iconTextSize: 9.5, valueFontSize: 12)
         default:
             return (iconSize: 16, iconTextSize: 10.5, valueFontSize: 13.5)
+        }
+    }
+}
+
+private struct MenuBarTickerTextView: View {
+    let rows: [CoinRowState]
+    let currencyCode: String
+    let style: MenuBarStyle
+
+    var body: some View {
+        Group {
+            if rows.isEmpty {
+                Text("NowCoiner")
+            } else {
+                HStack(spacing: 0) {
+                    ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
+                        MenuBarTickerTextSegment(row: row, currencyCode: currencyCode, style: style)
+                        if index < rows.count - 1 {
+                            Text(" | ")
+                        }
+                    }
+                }
+            }
+        }
+        .font(.system(size: 12, weight: .regular))
+        .monospacedDigit()
+        .lineLimit(1)
+        .truncationMode(.tail)
+        .transaction { tx in
+            tx.animation = nil
+        }
+    }
+}
+
+private struct MenuBarTickerTextSegment: View {
+    let row: CoinRowState
+    let currencyCode: String
+    let style: MenuBarStyle
+
+    var body: some View {
+        if let price = row.price {
+            switch style {
+            case .priceOnly:
+                Text(PriceFormatter.compactCurrency(price.currentPrice, code: currencyCode))
+                    .contentTransition(.numericText())
+            case .symbolAndPrice:
+                HStack(spacing: 0) {
+                    Text("\(row.coin.symbol.uppercased()) ")
+                    Text(PriceFormatter.compactCurrency(price.currentPrice, code: currencyCode))
+                        .contentTransition(.numericText())
+                }
+            case .symbolAndChange:
+                HStack(spacing: 0) {
+                    Text("\(row.coin.symbol.uppercased()) ")
+                    Text(PriceFormatter.percent(price.priceChangePercent24h))
+                        .contentTransition(.numericText())
+                }
+            case .full:
+                HStack(spacing: 0) {
+                    Text("\(row.coin.symbol.uppercased()) ")
+                    Text(PriceFormatter.compactCurrency(price.currentPrice, code: currencyCode))
+                        .contentTransition(.numericText())
+                    Text(" ")
+                    Text(PriceFormatter.percent(price.priceChangePercent24h))
+                        .contentTransition(.numericText())
+                }
+            }
+        } else {
+            Text("--")
         }
     }
 }
