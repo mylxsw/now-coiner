@@ -21,6 +21,8 @@ final class AnchoredPanelController {
         ))
         host.frame = NSRect(origin: .zero, size: panelSize)
         host.autoresizingMask = [.width, .height]
+        host.wantsLayer = true
+        host.layer?.backgroundColor = NSColor.clear.cgColor
         panel.contentView = host
 
         let targetFrame = computeFrame(anchor: anchor, size: panelSize)
@@ -78,7 +80,7 @@ final class AnchoredPanelController {
         created.isReleasedWhenClosed = false
         created.backgroundColor = .clear
         created.isOpaque = false
-        created.hasShadow = true
+        created.hasShadow = false
         created.hidesOnDeactivate = false
         created.ignoresMouseEvents = false
         created.becomesKeyOnlyIfNeeded = false

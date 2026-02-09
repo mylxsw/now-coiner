@@ -66,7 +66,7 @@ struct SearchPanelView: View {
                     .foregroundStyle(NowCoinerColors.textSecondary)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
-                    .background(NowCoinerColors.groupedPanel)
+                    .background(Color.white.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 6))
             } else {
                 Button {

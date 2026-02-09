@@ -7,15 +7,35 @@ struct PanelSurface<Content: View>: View {
 
     var body: some View {
         VStack(spacing: 0, content: content)
-            .frame(width: width, height: height)
-            .background(.regularMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .frame(width: width - 2, height: height - 2)
+            .background {
+                RoundedRectangle(cornerRadius: panelCornerRadius, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: panelCornerRadius, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color.white.opacity(0.12),
+                                        Color.clear
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .center
+                                )
+                            )
+                    )
+            }
+            .clipShape(RoundedRectangle(cornerRadius: panelCornerRadius, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(NowCoinerColors.divider.opacity(0.8), lineWidth: 1)
+                RoundedRectangle(cornerRadius: panelCornerRadius, style: .continuous)
+                    .stroke(Color.white.opacity(0.22), lineWidth: 0.8)
             )
+            .shadow(color: .black.opacity(0.14), radius: 14, x: 0, y: 8)
+            .frame(width: width, height: height)
     }
 }
+
+private var panelCornerRadius: CGFloat { PanelMetrics.cornerRadius }
 
 struct PanelHeader<Trailing: View>: View {
     let title: String
@@ -31,7 +51,7 @@ struct PanelHeader<Trailing: View>: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(NowCoinerColors.groupedPanel)
+        .background(Color.white.opacity(0.05))
         .overlay(alignment: .bottom) {
             Divider()
         }

@@ -10,67 +10,67 @@ struct MainPanelView: View {
     @State private var showPinLimitNotice = false
 
     var body: some View {
-        ZStack {
-            VStack(spacing: 0) {
-                header
+        PanelSurface(width: 320, height: 420) {
+            ZStack {
+                VStack(spacing: 0) {
+                    header
 
-                if viewModel.visibleRows.isEmpty {
-                    emptyView
-                } else {
-                    ScrollView {
-                        ScrollViewBehaviorConfigurator()
-                            .frame(height: 0)
-                            .allowsHitTesting(false)
+                    if viewModel.visibleRows.isEmpty {
+                        emptyView
+                    } else {
+                        ScrollView {
+                            ScrollViewBehaviorConfigurator()
+                                .frame(height: 0)
+                                .allowsHitTesting(false)
 
-                        LazyVStack(spacing: 4) {
-                            ForEach(viewModel.visibleRows) { row in
-                                CoinRowView(
-                                    row: row,
-                                    currencyCode: viewModel.settings.vsCurrency,
-                                    colorScheme: viewModel.settings.priceColorScheme,
-                                    onTap: {
-                                        viewModel.selectionToggle(coinID: row.coin.id)
-                                    },
-                                    onPinToggle: {
-                                        let success = viewModel.togglePin(coinID: row.coin.id)
-                                        if !success { showPinLimitNotice = true }
-                                    },
-                                    onOpenDetail: {
-                                        detailCoinID = CoinDetailSheetItem(coinID: row.coin.id)
-                                    },
-                                    onMoveTop: {
-                                        Task { await viewModel.moveCoinToTop(coinID: row.coin.id) }
-                                    },
-                                    onRemove: {
-                                        Task { await viewModel.removeCoin(coinID: row.coin.id) }
-                                    },
-                                    onOpenTradingView: {
-                                        openTradingView(for: row.coin)
-                                    },
-                                    onOpenExchange: {
-                                        openExchange(for: row.coin)
-                                    }
-                                )
+                            LazyVStack(spacing: 4) {
+                                ForEach(viewModel.visibleRows) { row in
+                                    CoinRowView(
+                                        row: row,
+                                        currencyCode: viewModel.settings.vsCurrency,
+                                        colorScheme: viewModel.settings.priceColorScheme,
+                                        onTap: {
+                                            viewModel.selectionToggle(coinID: row.coin.id)
+                                        },
+                                        onPinToggle: {
+                                            let success = viewModel.togglePin(coinID: row.coin.id)
+                                            if !success { showPinLimitNotice = true }
+                                        },
+                                        onOpenDetail: {
+                                            detailCoinID = CoinDetailSheetItem(coinID: row.coin.id)
+                                        },
+                                        onMoveTop: {
+                                            Task { await viewModel.moveCoinToTop(coinID: row.coin.id) }
+                                        },
+                                        onRemove: {
+                                            Task { await viewModel.removeCoin(coinID: row.coin.id) }
+                                        },
+                                        onOpenTradingView: {
+                                            openTradingView(for: row.coin)
+                                        },
+                                        onOpenExchange: {
+                                            openExchange(for: row.coin)
+                                        }
+                                    )
+                                }
                             }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 8)
+                        .accessibilityLabel(L10n.tr("main.watchlist.accessibility"))
                     }
-                    .accessibilityLabel(L10n.tr("main.watchlist.accessibility"))
                 }
-            }
 
-            if showPinLimitNotice {
-                PinLimitOverlay(
-                    maxPinnedCount: TickerViewModel.maxPinnedCount,
-                    onConfirm: { showPinLimitNotice = false }
-                )
-                .transition(.opacity)
+                if showPinLimitNotice {
+                    PinLimitOverlay(
+                        maxPinnedCount: TickerViewModel.maxPinnedCount,
+                        onConfirm: { showPinLimitNotice = false }
+                    )
+                    .transition(.opacity)
+                }
             }
         }
         .animation(.easeOut(duration: 0.12), value: showPinLimitNotice)
-        .frame(width: 320, height: 420)
-        .background(NowCoinerColors.panel)
         .onMoveCommand(perform: handleMoveCommand)
         .onDeleteCommand(perform: removeSelected)
         .onExitCommand {

@@ -83,7 +83,7 @@ struct CoinRowView: View {
         if row.isSelected {
             return NowCoinerColors.selectionFill
         }
-        return isHovered ? NowCoinerColors.hoverFill : Color.clear
+        return isHovered ? Color.white.opacity(0.08) : Color.clear
     }
 
     private var borderColor: Color {
