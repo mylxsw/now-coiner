@@ -1,14 +1,16 @@
 import SwiftUI
 
 enum NowCoinerColors {
-    static let panel = Color(hex: "1C1C1E")
-    static let secondaryPanel = Color(hex: "2C2C2E")
-    static let divider = Color(hex: "3C3C3E")
-    static let textPrimary = Color.white
-    static let textSecondary = Color(hex: "8E8E93")
-    static let green = Color(hex: "34C759")
-    static let red = Color(hex: "FF453A")
-    static let blue = Color(hex: "007AFF")
-    static let selectionFill = Color(hex: "339333EA")
-    static let selectionStroke = Color(hex: "9333EA")
+    static let panel = Color(nsColor: .windowBackgroundColor)
+    static let secondaryPanel = Color(nsColor: .controlBackgroundColor)
+    static let groupedPanel = Color(nsColor: .underPageBackgroundColor)
+    static let divider = Color(nsColor: .separatorColor)
+    static let textPrimary = Color.primary
+    static let textSecondary = Color.secondary
+    static let green = Color(nsColor: .systemGreen)
+    static let red = Color(nsColor: .systemRed)
+    static let blue = Color.accentColor
+    static let selectionFill = Color.accentColor.opacity(0.18)
+    static let selectionStroke = Color.accentColor.opacity(0.42)
+    static let hoverFill = Color(nsColor: .selectedContentBackgroundColor).opacity(0.1)
 }

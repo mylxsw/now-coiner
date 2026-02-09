@@ -44,16 +44,14 @@ struct CoinDetailView: View {
     private var titleBar: some View {
         HStack {
             Text(L10n.tr("detail.title"))
-                .font(.system(size: 14, weight: .semibold))
+                .font(.headline)
                 .foregroundStyle(NowCoinerColors.textPrimary)
             Spacer()
-            Button(L10n.tr("common.close")) { dismiss() }
-                .buttonStyle(.plain)
-                .foregroundStyle(NowCoinerColors.textSecondary)
+            Button(L10n.tr("common.close")) { dismiss() }.buttonStyle(.bordered)
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(NowCoinerColors.secondaryPanel)
+        .padding(.vertical, 8)
+        .background(NowCoinerColors.groupedPanel)
     }
 
     private func loadDetail() async {
@@ -65,90 +63,85 @@ struct CoinDetailView: View {
     private func header(detail: CoinDetail) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("\(detail.name) (\(detail.symbol.uppercased()))")
-                .font(.system(size: 18, weight: .bold))
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(NowCoinerColors.textPrimary)
             Text(PriceFormatter.currency(detail.currentPrice, code: viewModel.settings.vsCurrency))
-                .font(.system(size: 24, weight: .semibold))
+                .font(.title2.weight(.semibold))
                 .foregroundStyle(NowCoinerColors.textPrimary)
             Text(PriceFormatter.percent(detail.priceChangePercentage24h))
                 .foregroundStyle(detail.priceChangePercentage24h >= 0 ? NowCoinerColors.green : NowCoinerColors.red)
-                .font(.system(size: 12, weight: .medium))
+                .font(.subheadline.weight(.medium))
         }
     }
 
     private var sparklineCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(L10n.tr("detail.sparkline_7d"))
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(NowCoinerColors.textPrimary)
-
-            if let values = viewModel.sparklines[coinID]?.prices, values.count >= 2 {
-                Chart(Array(values.enumerated()), id: \.offset) { index, value in
-                    LineMark(
-                        x: .value("Index", index),
-                        y: .value("Price", value)
-                    )
-                    .interpolationMethod(.catmullRom)
-                    .lineStyle(StrokeStyle(lineWidth: 2))
-                    .foregroundStyle(NowCoinerColors.blue)
+        GroupBox {
+            VStack(alignment: .leading, spacing: 8) {
+                if let values = viewModel.sparklines[coinID]?.prices, values.count >= 2 {
+                    Chart(Array(values.enumerated()), id: \.offset) { index, value in
+                        LineMark(
+                            x: .value("Index", index),
+                            y: .value("Price", value)
+                        )
+                        .interpolationMethod(.catmullRom)
+                        .lineStyle(StrokeStyle(lineWidth: 2))
+                        .foregroundStyle(NowCoinerColors.blue)
+                    }
+                    .chartXAxis(.hidden)
+                    .chartYAxis(.hidden)
+                    .frame(height: 120)
+                } else {
+                    Text(L10n.tr("detail.no_chart_data"))
+                        .font(.subheadline)
+                        .foregroundStyle(NowCoinerColors.textSecondary)
                 }
-                .chartXAxis(.hidden)
-                .chartYAxis(.hidden)
-                .frame(height: 120)
-            } else {
-                Text(L10n.tr("detail.no_chart_data"))
-                    .font(.system(size: 12))
-                    .foregroundStyle(NowCoinerColors.textSecondary)
             }
+        } label: {
+            Text(L10n.tr("detail.sparkline_7d"))
+                .font(.subheadline.weight(.semibold))
         }
-        .padding(12)
-        .background(NowCoinerColors.secondaryPanel)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func marketCard(detail: CoinDetail) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 8) {
+                keyValue(L10n.tr("detail.market_cap"), PriceFormatter.currency(detail.marketCap, code: viewModel.settings.vsCurrency))
+                keyValue(L10n.tr("detail.rank"), "#\(detail.marketCapRank)")
+                keyValue(L10n.tr("detail.volume_24h"), PriceFormatter.currency(detail.totalVolume, code: viewModel.settings.vsCurrency))
+                keyValue(L10n.tr("detail.high_24h"), PriceFormatter.currency(detail.high24h, code: viewModel.settings.vsCurrency))
+                keyValue(L10n.tr("detail.low_24h"), PriceFormatter.currency(detail.low24h, code: viewModel.settings.vsCurrency))
+            }
+        } label: {
             Text(L10n.tr("detail.market_data"))
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(NowCoinerColors.textPrimary)
-            keyValue(L10n.tr("detail.market_cap"), PriceFormatter.currency(detail.marketCap, code: viewModel.settings.vsCurrency))
-            keyValue(L10n.tr("detail.rank"), "#\(detail.marketCapRank)")
-            keyValue(L10n.tr("detail.volume_24h"), PriceFormatter.currency(detail.totalVolume, code: viewModel.settings.vsCurrency))
-            keyValue(L10n.tr("detail.high_24h"), PriceFormatter.currency(detail.high24h, code: viewModel.settings.vsCurrency))
-            keyValue(L10n.tr("detail.low_24h"), PriceFormatter.currency(detail.low24h, code: viewModel.settings.vsCurrency))
+                .font(.subheadline.weight(.semibold))
         }
-        .padding(12)
-        .background(NowCoinerColors.secondaryPanel)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func linksCard(detail: CoinDetail) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 8) {
+                linkRow(L10n.tr("detail.website"), detail.homepage)
+                linkRow(L10n.tr("detail.whitepaper"), detail.whitepaper)
+                linkRow("Reddit", detail.subredditURL)
+                linkRow("GitHub", detail.githubRepos.first)
+            }
+        } label: {
             Text(L10n.tr("detail.links"))
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(NowCoinerColors.textPrimary)
-            linkRow(L10n.tr("detail.website"), detail.homepage)
-            linkRow(L10n.tr("detail.whitepaper"), detail.whitepaper)
-            linkRow("Reddit", detail.subredditURL)
-            linkRow("GitHub", detail.githubRepos.first)
+                .font(.subheadline.weight(.semibold))
         }
-        .padding(12)
-        .background(NowCoinerColors.secondaryPanel)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func developerCard(detail: CoinDetail) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 8) {
+                keyValue("Stars", detail.githubStars.map(String.init) ?? "--")
+                keyValue("Forks", detail.githubForks.map(String.init) ?? "--")
+                keyValue(L10n.tr("detail.commits_4w"), detail.commitCount4Weeks.map(String.init) ?? "--")
+            }
+        } label: {
             Text(L10n.tr("detail.developer_data"))
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(NowCoinerColors.textPrimary)
-            keyValue("Stars", detail.githubStars.map(String.init) ?? "--")
-            keyValue("Forks", detail.githubForks.map(String.init) ?? "--")
-            keyValue(L10n.tr("detail.commits_4w"), detail.commitCount4Weeks.map(String.init) ?? "--")
+                .font(.subheadline.weight(.semibold))
         }
-        .padding(12)
-        .background(NowCoinerColors.secondaryPanel)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func keyValue(_ key: String, _ value: String) -> some View {
@@ -159,14 +152,14 @@ struct CoinDetailView: View {
             Text(value)
                 .foregroundStyle(NowCoinerColors.textPrimary)
         }
-        .font(.system(size: 12, weight: .medium))
+        .font(.subheadline.weight(.medium))
     }
 
     @ViewBuilder
     private func linkRow(_ title: String, _ value: String?) -> some View {
         if let value, let url = URL(string: value), !value.isEmpty {
             Link(title, destination: url)
-                .font(.system(size: 12, weight: .medium))
+                .font(.subheadline.weight(.medium))
         }
     }
 }

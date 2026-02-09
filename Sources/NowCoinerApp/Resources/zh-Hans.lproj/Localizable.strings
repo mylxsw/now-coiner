@@ -87,5 +87,5 @@
 "coin_row.unknown_change" = "未知涨跌";
 "coin_row.accessibility.summary" = "%@，代码 %@，价格 %@，涨跌 %@";
 
-"status_menu.settings" = "设置";
+"status_menu.app_settings" = "应用设置";
 "status_menu.quit" = "退出";

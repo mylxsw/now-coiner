@@ -22,7 +22,7 @@ struct MainPanelView: View {
                             .frame(height: 0)
                             .allowsHitTesting(false)
 
-                        LazyVStack(spacing: 6) {
+                        LazyVStack(spacing: 4) {
                             ForEach(viewModel.visibleRows) { row in
                                 CoinRowView(
                                     row: row,
@@ -53,7 +53,7 @@ struct MainPanelView: View {
                                 )
                             }
                         }
-                        .padding(.horizontal, 8)
+                        .padding(.horizontal, 10)
                         .padding(.vertical, 8)
                     }
                     .accessibilityLabel(L10n.tr("main.watchlist.accessibility"))
@@ -115,10 +115,10 @@ struct MainPanelView: View {
         VStack(spacing: 10) {
             Text(L10n.tr("main.empty.title"))
                 .foregroundStyle(NowCoinerColors.textPrimary)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.headline)
             Text(L10n.tr("main.empty.subtitle"))
                 .foregroundStyle(NowCoinerColors.textSecondary)
-                .font(.system(size: 11))
+                .font(.subheadline)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -180,33 +180,30 @@ private struct PinLimitOverlay: View {
 
             VStack(alignment: .leading, spacing: 14) {
                 Text(L10n.tr("pin_limit.title"))
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.headline)
                     .foregroundStyle(NowCoinerColors.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Text(L10n.tr("pin_limit.message", maxPinnedCount))
-                    .font(.system(size: 11, weight: .regular))
+                    .font(.subheadline)
                     .foregroundStyle(NowCoinerColors.textPrimary.opacity(0.95))
                     .fixedSize(horizontal: false, vertical: true)
 
                 Button(action: onConfirm) {
                     Text(L10n.tr("common.ok"))
-                        .font(.system(size: 13, weight: .semibold))
-                        .frame(maxWidth: .infinity, minHeight: 38)
-                        .background(Color.white.opacity(0.12))
-                        .clipShape(Capsule())
-                        .contentShape(Capsule())
+                        .frame(maxWidth: .infinity, minHeight: 32)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.regular)
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 18)
             .frame(width: 220)
-            .background(.ultraThinMaterial)
+            .background(.thickMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                    .stroke(NowCoinerColors.divider, lineWidth: 1)
             )
         }
     }

@@ -119,6 +119,7 @@ struct NowCoinerApp: App {
 private struct MenuBarTickerView: View {
     @ObservedObject var viewModel: TickerViewModel
     @State private var iconMap: [String: NSImage] = [:]
+    @State private var lockedFractionDigits: [String: Int] = [:]
 
     var body: some View {
         Group {
@@ -126,8 +127,7 @@ private struct MenuBarTickerView: View {
                 iconModeLabel
             } else {
                 Text(attributedLabelText)
-                    .font(.system(size: 12, weight: .regular))
-                    .monospacedDigit()
+                    .font(menuBarMonospacedFont)
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
@@ -135,27 +135,14 @@ private struct MenuBarTickerView: View {
         .task(id: menuBarPrefetchIdentity) {
             await CoinIconCache.shared.prefetch(coins: viewModel.menuBarRows.map(\.coin))
             await refreshMenuBarIcons()
+            updatePriceFractionLocks()
         }
-    }
-
-    private var labelText: String {
-        let rows = Array(viewModel.menuBarRows.prefix(3))
-        if rows.isEmpty {
-            return L10n.tr("app.name")
+        .onChange(of: viewModel.menuBarRows) { _, _ in
+            updatePriceFractionLocks()
         }
-
-        let parts: [String] = rows.compactMap { row in
-            guard let price = row.price else { return nil }
-            return PriceFormatter.menuBarText(
-                symbol: row.coin.symbol,
-                price: price.currentPrice,
-                changePercent: price.priceChangePercent24h,
-                currencyCode: viewModel.settings.vsCurrency,
-                style: viewModel.settings.menuBarDisplayStyle
-            )
+        .onChange(of: viewModel.settings.vsCurrency) { _, _ in
+            updatePriceFractionLocks()
         }
-
-        return parts.isEmpty ? L10n.tr("app.name") : parts.joined(separator: " | ")
     }
 
     private var attributedLabelText: AttributedString {
@@ -169,20 +156,17 @@ private struct MenuBarTickerView: View {
 
         for (index, row) in rows.enumerated() {
             if let price = row.price {
-                var segment = AttributedString(PriceFormatter.menuBarText(
-                    symbol: row.coin.symbol,
-                    price: price.currentPrice,
-                    changePercent: price.priceChangePercent24h,
-                    currencyCode: viewModel.settings.vsCurrency,
-                    style: viewModel.settings.menuBarDisplayStyle
-                ))
+                var segment = AttributedString(menuBarText(for: row, price: price))
                 segment.foregroundColor = menuBarTextColor(for: price.priceChangePercent24h)
+                segment.font = menuBarMonospacedFont
                 combined += segment
                 hasPriceSegment = true
             }
 
             if index < rows.count - 1 {
-                combined += AttributedString(" | ")
+                var separator = AttributedString(" | ")
+                separator.font = menuBarMonospacedFont
+                combined += separator
             }
         }
 
@@ -195,7 +179,7 @@ private struct MenuBarTickerView: View {
                 Image(nsImage: combinedImage)
             } else {
                 Text(L10n.tr("app.name"))
-                    .font(.system(size: 12, weight: .regular))
+                    .font(menuBarMonospacedFont)
             }
         }
         .onAppear {
@@ -219,6 +203,7 @@ private struct MenuBarTickerView: View {
     }
 
     @State private var combinedImage: NSImage?
+    private let menuBarMonospacedFont = Font.system(size: 12, weight: .regular, design: .monospaced)
 
     private func updateCombinedImage() {
         let rows = Array(viewModel.menuBarRows.prefix(3))
@@ -244,8 +229,8 @@ private struct MenuBarTickerView: View {
             let icon = iconMap[row.coin.id] ?? fallbackIconImage(for: row.coin, metrics: metrics)
             
             // 准备文字
-            let textString = iconModeValueText(for: row.price)
-            let font = NSFont.monospacedDigitSystemFont(ofSize: metrics.valueFontSize, weight: .regular)
+            let textString = iconModeValueText(for: row)
+            let font = NSFont.monospacedSystemFont(ofSize: metrics.valueFontSize, weight: .regular)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
                 .foregroundColor: menuBarNSColor(for: row.price?.priceChangePercent24h)
@@ -294,9 +279,9 @@ private struct MenuBarTickerView: View {
         return image
     }
 
-    private func iconModeValueText(for price: CoinPrice?) -> String {
-        guard let price else { return "--" }
-        let p = PriceFormatter.compactCurrency(price.currentPrice, code: viewModel.settings.vsCurrency)
+    private func iconModeValueText(for row: CoinRowState) -> String {
+        guard let price = row.price else { return "--" }
+        let p = fixedCompactPriceText(coinID: row.coin.id, price: price.currentPrice)
         let c = PriceFormatter.percent(price.priceChangePercent24h)
 
         switch viewModel.settings.menuBarDisplayStyle {
@@ -309,6 +294,47 @@ private struct MenuBarTickerView: View {
         case .full:
             return "\(p) \(c)"
         }
+    }
+
+    private func menuBarText(for row: CoinRowState, price: CoinPrice) -> String {
+        let s = row.coin.symbol.uppercased()
+        let p = fixedCompactPriceText(coinID: row.coin.id, price: price.currentPrice)
+        let c = PriceFormatter.percent(price.priceChangePercent24h)
+
+        switch viewModel.settings.menuBarDisplayStyle {
+        case .priceOnly:
+            return p
+        case .symbolAndPrice:
+            return "\(s) \(p)"
+        case .symbolAndChange:
+            return "\(s) \(c)"
+        case .full:
+            return "\(s) \(p) \(c)"
+        }
+    }
+
+    private func fixedCompactPriceText(coinID: String, price: Double) -> String {
+        let key = fractionLockKey(coinID: coinID)
+        let digits = lockedFractionDigits[key] ?? PriceFormatter.compactFractionDigits(for: price)
+        return PriceFormatter.compactCurrency(price, code: viewModel.settings.vsCurrency, fractionDigits: digits)
+    }
+
+    private func updatePriceFractionLocks() {
+        var next = lockedFractionDigits
+        for row in viewModel.menuBarRows {
+            guard let price = row.price else { continue }
+            let key = fractionLockKey(coinID: row.coin.id)
+            if next[key] == nil {
+                next[key] = PriceFormatter.compactFractionDigits(for: price.currentPrice)
+            }
+        }
+        if next != lockedFractionDigits {
+            lockedFractionDigits = next
+        }
+    }
+
+    private func fractionLockKey(coinID: String) -> String {
+        "\(coinID)|\(viewModel.settings.vsCurrency.lowercased())"
     }
 
     private func menuBarTextColor(for changePercent: Double?) -> Color {

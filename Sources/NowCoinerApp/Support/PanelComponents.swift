@@ -8,11 +8,11 @@ struct PanelSurface<Content: View>: View {
     var body: some View {
         VStack(spacing: 0, content: content)
             .frame(width: width, height: height)
-            .background(NowCoinerColors.panel)
+            .background(.regularMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(NowCoinerColors.divider.opacity(0.6), lineWidth: 1)
+                    .stroke(NowCoinerColors.divider.opacity(0.8), lineWidth: 1)
             )
     }
 }
@@ -24,16 +24,16 @@ struct PanelHeader<Trailing: View>: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.headline)
                 .foregroundStyle(NowCoinerColors.textPrimary)
             Spacer()
             trailing()
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 11)
-        .background(NowCoinerColors.secondaryPanel)
+        .padding(.vertical, 10)
+        .background(NowCoinerColors.groupedPanel)
         .overlay(alignment: .bottom) {
-            Divider().overlay(NowCoinerColors.divider)
+            Divider()
         }
     }
 }
@@ -56,16 +56,18 @@ struct PanelCloseButton: View {
 struct PanelIconButton: View {
     let systemName: String
     let action: () -> Void
+    @State private var isHovered = false
 
     var body: some View {
         Button(action: action) {
             Image(systemName: systemName)
-                .font(.system(size: 11, weight: .bold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(NowCoinerColors.textSecondary)
-                .frame(width: 22, height: 22)
-                .background(NowCoinerColors.panel.opacity(0.65))
-                .clipShape(Circle())
+                .frame(width: 24, height: 24)
+                .background(isHovered ? NowCoinerColors.hoverFill : Color.clear)
+                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
         .buttonStyle(.plain)
+        .onHover { isHovered = $0 }
     }
 }

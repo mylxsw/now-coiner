@@ -45,7 +45,7 @@ struct CoinIconView: View {
                 )
             )
         }
-        return AnyShapeStyle(Color(hex: "3A3A3C"))
+        return AnyShapeStyle(Color(nsColor: .quaternaryLabelColor))
     }
 
     private var fallbackText: String {
