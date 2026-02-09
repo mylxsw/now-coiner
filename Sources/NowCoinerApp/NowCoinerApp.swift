@@ -150,10 +150,7 @@ private struct MenuBarTickerView: View {
             if viewModel.settings.menuBarCoinDisplayMode == .icon {
                 iconModeLabel
             } else {
-                Text(attributedLabelText)
-                    .font(menuBarMonospacedFont)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+                textModeLabel
             }
         }
         .task(id: menuBarPrefetchIdentity) {
@@ -169,32 +166,162 @@ private struct MenuBarTickerView: View {
         }
     }
 
-    private var attributedLabelText: AttributedString {
+    @State private var textModeImage: NSImage?
+
+    private var textModeLabel: some View {
+        Group {
+            if let textModeImage {
+                Image(nsImage: textModeImage)
+            } else {
+                Text(L10n.tr("app.name"))
+                    .font(menuBarMonospacedFont)
+            }
+        }
+        .onAppear {
+            updateTextModeImage()
+        }
+        .onChange(of: viewModel.menuBarRows) { _, _ in
+            updateTextModeImage()
+        }
+        .onChange(of: viewModel.settings.menuBarDisplayStyle) { _, _ in
+            updateTextModeImage()
+        }
+        .onChange(of: viewModel.settings.menuBarUsePriceColor) { _, _ in
+            updateTextModeImage()
+        }
+        .onChange(of: viewModel.settings.priceColorScheme) { _, _ in
+            updateTextModeImage()
+        }
+    }
+
+    private func updateTextModeImage() {
         let rows = Array(viewModel.menuBarRows.prefix(3))
-        guard !rows.isEmpty else {
-            return AttributedString(L10n.tr("app.name"))
+        guard !rows.isEmpty, rows.contains(where: { $0.price != nil }) else {
+            textModeImage = nil
+            return
+        }
+        textModeImage = drawTextModeCombinedImage(rows: rows)
+    }
+
+    private func drawTextModeCombinedImage(rows: [CoinRowState]) -> NSImage {
+        let metrics = iconMetrics(for: rows.count)
+        let symbolFontSize: CGFloat = metrics.valueFontSize
+        let priceFontSize: CGFloat = metrics.valueFontSize
+        let tagHPadding: CGFloat = 4
+        let tagVPadding: CGFloat = 1.5
+        let tagCornerRadius: CGFloat = 3
+        let spacing: CGFloat = 3
+        let groupSpacing: CGFloat = 8
+        let height: CGFloat = 22
+
+        let symbolFont = NSFont.monospacedSystemFont(ofSize: symbolFontSize, weight: .medium)
+        let priceFont = NSFont.monospacedSystemFont(ofSize: priceFontSize, weight: .regular)
+
+        struct CoinSegment {
+            let symbolText: NSAttributedString
+            let symbolWidth: CGFloat
+            let priceText: NSAttributedString?
+            let priceWidth: CGFloat
+            let tagWidth: CGFloat
         }
 
-        var combined = AttributedString()
-        var hasPriceSegment = false
+        var segments: [CoinSegment] = []
+        var totalWidth: CGFloat = 0
 
         for (index, row) in rows.enumerated() {
+            let s = row.coin.symbol.uppercased()
+            let symbolAttrs: [NSAttributedString.Key: Any] = [
+                .font: symbolFont,
+                .foregroundColor: NSColor.labelColor,
+            ]
+            let symbolAttrStr = NSAttributedString(string: s, attributes: symbolAttrs)
+            let symbolSize = symbolAttrStr.size()
+            let tagWidth = symbolSize.width + tagHPadding * 2
+
+            var priceAttrStr: NSAttributedString? = nil
+            var priceWidth: CGFloat = 0
+
             if let price = row.price {
-                var segment = AttributedString(menuBarText(for: row, price: price))
-                segment.foregroundColor = menuBarTextColor(for: price.priceChangePercent24h)
-                segment.font = menuBarMonospacedFont
-                combined += segment
-                hasPriceSegment = true
+                let valueText = textModeValueText(for: row, price: price)
+                if !valueText.isEmpty {
+                    let priceColor = menuBarNSColor(for: price.priceChangePercent24h)
+                    let priceAttrs: [NSAttributedString.Key: Any] = [
+                        .font: priceFont,
+                        .foregroundColor: priceColor,
+                    ]
+                    priceAttrStr = NSAttributedString(string: valueText, attributes: priceAttrs)
+                    priceWidth = priceAttrStr!.size().width
+                }
             }
 
+            let segmentWidth = tagWidth + (priceWidth > 0 ? spacing + priceWidth : 0)
+            segments.append(CoinSegment(
+                symbolText: symbolAttrStr,
+                symbolWidth: symbolSize.width,
+                priceText: priceAttrStr,
+                priceWidth: priceWidth,
+                tagWidth: tagWidth
+            ))
+
+            totalWidth += segmentWidth
             if index < rows.count - 1 {
-                var separator = AttributedString(" | ")
-                separator.font = menuBarMonospacedFont
-                combined += separator
+                totalWidth += groupSpacing
             }
         }
 
-        return hasPriceSegment ? combined : AttributedString(L10n.tr("app.name"))
+        let image = NSImage(size: NSSize(width: totalWidth, height: height), flipped: false) { _ in
+            var currentX: CGFloat = 0
+
+            for (index, seg) in segments.enumerated() {
+                // Draw tag background (rounded rect border)
+                let tagHeight = symbolFont.ascender - symbolFont.descender + tagVPadding * 2
+                let tagY = (height - tagHeight) / 2
+                let tagRect = NSRect(x: currentX, y: tagY, width: seg.tagWidth, height: tagHeight)
+                let tagPath = NSBezierPath(roundedRect: tagRect, xRadius: tagCornerRadius, yRadius: tagCornerRadius)
+                NSColor.labelColor.withAlphaComponent(0.25).setStroke()
+                tagPath.lineWidth = 0.8
+                tagPath.stroke()
+
+                // Draw symbol text centered in tag
+                let symbolY = tagY + tagVPadding + (tagHeight - tagVPadding * 2 - seg.symbolText.size().height) / 2
+                let symbolX = currentX + (seg.tagWidth - seg.symbolWidth) / 2
+                seg.symbolText.draw(at: NSPoint(x: symbolX, y: symbolY))
+
+                currentX += seg.tagWidth
+
+                // Draw price text
+                if let priceText = seg.priceText {
+                    currentX += spacing
+                    let priceY = (height - priceText.size().height) / 2 + 0.5
+                    priceText.draw(at: NSPoint(x: currentX, y: priceY))
+                    currentX += seg.priceWidth
+                }
+
+                if index < segments.count - 1 {
+                    currentX += groupSpacing
+                }
+            }
+            return true
+        }
+
+        image.isTemplate = false
+        return image
+    }
+
+    private func textModeValueText(for row: CoinRowState, price: CoinPrice) -> String {
+        let p = fixedCompactPriceText(coinID: row.coin.id, price: price.currentPrice)
+        let c = PriceFormatter.percent(price.priceChangePercent24h)
+
+        switch viewModel.settings.menuBarDisplayStyle {
+        case .priceOnly:
+            return p
+        case .symbolAndPrice:
+            return p
+        case .symbolAndChange:
+            return c
+        case .full:
+            return "\(p) \(c)"
+        }
     }
 
     private var iconModeLabel: some View {
@@ -320,23 +447,6 @@ private struct MenuBarTickerView: View {
         }
     }
 
-    private func menuBarText(for row: CoinRowState, price: CoinPrice) -> String {
-        let s = row.coin.symbol.uppercased()
-        let p = fixedCompactPriceText(coinID: row.coin.id, price: price.currentPrice)
-        let c = PriceFormatter.percent(price.priceChangePercent24h)
-
-        switch viewModel.settings.menuBarDisplayStyle {
-        case .priceOnly:
-            return p
-        case .symbolAndPrice:
-            return "\(s) \(p)"
-        case .symbolAndChange:
-            return "\(s) \(c)"
-        case .full:
-            return "\(s) \(p) \(c)"
-        }
-    }
-
     private func fixedCompactPriceText(coinID: String, price: Double) -> String {
         let key = fractionLockKey(coinID: coinID)
         let digits = lockedFractionDigits[key] ?? PriceFormatter.compactFractionDigits(for: price)
@@ -359,19 +469,6 @@ private struct MenuBarTickerView: View {
 
     private func fractionLockKey(coinID: String) -> String {
         "\(coinID)|\(viewModel.settings.vsCurrency.lowercased())"
-    }
-
-    private func menuBarTextColor(for changePercent: Double?) -> Color {
-        guard viewModel.settings.menuBarUsePriceColor, let changePercent else {
-            return .primary
-        }
-
-        switch viewModel.settings.priceColorScheme {
-        case .greenUpRedDown:
-            return changePercent >= 0 ? NowCoinerColors.green : NowCoinerColors.red
-        case .redUpGreenDown:
-            return changePercent >= 0 ? NowCoinerColors.red : NowCoinerColors.green
-        }
     }
 
     private func menuBarNSColor(for changePercent: Double?) -> NSColor {
