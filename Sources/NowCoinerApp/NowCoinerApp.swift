@@ -7,6 +7,7 @@ struct NowCoinerApp: App {
     @StateObject private var viewModel: TickerViewModel
 
     @State private var statusBarRightClickMonitor: StatusBarRightClickMonitor?
+    @State private var statusBarLeftClickMonitor: StatusBarLeftClickMonitor?
     @State private var searchPanelController = AnchoredPanelController()
     @State private var settingsPanelController = AnchoredPanelController()
     @State private var didBootstrap = false
@@ -65,6 +66,17 @@ struct NowCoinerApp: App {
         )
         monitor.start()
         self.statusBarRightClickMonitor = monitor
+
+        if let statusBarLeftClickMonitor {
+            statusBarLeftClickMonitor.start()
+            return
+        }
+
+        let leftClickMonitor = StatusBarLeftClickMonitor {
+            closeAnyAuxiliaryPanelIfNeeded()
+        }
+        leftClickMonitor.start()
+        self.statusBarLeftClickMonitor = leftClickMonitor
     }
 
     private func openSearchFromMenu() {
@@ -104,11 +116,23 @@ struct NowCoinerApp: App {
     private func terminateApp() {
         viewModel.persistStateSnapshot()
         statusBarRightClickMonitor?.stop()
+        statusBarLeftClickMonitor?.stop()
         searchPanelController.close()
         settingsPanelController.close()
         MenuAnchorResolver.endMenuTracking()
         MenuAnchorResolver.closeAllAppWindows()
         NSApp.terminate(nil)
+    }
+
+    @MainActor
+    private func closeAnyAuxiliaryPanelIfNeeded() -> Bool {
+        let searchVisible = searchPanelController.window?.isVisible == true
+        let settingsVisible = settingsPanelController.window?.isVisible == true
+        guard searchVisible || settingsVisible else { return false }
+
+        searchPanelController.close()
+        settingsPanelController.close()
+        return true
     }
 
     private var preferredColorScheme: ColorScheme? {
