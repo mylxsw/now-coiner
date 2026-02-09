@@ -1,5 +1,5 @@
 import SwiftUI
-import TickerPadCore
+import NowCoinerCore
 
 struct SearchPanelView: View {
     @ObservedObject var viewModel: TickerViewModel
@@ -19,7 +19,7 @@ struct SearchPanelView: View {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .foregroundStyle(NowCoinerColors.textSecondary)
 
                 AppKitTextField(
                     text: $searchVM.query,
@@ -32,14 +32,14 @@ struct SearchPanelView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
-            .background(TickerPadColors.secondaryPanel)
+            .background(NowCoinerColors.secondaryPanel)
 
             ScrollView {
                 LazyVStack(spacing: 0) {
                     ForEach(searchVM.results.prefix(120), id: \.id) { coin in
                         row(coin: coin)
                         Divider()
-                            .overlay(TickerPadColors.divider.opacity(0.35))
+                            .overlay(NowCoinerColors.divider.opacity(0.35))
                             .padding(.leading, 56)
                     }
                 }
@@ -47,7 +47,7 @@ struct SearchPanelView: View {
             }
         }
         .frame(width: 300, height: 460)
-        .background(TickerPadColors.panel)
+        .background(NowCoinerColors.panel)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
@@ -55,21 +55,21 @@ struct SearchPanelView: View {
         HStack {
             Text("添加币种")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
             Spacer()
             Button(action: onClose) {
                 Image(systemName: "xmark")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .foregroundStyle(NowCoinerColors.textSecondary)
                     .frame(width: 20, height: 20)
-                    .background(TickerPadColors.secondaryPanel)
+                    .background(NowCoinerColors.secondaryPanel)
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(TickerPadColors.secondaryPanel)
+        .background(NowCoinerColors.secondaryPanel)
     }
 
     private func row(coin: Coin) -> some View {
@@ -86,10 +86,10 @@ struct SearchPanelView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(coin.name)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(TickerPadColors.textPrimary)
+                    .foregroundStyle(NowCoinerColors.textPrimary)
                 Text(coin.symbol.uppercased())
                     .font(.system(size: 11, weight: .regular))
-                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .foregroundStyle(NowCoinerColors.textSecondary)
             }
 
             Spacer()
@@ -97,10 +97,10 @@ struct SearchPanelView: View {
             if searchVM.isAdded(coin.id, watchlist: viewModel.watchlist) {
                 Text("已添加")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .foregroundStyle(NowCoinerColors.textSecondary)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .background(TickerPadColors.secondaryPanel)
+                    .background(NowCoinerColors.secondaryPanel)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
             } else {
                 Button {
@@ -113,7 +113,7 @@ struct SearchPanelView: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(TickerPadColors.blue)
+                        .background(NowCoinerColors.blue)
                         .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)

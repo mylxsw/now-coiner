@@ -1,8 +1,8 @@
 # Architecture
 
-## 1. View Layer (`TickerPadApp`)
+## 1. View Layer (`NowCoinerApp`)
 
-- `TickerPadApp.swift`
+- `NowCoinerApp.swift`
   - 菜单栏入口与生命周期。
   - 启动加载、设置同步、全局快捷键注册。
 - `MainPanelView.swift`
@@ -14,7 +14,7 @@
 - `CoinDetailView.swift`
   - 详情展示与图表。
 
-## 2. ViewModel Layer (`TickerPadCore/ViewModels`)
+## 2. ViewModel Layer (`NowCoinerCore/ViewModels`)
 
 - `TickerViewModel`
   - 聚合应用状态（coins/watchlist/prices/sparklines/settings）。
@@ -23,7 +23,7 @@
 - `SearchViewModel`
   - 300ms 防抖 + 过滤。
 
-## 3. Service Layer (`TickerPadCore/Services`)
+## 3. Service Layer (`NowCoinerCore/Services`)
 
 - `CoinGeckoService`
   - `coins/list`
@@ -39,7 +39,7 @@
 - `WebSocketMessageParser`
   - 统一解析合并流/直连流 payload。
 
-## 4. Storage Layer (`TickerPadCore/Storage`)
+## 4. Storage Layer (`NowCoinerCore/Storage`)
 
 - `AppStoragePaths`
   - 管理 Application Support 路径。
@@ -54,4 +54,4 @@
 - 协议解耦：`CoinGeckoServicing` / `BinanceServicing` / `WebSocketManaging` 便于替换与测试。
 - 状态单向流动：网络/存储 -> ViewModel -> SwiftUI 视图。
 - 运行时任务统一收敛到 ViewModel，避免视图层重复轮询。
-- 易测逻辑下沉到 `TickerPadCore`（格式化、过滤、URL 构建、退避、解析器）。
+- 易测逻辑下沉到 `NowCoinerCore`（格式化、过滤、URL 构建、退避、解析器）。

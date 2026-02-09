@@ -1,5 +1,5 @@
 import SwiftUI
-import TickerPadCore
+import NowCoinerCore
 
 struct SettingsView: View {
     @ObservedObject var viewModel: TickerViewModel
@@ -10,14 +10,14 @@ struct SettingsView: View {
             HStack {
                 Text("设置")
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(TickerPadColors.textPrimary)
+                    .foregroundStyle(NowCoinerColors.textPrimary)
                 Spacer()
                 Button(action: onClose) {
                     Image(systemName: "xmark")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(TickerPadColors.textSecondary)
+                        .foregroundStyle(NowCoinerColors.textSecondary)
                         .frame(width: 20, height: 20)
-                        .background(TickerPadColors.secondaryPanel)
+                        .background(NowCoinerColors.secondaryPanel)
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
@@ -25,7 +25,7 @@ struct SettingsView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
 
-            Divider().overlay(TickerPadColors.divider)
+            Divider().overlay(NowCoinerColors.divider)
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -147,11 +147,11 @@ struct SettingsView: View {
             }
         }
         .frame(width: 340, height: 500)
-        .background(TickerPadColors.panel)
+        .background(NowCoinerColors.panel)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(TickerPadColors.divider.opacity(0.6), lineWidth: 1)
+                .stroke(NowCoinerColors.divider.opacity(0.6), lineWidth: 1)
         )
     }
 
@@ -160,13 +160,13 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(TickerPadColors.textSecondary)
+                .foregroundStyle(NowCoinerColors.textSecondary)
 
             content()
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(TickerPadColors.secondaryPanel)
+        .background(NowCoinerColors.secondaryPanel)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
@@ -178,7 +178,7 @@ private struct ToggleRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
                 .font(.system(size: 14))
             Spacer()
             Toggle("", isOn: $isOn)
@@ -194,7 +194,7 @@ private struct PickerRow<Content: View>: View {
     var body: some View {
         HStack {
             Text(title)
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
                 .font(.system(size: 14))
             Spacer()
             content()
@@ -209,7 +209,7 @@ private struct TextFieldRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
                 .font(.system(size: 14))
             Spacer()
             TextField("⌘⇧C", text: $text)

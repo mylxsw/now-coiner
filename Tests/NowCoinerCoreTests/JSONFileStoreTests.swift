@@ -1,5 +1,5 @@
 import XCTest
-@testable import TickerPadCore
+@testable import NowCoinerCore
 
 final class JSONFileStoreTests: XCTestCase {
     func testSaveAndLoad() throws {

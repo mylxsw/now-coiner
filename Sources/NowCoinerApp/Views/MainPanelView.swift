@@ -1,6 +1,6 @@
 import SwiftUI
 import AppKit
-import TickerPadCore
+import NowCoinerCore
 
 struct MainPanelView: View {
     @ObservedObject var viewModel: TickerViewModel
@@ -13,7 +13,7 @@ struct MainPanelView: View {
         ZStack {
             VStack(spacing: 0) {
                 header
-                Divider().overlay(TickerPadColors.divider)
+                Divider().overlay(NowCoinerColors.divider)
 
                 if viewModel.visibleRows.isEmpty {
                     emptyView
@@ -73,7 +73,7 @@ struct MainPanelView: View {
         }
         .animation(.easeOut(duration: 0.12), value: showPinLimitNotice)
         .frame(width: 320, height: 420)
-        .background(TickerPadColors.panel)
+        .background(NowCoinerColors.panel)
         .onMoveCommand(perform: handleMoveCommand)
         .onDeleteCommand(perform: removeSelected)
         .onExitCommand {
@@ -104,9 +104,9 @@ struct MainPanelView: View {
 
     private var header: some View {
         HStack(spacing: 8) {
-            Text("TickerPad")
+            Text("NowCoiner")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
                 .accessibilityAddTraits(.isHeader)
 
             Spacer()
@@ -114,7 +114,7 @@ struct MainPanelView: View {
             Button(action: onOpenSearch) {
                 Image(systemName: "plus")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .foregroundStyle(NowCoinerColors.textSecondary)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Add Coin")
@@ -122,7 +122,7 @@ struct MainPanelView: View {
             Button(action: onOpenSettings) {
                 Image(systemName: "gearshape")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .foregroundStyle(NowCoinerColors.textSecondary)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Open Settings")
@@ -134,10 +134,10 @@ struct MainPanelView: View {
     private var emptyView: some View {
         VStack(spacing: 10) {
             Text("暂无币种")
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
                 .font(.system(size: 14, weight: .semibold))
             Text("点击右上角 + 添加你关注的币种")
-                .foregroundStyle(TickerPadColors.textSecondary)
+                .foregroundStyle(NowCoinerColors.textSecondary)
                 .font(.system(size: 11))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -197,12 +197,12 @@ private struct PinLimitOverlay: View {
             VStack(alignment: .leading, spacing: 14) {
                 Text("置顶数量已达上限")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(TickerPadColors.textPrimary)
+                    .foregroundStyle(NowCoinerColors.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Text("最多只能置顶 \(maxPinnedCount) 个币种，请先取消其他币种的置顶")
                     .font(.system(size: 11, weight: .regular))
-                    .foregroundStyle(TickerPadColors.textPrimary.opacity(0.95))
+                    .foregroundStyle(NowCoinerColors.textPrimary.opacity(0.95))
                     .fixedSize(horizontal: false, vertical: true)
 
                 Button(action: onConfirm) {

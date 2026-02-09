@@ -1,22 +1,22 @@
-# TickerPad
+# NowCoiner
 
-TickerPad 是一个基于 macOS 菜单栏的加密货币价格追踪应用实现，按 `REQUIREMENTS.md` 的 MVVM 架构落地。
+NowCoiner 是一个基于 macOS 菜单栏的加密货币价格追踪应用实现，按 `REQUIREMENTS.md` 的 MVVM 架构落地。
 
 ## 模块结构
 
 ```text
 Sources/
-  TickerPadCore/
+  NowCoinerCore/
     Models/      # 领域模型
     Services/    # CoinGecko / Binance / WebSocket
     Storage/     # JSON 持久化仓储
     Utils/       # 格式化、搜索、URL、退避
     ViewModels/  # 核心状态与业务编排
-  TickerPadApp/
+  NowCoinerApp/
     Support/     # 应用容器、快捷键、浮动面板、开机自启
     Views/       # 主面板、搜索、设置、详情、行视图
 Tests/
-  TickerPadCoreTests/
+  NowCoinerCoreTests/
 ```
 
 ## 已实现功能
@@ -48,7 +48,7 @@ Tests/
 
 ## 测试覆盖
 
-`TickerPadCoreTests` 包含 13 个测试：
+`NowCoinerCoreTests` 包含 13 个测试：
 
 - `PriceFormatterTests`
 - `ExchangeURLBuilderTests`
@@ -64,7 +64,7 @@ Tests/
 
 ```bash
 swift test
-swift run TickerPadApp
+swift run NowCoinerApp
 ```
 
 ## 环境变量
@@ -76,7 +76,7 @@ swift run TickerPadApp
 运行后会写入：
 
 ```text
-~/Library/Application Support/TickerPad/
+~/Library/Application Support/NowCoiner/
   settings.json
   watchlist.json
   cache/

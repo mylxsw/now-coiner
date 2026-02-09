@@ -1,5 +1,5 @@
 import XCTest
-@testable import TickerPadCore
+@testable import NowCoinerCore
 
 @MainActor
 final class TickerRealtimeTests: XCTestCase {

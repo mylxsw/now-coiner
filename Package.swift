@@ -2,26 +2,26 @@
 import PackageDescription
 
 let package = Package(
-    name: "TickerPad",
+    name: "NowCoiner",
     defaultLocalization: "en",
     platforms: [
         .macOS(.v14)
     ],
     products: [
-        .library(name: "TickerPadCore", targets: ["TickerPadCore"]),
-        .executable(name: "TickerPadApp", targets: ["TickerPadApp"])
+        .library(name: "NowCoinerCore", targets: ["NowCoinerCore"]),
+        .executable(name: "NowCoinerApp", targets: ["NowCoinerApp"])
     ],
     targets: [
         .target(
-            name: "TickerPadCore"
+            name: "NowCoinerCore"
         ),
         .executableTarget(
-            name: "TickerPadApp",
-            dependencies: ["TickerPadCore"]
+            name: "NowCoinerApp",
+            dependencies: ["NowCoinerCore"]
         ),
         .testTarget(
-            name: "TickerPadCoreTests",
-            dependencies: ["TickerPadCore"]
+            name: "NowCoinerCoreTests",
+            dependencies: ["NowCoinerCore"]
         )
     ]
 )

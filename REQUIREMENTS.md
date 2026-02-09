@@ -1,4 +1,4 @@
-# TickerPad 产品需求文档 (PRD)
+# NowCoiner 产品需求文档 (PRD)
 
 > macOS 菜单栏加密货币实时价格追踪应用
 
@@ -23,7 +23,7 @@
 
 ### 1.1 产品名称
 
-**TickerPad**
+**NowCoiner**
 
 ### 1.2 产品定位
 
@@ -122,7 +122,7 @@
 
 ### 3.2 主面板（币种列表）
 
-**设计稿节点**：`TickerPad - Main Panel` (ID: `MjDfi`)
+**设计稿节点**：`NowCoiner - Main Panel` (ID: `MjDfi`)
 
 **尺寸与布局**：
 - 宽度：320px
@@ -132,7 +132,7 @@
 - 从菜单栏图标正下方弹出
 
 **头部 (Header)**：
-- 左侧：应用名称 "TickerPad"，Inter 14px SemiBold，白色
+- 左侧：应用名称 "NowCoiner"，Inter 14px SemiBold，白色
 - 右侧：两个操作按钮
   - `+` 按钮（Lucide `plus` 图标，18×18px，`#8E8E93`）：打开搜索面板添加币种
   - 设置按钮（Lucide `settings` 图标，18×18px，`#8E8E93`）：打开设置页面
@@ -174,7 +174,7 @@
 
 ### 3.3 搜索面板
 
-**设计稿节点**：`TickerPad - Search Panel` (ID: `Y2daw`)
+**设计稿节点**：`NowCoiner - Search Panel` (ID: `Y2daw`)
 
 **尺寸与布局**：
 - 宽度：280px
@@ -211,7 +211,7 @@
 
 ### 3.4 右键上下文菜单
 
-**设计稿节点**：`TickerPad - Context Menu` (ID: `SCGKb`)
+**设计稿节点**：`NowCoiner - Context Menu` (ID: `SCGKb`)
 
 **尺寸与布局**：
 - 宽度：180px
@@ -245,7 +245,7 @@
 
 ### 3.5 选中状态
 
-**设计稿节点**：`TickerPad - With Selection` (ID: `ycICH`)
+**设计稿节点**：`NowCoiner - With Selection` (ID: `ycICH`)
 
 **选中行样式**（以 BNB 为例）：
 - 背景色：`#9333EA33`（紫色，约 20% 透明度）
@@ -394,7 +394,7 @@
 
 ### 4.4 全局快捷键
 
-**功能描述**：用户可通过全局快捷键在任何应用中快速唤起/隐藏 TickerPad 主面板。
+**功能描述**：用户可通过全局快捷键在任何应用中快速唤起/隐藏 NowCoiner 主面板。
 
 **实现要求**：
 - 默认快捷键：`⌘⇧C`（Command + Shift + C）
@@ -969,7 +969,7 @@ enum Exchange: String, Codable {
 
 使用 `Application Support` 目录：
 ```
-~/Library/Application Support/TickerPad/
+~/Library/Application Support/NowCoiner/
 ├── settings.json            // 或使用 UserDefaults
 ├── watchlist.json           // 关注列表
 ├── cache/
@@ -1069,7 +1069,7 @@ enum Exchange: String, Codable {
 
 | 用途 | 字体 | 字号 | 字重 |
 |------|------|------|------|
-| 面板标题 "TickerPad" | Inter | 14px | SemiBold (600) |
+| 面板标题 "NowCoiner" | Inter | 14px | SemiBold (600) |
 | 币种代号 (BTC) | Inter | 14px | SemiBold (600) |
 | 币种全名 (Bitcoin) | Inter | 11px | Regular (400) |
 | 当前价格 ($16,903.83) | Inter | 14px | SemiBold (600) |

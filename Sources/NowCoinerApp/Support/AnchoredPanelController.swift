@@ -3,7 +3,7 @@ import AppKit
 
 @MainActor
 final class AnchoredPanelController {
-    static let windowIdentifier = "tickerpad.anchored.panel"
+    static let windowIdentifier = "nowcoiner.anchored.panel"
 
     private var panel: InputFriendlyPanel?
 

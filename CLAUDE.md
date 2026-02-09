@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**TickerPad** — a macOS menu bar cryptocurrency price tracker. It's an LSUIElement app (no Dock icon, no main window) built with SwiftUI + AppKit. Prices update in real-time via Binance WebSocket, supplemented by CoinGecko REST polling.
+**NowCoiner** — a macOS menu bar cryptocurrency price tracker. It's an LSUIElement app (no Dock icon, no main window) built with SwiftUI + AppKit. Prices update in real-time via Binance WebSocket, supplemented by CoinGecko REST polling.
 
 ## Build & Run Commands
 
 ```bash
 swift build                          # Build all targets
-swift run TickerPadApp               # Run the app
+swift run NowCoinerApp               # Run the app
 swift test                           # Run all tests
 swift test --filter PriceFormatter   # Run a single test suite
 ```
@@ -25,14 +25,14 @@ Swift tools version: 6.2, minimum deployment target: macOS 14.0 (Sonoma).
 
 Two-target Swift Package (no Xcode project file):
 
-- **TickerPadCore** (library) — models, services, storage, utils, view models. All testable logic lives here.
-- **TickerPadApp** (executable) — SwiftUI views, AppKit integration (menu bar, floating panels, global shortcuts).
+- **NowCoinerCore** (library) — models, services, storage, utils, view models. All testable logic lives here.
+- **NowCoinerApp** (executable) — SwiftUI views, AppKit integration (menu bar, floating panels, global shortcuts).
 
 ### MVVM + Protocol-Driven Services
 
 ```
-Views (TickerPadApp)
-  └─ TickerViewModel (TickerPadCore) — single @MainActor ObservableObject, owns all app state
+Views (NowCoinerApp)
+  └─ TickerViewModel (NowCoinerCore) — single @MainActor ObservableObject, owns all app state
        ├─ CoinGeckoServicing (protocol) → CoinGeckoService
        ├─ BinanceServicing (protocol) → BinanceService
        ├─ WebSocketManaging (protocol) → BinanceWebSocketManager
@@ -40,7 +40,7 @@ Views (TickerPadApp)
 ```
 
 - **TickerViewModel** is the central orchestrator: watchlist, prices, sparklines, settings, runtime tasks (WebSocket, polling timers). All UI operations route through it.
-- **AppContainer** (`TickerPadApp/Support/AppContainer.swift`) wires dependencies via `makeDefault()`.
+- **AppContainer** (`NowCoinerApp/Support/AppContainer.swift`) wires dependencies via `makeDefault()`.
 - Service protocols (`CoinGeckoServicing`, `BinanceServicing`, `WebSocketManaging`) enable mock injection in tests.
 
 ### Real-time Data Flow
@@ -52,7 +52,7 @@ Views (TickerPadApp)
 
 ### Storage
 
-JSON files under `~/Library/Application Support/TickerPad/`. The `JSONFileStore<T>` generic handles serialization. Domain repositories: `SettingsStore`, `WatchlistStore`, `CoinCacheStore`. Detail cache uses 10-minute TTL via `DetailCacheEntry`.
+JSON files under `~/Library/Application Support/NowCoiner/`. The `JSONFileStore<T>` generic handles serialization. Domain repositories: `SettingsStore`, `WatchlistStore`, `CoinCacheStore`. Detail cache uses 10-minute TTL via `DetailCacheEntry`.
 
 ### UI Panels
 
@@ -63,7 +63,7 @@ JSON files under `~/Library/Application Support/TickerPad/`. The `JSONFileStore<
 
 ## Testing Patterns
 
-Tests are in `TickerPadCoreTests`. Each test creates mock services implementing the service protocols and temporary file-backed stores. Example mocks: `MockCoinGeckoService`, `MockBinanceService`, `StubWebSocketManager`. ViewModel tests use `@MainActor` and are async.
+Tests are in `NowCoinerCoreTests`. Each test creates mock services implementing the service protocols and temporary file-backed stores. Example mocks: `MockCoinGeckoService`, `MockBinanceService`, `StubWebSocketManager`. ViewModel tests use `@MainActor` and are async.
 
 ## Key Conventions
 

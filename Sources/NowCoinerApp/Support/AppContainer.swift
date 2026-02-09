@@ -1,5 +1,5 @@
 import Foundation
-import TickerPadCore
+import NowCoinerCore
 
 struct AppContainer {
     let viewModel: TickerViewModel

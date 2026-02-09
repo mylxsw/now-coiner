@@ -10,7 +10,7 @@ public struct AppStoragePaths: Sendable {
     public let sparklinesFile: URL
     public let detailsFile: URL
 
-    public init(fileManager: FileManager = .default, appName: String = "TickerPad") {
+    public init(fileManager: FileManager = .default, appName: String = "NowCoiner") {
         let base = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         root = base.appendingPathComponent(appName, isDirectory: true)
         cacheDirectory = root.appendingPathComponent("cache", isDirectory: true)

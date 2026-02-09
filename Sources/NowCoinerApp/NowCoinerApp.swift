@@ -1,8 +1,8 @@
 import SwiftUI
-import TickerPadCore
+import NowCoinerCore
 
 @main
-struct TickerPadApp: App {
+struct NowCoinerApp: App {
     @StateObject private var viewModel: TickerViewModel
 
     @State private var shortcutMonitor: GlobalShortcutMonitor?
@@ -136,7 +136,7 @@ private struct MenuBarTickerView: View {
     private var labelText: String {
         let rows = Array(viewModel.menuBarRows.prefix(3))
         if rows.isEmpty {
-            return "TickerPad"
+            return "NowCoiner"
         }
 
         let parts: [String] = rows.compactMap { (row: CoinRowState) -> String? in
@@ -150,7 +150,7 @@ private struct MenuBarTickerView: View {
             )
         }
 
-        return parts.isEmpty ? "TickerPad" : parts.joined(separator: " | ")
+        return parts.isEmpty ? "NowCoiner" : parts.joined(separator: " | ")
     }
 }
 

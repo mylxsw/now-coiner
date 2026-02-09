@@ -1,6 +1,6 @@
 import SwiftUI
 
-enum TickerPadColors {
+enum NowCoinerColors {
     static let panel = Color(hex: "1C1C1E")
     static let secondaryPanel = Color(hex: "2C2C2E")
     static let divider = Color(hex: "3C3C3E")

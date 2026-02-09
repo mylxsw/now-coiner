@@ -1,6 +1,6 @@
 import SwiftUI
 import Charts
-import TickerPadCore
+import NowCoinerCore
 
 struct CoinRowView: View {
     let row: CoinRowState
@@ -24,16 +24,16 @@ struct CoinRowView: View {
                 HStack(spacing: 4) {
                     Text(row.coin.symbol.uppercased())
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(TickerPadColors.textPrimary)
+                        .foregroundStyle(NowCoinerColors.textPrimary)
                     if row.isPinned {
                         Image(systemName: "pin.fill")
                             .font(.system(size: 9))
-                            .foregroundStyle(TickerPadColors.textSecondary)
+                            .foregroundStyle(NowCoinerColors.textSecondary)
                     }
                 }
                 Text(row.coin.name)
                     .font(.system(size: 11, weight: .regular))
-                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .foregroundStyle(NowCoinerColors.textSecondary)
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -41,7 +41,7 @@ struct CoinRowView: View {
             VStack(alignment: .trailing, spacing: 3) {
                 Text(priceText)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(TickerPadColors.textPrimary)
+                    .foregroundStyle(NowCoinerColors.textPrimary)
 
                 Text(changeText)
                     .font(.system(size: 11, weight: .medium))
@@ -81,13 +81,13 @@ struct CoinRowView: View {
 
     private var backgroundFill: Color {
         if row.isSelected {
-            return TickerPadColors.selectionFill
+            return NowCoinerColors.selectionFill
         }
-        return isHovered ? TickerPadColors.secondaryPanel.opacity(0.45) : Color.clear
+        return isHovered ? NowCoinerColors.secondaryPanel.opacity(0.45) : Color.clear
     }
 
     private var borderColor: Color {
-        row.isSelected ? TickerPadColors.selectionStroke : TickerPadColors.divider.opacity(0.15)
+        row.isSelected ? NowCoinerColors.selectionStroke : NowCoinerColors.divider.opacity(0.15)
     }
 
     private var iconView: some View {
@@ -144,14 +144,14 @@ struct CoinRowView: View {
 
     private var changeColor: Color {
         guard let value = row.price?.priceChangePercent24h else {
-            return TickerPadColors.textSecondary
+            return NowCoinerColors.textSecondary
         }
 
         switch colorScheme {
         case .greenUpRedDown:
-            return value >= 0 ? TickerPadColors.green : TickerPadColors.red
+            return value >= 0 ? NowCoinerColors.green : NowCoinerColors.red
         case .redUpGreenDown:
-            return value >= 0 ? TickerPadColors.red : TickerPadColors.green
+            return value >= 0 ? NowCoinerColors.red : NowCoinerColors.green
         }
     }
 

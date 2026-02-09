@@ -1,6 +1,6 @@
 import SwiftUI
 import Charts
-import TickerPadCore
+import NowCoinerCore
 
 struct CoinDetailView: View {
     @ObservedObject var viewModel: TickerViewModel
@@ -30,12 +30,12 @@ struct CoinDetailView: View {
                 }
             } else {
                 Text("加载失败")
-                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .foregroundStyle(NowCoinerColors.textSecondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .frame(width: 360, height: 520)
-        .background(TickerPadColors.panel)
+        .background(NowCoinerColors.panel)
         .task {
             await loadDetail()
         }
@@ -45,15 +45,15 @@ struct CoinDetailView: View {
         HStack {
             Text("币种详情")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
             Spacer()
             Button("关闭") { dismiss() }
                 .buttonStyle(.plain)
-                .foregroundStyle(TickerPadColors.textSecondary)
+                .foregroundStyle(NowCoinerColors.textSecondary)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(TickerPadColors.secondaryPanel)
+        .background(NowCoinerColors.secondaryPanel)
     }
 
     private func loadDetail() async {
@@ -66,12 +66,12 @@ struct CoinDetailView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text("\(detail.name) (\(detail.symbol.uppercased()))")
                 .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
             Text(PriceFormatter.currency(detail.currentPrice, code: viewModel.settings.vsCurrency))
                 .font(.system(size: 24, weight: .semibold))
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
             Text(PriceFormatter.percent(detail.priceChangePercentage24h))
-                .foregroundStyle(detail.priceChangePercentage24h >= 0 ? TickerPadColors.green : TickerPadColors.red)
+                .foregroundStyle(detail.priceChangePercentage24h >= 0 ? NowCoinerColors.green : NowCoinerColors.red)
                 .font(.system(size: 12, weight: .medium))
         }
     }
@@ -80,7 +80,7 @@ struct CoinDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("7 天走势")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
 
             if let values = viewModel.sparklines[coinID]?.prices, values.count >= 2 {
                 Chart(Array(values.enumerated()), id: \.offset) { index, value in
@@ -90,7 +90,7 @@ struct CoinDetailView: View {
                     )
                     .interpolationMethod(.catmullRom)
                     .lineStyle(StrokeStyle(lineWidth: 2))
-                    .foregroundStyle(TickerPadColors.blue)
+                    .foregroundStyle(NowCoinerColors.blue)
                 }
                 .chartXAxis(.hidden)
                 .chartYAxis(.hidden)
@@ -98,11 +98,11 @@ struct CoinDetailView: View {
             } else {
                 Text("暂无图表数据")
                     .font(.system(size: 12))
-                    .foregroundStyle(TickerPadColors.textSecondary)
+                    .foregroundStyle(NowCoinerColors.textSecondary)
             }
         }
         .padding(12)
-        .background(TickerPadColors.secondaryPanel)
+        .background(NowCoinerColors.secondaryPanel)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
@@ -110,7 +110,7 @@ struct CoinDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("市场数据")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
             keyValue("市值", PriceFormatter.currency(detail.marketCap, code: viewModel.settings.vsCurrency))
             keyValue("排名", "#\(detail.marketCapRank)")
             keyValue("24h 交易量", PriceFormatter.currency(detail.totalVolume, code: viewModel.settings.vsCurrency))
@@ -118,7 +118,7 @@ struct CoinDetailView: View {
             keyValue("24h 低", PriceFormatter.currency(detail.low24h, code: viewModel.settings.vsCurrency))
         }
         .padding(12)
-        .background(TickerPadColors.secondaryPanel)
+        .background(NowCoinerColors.secondaryPanel)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
@@ -126,14 +126,14 @@ struct CoinDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("外部链接")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
             linkRow("官网", detail.homepage)
             linkRow("白皮书", detail.whitepaper)
             linkRow("Reddit", detail.subredditURL)
             linkRow("GitHub", detail.githubRepos.first)
         }
         .padding(12)
-        .background(TickerPadColors.secondaryPanel)
+        .background(NowCoinerColors.secondaryPanel)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
@@ -141,23 +141,23 @@ struct CoinDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("开发者数据")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
             keyValue("Stars", detail.githubStars.map(String.init) ?? "--")
             keyValue("Forks", detail.githubForks.map(String.init) ?? "--")
             keyValue("近四周提交", detail.commitCount4Weeks.map(String.init) ?? "--")
         }
         .padding(12)
-        .background(TickerPadColors.secondaryPanel)
+        .background(NowCoinerColors.secondaryPanel)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private func keyValue(_ key: String, _ value: String) -> some View {
         HStack {
             Text(key)
-                .foregroundStyle(TickerPadColors.textSecondary)
+                .foregroundStyle(NowCoinerColors.textSecondary)
             Spacer()
             Text(value)
-                .foregroundStyle(TickerPadColors.textPrimary)
+                .foregroundStyle(NowCoinerColors.textPrimary)
         }
         .font(.system(size: 12, weight: .medium))
     }

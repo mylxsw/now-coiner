@@ -1,5 +1,5 @@
 
 run:
-	swift run TickerPadApp
+	swift run NowCoinerApp
 
 .PHONY: run
