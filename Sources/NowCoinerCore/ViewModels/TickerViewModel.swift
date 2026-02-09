@@ -130,6 +130,8 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public func shutdown() async {
+        persistStateSnapshot()
+
         realtimeTask?.cancel()
         realtimeTask = nil
 
@@ -140,6 +142,16 @@ public final class TickerViewModel: ObservableObject {
         sparklineRefreshTask = nil
 
         await webSocketManager.disconnect()
+    }
+
+    /// Force-persist current state. Used as a final safeguard before app termination.
+    public func persistStateSnapshot() {
+        settingsStore.save(settings)
+        watchlistStore.save(watchlist)
+        cacheStore.saveCoins(coins)
+        cacheStore.savePrices(prices)
+        cacheStore.saveSparklines(sparklines)
+        cacheStore.saveDetails(detailCache)
     }
 
     public func refreshMarketData(includeSparkline: Bool = false) async {

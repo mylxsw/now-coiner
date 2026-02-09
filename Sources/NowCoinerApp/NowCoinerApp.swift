@@ -35,6 +35,9 @@ struct NowCoinerApp: App {
             .onChange(of: viewModel.settings.launchAtLogin) { _, newValue in
                 LaunchAtLoginManager.apply(enabled: newValue)
             }
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
+                viewModel.persistStateSnapshot()
+            }
         } label: {
             MenuBarTickerView(viewModel: viewModel)
                 .task {
@@ -128,6 +131,8 @@ struct NowCoinerApp: App {
     }
 
     private func terminateApp() {
+        viewModel.persistStateSnapshot()
+        statusBarRightClickMonitor?.stop()
         searchPanelController.close()
         settingsPanelController.close()
         MenuAnchorResolver.endMenuTracking()

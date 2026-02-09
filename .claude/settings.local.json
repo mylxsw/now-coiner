@@ -9,7 +9,9 @@
       "Bash(swift build:*)",
       "WebSearch",
       "Bash(swift test:*)",
-      "Bash(swift:*)"
+      "Bash(swift:*)",
+      "Bash(brew list:*)",
+      "Bash(# Run app in background, wait 10s, then kill it swift run NowCoinerApp 2>&1 & APP_PID=$! echo \"\"App PID: $APP_PID\"\" sleep 10 kill $APP_PID sleep 2 echo \"\"=== STDOUT/STDERR ===\"\" cat /tmp/nowcoiner_stdout.log)"
     ]
   }
 }

@@ -15,7 +15,7 @@ public struct JSONFileStore<Value: Codable & Sendable>: Sendable {
     }
 
     public func load() throws -> Value? {
-        guard FileManager.default.fileExists(atPath: url.path()) else {
+        guard FileManager.default.fileExists(atPath: url.path(percentEncoded: false)) else {
             return nil
         }
         let data = try Data(contentsOf: url)
