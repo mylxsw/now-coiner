@@ -125,7 +125,7 @@ private struct MenuBarTickerView: View {
             if viewModel.settings.menuBarCoinDisplayMode == .icon {
                 iconModeLabel
             } else {
-                Text(labelText)
+                Text(attributedLabelText)
                     .font(.system(size: 12, weight: .regular))
                     .monospacedDigit()
                     .lineLimit(1)
@@ -156,6 +156,37 @@ private struct MenuBarTickerView: View {
         }
 
         return parts.isEmpty ? L10n.tr("app.name") : parts.joined(separator: " | ")
+    }
+
+    private var attributedLabelText: AttributedString {
+        let rows = Array(viewModel.menuBarRows.prefix(3))
+        guard !rows.isEmpty else {
+            return AttributedString(L10n.tr("app.name"))
+        }
+
+        var combined = AttributedString()
+        var hasPriceSegment = false
+
+        for (index, row) in rows.enumerated() {
+            if let price = row.price {
+                var segment = AttributedString(PriceFormatter.menuBarText(
+                    symbol: row.coin.symbol,
+                    price: price.currentPrice,
+                    changePercent: price.priceChangePercent24h,
+                    currencyCode: viewModel.settings.vsCurrency,
+                    style: viewModel.settings.menuBarDisplayStyle
+                ))
+                segment.foregroundColor = menuBarTextColor(for: price.priceChangePercent24h)
+                combined += segment
+                hasPriceSegment = true
+            }
+
+            if index < rows.count - 1 {
+                combined += AttributedString(" | ")
+            }
+        }
+
+        return hasPriceSegment ? combined : AttributedString(L10n.tr("app.name"))
     }
 
     private var iconModeLabel: some View {
@@ -217,7 +248,7 @@ private struct MenuBarTickerView: View {
             let font = NSFont.monospacedDigitSystemFont(ofSize: metrics.valueFontSize, weight: .regular)
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: font,
-                .foregroundColor: NSColor.labelColor // 自动适配深浅色模式
+                .foregroundColor: menuBarNSColor(for: row.price?.priceChangePercent24h)
             ]
             let attrText = NSAttributedString(string: textString, attributes: attributes)
             let textSize = attrText.size()
@@ -277,6 +308,32 @@ private struct MenuBarTickerView: View {
             return c
         case .full:
             return "\(p) \(c)"
+        }
+    }
+
+    private func menuBarTextColor(for changePercent: Double?) -> Color {
+        guard viewModel.settings.menuBarUsePriceColor, let changePercent else {
+            return .primary
+        }
+
+        switch viewModel.settings.priceColorScheme {
+        case .greenUpRedDown:
+            return changePercent >= 0 ? NowCoinerColors.green : NowCoinerColors.red
+        case .redUpGreenDown:
+            return changePercent >= 0 ? NowCoinerColors.red : NowCoinerColors.green
+        }
+    }
+
+    private func menuBarNSColor(for changePercent: Double?) -> NSColor {
+        guard viewModel.settings.menuBarUsePriceColor, let changePercent else {
+            return .labelColor
+        }
+
+        switch viewModel.settings.priceColorScheme {
+        case .greenUpRedDown:
+            return changePercent >= 0 ? .systemGreen : .systemRed
+        case .redUpGreenDown:
+            return changePercent >= 0 ? .systemRed : .systemGreen
         }
     }
 
@@ -344,75 +401,6 @@ private struct MenuBarTickerView: View {
             return (iconSize: 14.5, iconTextSize: 9.5, valueFontSize: 12)
         default:
             return (iconSize: 16, iconTextSize: 10.5, valueFontSize: 13.5)
-        }
-    }
-}
-
-private struct MenuBarTickerTextView: View {
-    let rows: [CoinRowState]
-    let currencyCode: String
-    let style: MenuBarStyle
-
-    var body: some View {
-        Group {
-            if rows.isEmpty {
-                Text(L10n.tr("app.name"))
-            } else {
-                HStack(spacing: 0) {
-                    ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
-                        MenuBarTickerTextSegment(row: row, currencyCode: currencyCode, style: style)
-                        if index < rows.count - 1 {
-                            Text(" | ")
-                        }
-                    }
-                }
-            }
-        }
-        .font(.system(size: 12, weight: .regular))
-        .monospacedDigit()
-        .lineLimit(1)
-        .truncationMode(.tail)
-        .transaction { tx in
-            tx.animation = nil
-        }
-    }
-}
-
-private struct MenuBarTickerTextSegment: View {
-    let row: CoinRowState
-    let currencyCode: String
-    let style: MenuBarStyle
-
-    var body: some View {
-        if let price = row.price {
-            switch style {
-            case .priceOnly:
-                Text(PriceFormatter.compactCurrency(price.currentPrice, code: currencyCode))
-                    .contentTransition(.numericText())
-            case .symbolAndPrice:
-                HStack(spacing: 0) {
-                    Text("\(row.coin.symbol.uppercased()) ")
-                    Text(PriceFormatter.compactCurrency(price.currentPrice, code: currencyCode))
-                        .contentTransition(.numericText())
-                }
-            case .symbolAndChange:
-                HStack(spacing: 0) {
-                    Text("\(row.coin.symbol.uppercased()) ")
-                    Text(PriceFormatter.percent(price.priceChangePercent24h))
-                        .contentTransition(.numericText())
-                }
-            case .full:
-                HStack(spacing: 0) {
-                    Text("\(row.coin.symbol.uppercased()) ")
-                    Text(PriceFormatter.compactCurrency(price.currentPrice, code: currencyCode))
-                        .contentTransition(.numericText())
-                    Text(" ")
-                    Text(PriceFormatter.percent(price.priceChangePercent24h))
-                        .contentTransition(.numericText())
-                }
-            }
-        } else {
-            Text("--")
         }
     }
 }

@@ -25,6 +25,7 @@
 "settings.menu_bar_style" = "菜单栏样式";
 "settings.coin_display_mode" = "币种显示";
 "settings.price_color_scheme" = "涨跌颜色";
+"settings.menu_bar_price_color_enabled" = "菜单栏涨跌着色";
 "settings.appearance_mode" = "外观模式";
 "settings.language" = "语言";
 "settings.refresh_interval" = "刷新间隔";

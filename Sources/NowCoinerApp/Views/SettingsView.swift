@@ -66,6 +66,13 @@ struct SettingsView: View {
                             .frame(width: 140)
                         }
 
+                        ToggleRow(title: L10n.tr("settings.menu_bar_price_color_enabled"), isOn: Binding(
+                            get: { viewModel.settings.menuBarUsePriceColor },
+                            set: { value in
+                                viewModel.updateSettings { $0.menuBarUsePriceColor = value }
+                            }
+                        ))
+
                         PickerRow(title: L10n.tr("settings.language")) {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.appLanguage },

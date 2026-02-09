@@ -25,6 +25,7 @@
 "settings.menu_bar_style" = "Menu bar style";
 "settings.coin_display_mode" = "Coin display";
 "settings.price_color_scheme" = "Price color";
+"settings.menu_bar_price_color_enabled" = "Colorize menu bar ticker";
 "settings.appearance_mode" = "Appearance";
 "settings.language" = "Language";
 "settings.refresh_interval" = "Refresh interval";

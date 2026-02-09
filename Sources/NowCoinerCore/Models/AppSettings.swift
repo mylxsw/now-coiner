@@ -6,6 +6,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var vsCurrency: String
     public var menuBarDisplayStyle: MenuBarStyle
     public var menuBarCoinDisplayMode: MenuBarCoinDisplayMode
+    public var menuBarUsePriceColor: Bool
     public var appearanceMode: AppearanceMode
     public var appLanguage: AppLanguage
     public var priceColorScheme: PriceColorScheme
@@ -19,6 +20,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         vsCurrency: String = "usd",
         menuBarDisplayStyle: MenuBarStyle = .symbolAndPrice,
         menuBarCoinDisplayMode: MenuBarCoinDisplayMode = .text,
+        menuBarUsePriceColor: Bool = false,
         appearanceMode: AppearanceMode = .system,
         appLanguage: AppLanguage = .followSystem,
         priceColorScheme: PriceColorScheme = .greenUpRedDown,
@@ -31,6 +33,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.vsCurrency = vsCurrency
         self.menuBarDisplayStyle = menuBarDisplayStyle
         self.menuBarCoinDisplayMode = menuBarCoinDisplayMode
+        self.menuBarUsePriceColor = menuBarUsePriceColor
         self.appearanceMode = appearanceMode
         self.appLanguage = appLanguage
         self.priceColorScheme = priceColorScheme
@@ -47,6 +50,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         case vsCurrency
         case menuBarDisplayStyle
         case menuBarCoinDisplayMode
+        case menuBarUsePriceColor
         case appearanceMode
         case appLanguage
         case priceColorScheme
@@ -63,6 +67,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         vsCurrency = try container.decodeIfPresent(String.self, forKey: .vsCurrency) ?? "usd"
         menuBarDisplayStyle = try container.decodeIfPresent(MenuBarStyle.self, forKey: .menuBarDisplayStyle) ?? .symbolAndPrice
         menuBarCoinDisplayMode = try container.decodeIfPresent(MenuBarCoinDisplayMode.self, forKey: .menuBarCoinDisplayMode) ?? .text
+        menuBarUsePriceColor = try container.decodeIfPresent(Bool.self, forKey: .menuBarUsePriceColor) ?? false
         appearanceMode = try container.decodeIfPresent(AppearanceMode.self, forKey: .appearanceMode) ?? .system
         appLanguage = try container.decodeIfPresent(AppLanguage.self, forKey: .appLanguage) ?? .followSystem
         priceColorScheme = try container.decodeIfPresent(PriceColorScheme.self, forKey: .priceColorScheme) ?? .greenUpRedDown
