@@ -376,11 +376,11 @@ private struct MenuBarTickerView: View {
     private func iconMetrics(for count: Int) -> (iconSize: CGFloat, iconTextSize: CGFloat, valueFontSize: CGFloat) {
         switch count {
         case 3...:
-            return (iconSize: 11, iconTextSize: 7, valueFontSize: 8.5)
+            return (iconSize: 13, iconTextSize: 8.5, valueFontSize: 11)
         case 2:
-            return (iconSize: 12, iconTextSize: 7.5, valueFontSize: 9)
+            return (iconSize: 14.5, iconTextSize: 9.5, valueFontSize: 12)
         default:
-            return (iconSize: 13, iconTextSize: 8, valueFontSize: 10)
+            return (iconSize: 16, iconTextSize: 10.5, valueFontSize: 13.5)
         }
     }
 }
