@@ -19,26 +19,6 @@ struct SettingsView: View {
                                 viewModel.updateSettings { $0.launchAtLogin = value }
                             }
                         ))
-
-                        PickerRow(title: L10n.tr("settings.currency")) {
-                            Picker("", selection: Binding(
-                                get: { viewModel.settings.vsCurrency },
-                                set: { value in
-                                    guard value != viewModel.settings.vsCurrency else { return }
-                                    viewModel.updateSettings { $0.vsCurrency = value }
-                                    Task { await viewModel.refreshMarketData(includeSparkline: true) }
-                                }
-                            )) {
-                                Text("USD").tag("usd")
-                                Text("EUR").tag("eur")
-                                Text("GBP").tag("gbp")
-                                Text("CNY").tag("cny")
-                                Text("JPY").tag("jpy")
-                            }
-                            .labelsHidden()
-                            .frame(width: 130)
-                            .id("settings-currency-\(viewModel.settings.vsCurrency)")
-                        }
                     }
 
                     settingsSection(title: L10n.tr("settings.section.display")) {
@@ -149,7 +129,7 @@ struct SettingsView: View {
                 }
                 .padding(12)
             }
-            .id("settings-lang-\(viewModel.settings.appLanguage.rawValue)-\(viewModel.settings.vsCurrency)")
+            .id("settings-lang-\(viewModel.settings.appLanguage.rawValue)")
         }
     }
 

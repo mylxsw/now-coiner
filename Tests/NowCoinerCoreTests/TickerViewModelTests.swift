@@ -94,7 +94,7 @@ final class TickerViewModelTests: XCTestCase {
         vm.persistStateSnapshot()
 
         let savedSettingsData = try Data(contentsOf: settingsURL)
-        XCTAssertTrue(String(decoding: savedSettingsData, as: UTF8.self).contains("\"vsCurrency\" : \"eur\""))
+        XCTAssertTrue(String(decoding: savedSettingsData, as: UTF8.self).contains("\"vsCurrency\" : \"usd\""))
 
         let savedWatchlistData = try Data(contentsOf: watchlistURL)
         XCTAssertTrue(String(decoding: savedWatchlistData, as: UTF8.self).contains("\"coinID\" : \"solana\""))

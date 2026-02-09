@@ -6,25 +6,33 @@ enum LaunchAtLoginManager {
     private static let launchAgentLabel = "com.nowcoiner.launch-at-login"
 
     static func apply(enabled: Bool) {
-        if #available(macOS 13.0, *) {
-            do {
-                if enabled {
+        if enabled {
+            if #available(macOS 13.0, *) {
+                do {
                     try SMAppService.mainApp.register()
-                } else {
-                    try SMAppService.mainApp.unregister()
+                    // Best effort: remove legacy fallback if it exists.
+                    try? disableLaunchAgentFallback()
+                    return
+                } catch {
+                    // Fallback for unsigned/dev builds where SMAppService often fails.
                 }
-                return
-            } catch {
-                // Fallback for unsigned/dev builds where SMAppService often fails.
             }
+
+            do {
+                try enableLaunchAgentFallback()
+            } catch {
+                NSLog("NowCoiner: launch at login update failed: %@", error.localizedDescription)
+            }
+            return
+        }
+
+        // Disabling should always attempt both implementations to avoid stale autostart entries.
+        if #available(macOS 13.0, *) {
+            try? SMAppService.mainApp.unregister()
         }
 
         do {
-            if enabled {
-                try enableLaunchAgentFallback()
-            } else {
-                try disableLaunchAgentFallback()
-            }
+            try disableLaunchAgentFallback()
         } catch {
             NSLog("NowCoiner: launch at login update failed: %@", error.localizedDescription)
         }

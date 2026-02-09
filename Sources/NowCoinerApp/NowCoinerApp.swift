@@ -125,17 +125,37 @@ private struct MenuBarTickerView: View {
             if viewModel.settings.menuBarCoinDisplayMode == .icon {
                 iconModeLabel
             } else {
-                MenuBarTickerTextView(
-                    rows: Array(viewModel.menuBarRows.prefix(3)),
-                    currencyCode: viewModel.settings.vsCurrency,
-                    style: viewModel.settings.menuBarDisplayStyle
-                )
+                Text(labelText)
+                    .font(.system(size: 12, weight: .regular))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .truncationMode(.tail)
             }
         }
         .task(id: menuBarPrefetchIdentity) {
             await CoinIconCache.shared.prefetch(coins: viewModel.menuBarRows.map(\.coin))
             await refreshMenuBarIcons()
         }
+    }
+
+    private var labelText: String {
+        let rows = Array(viewModel.menuBarRows.prefix(3))
+        if rows.isEmpty {
+            return L10n.tr("app.name")
+        }
+
+        let parts: [String] = rows.compactMap { row in
+            guard let price = row.price else { return nil }
+            return PriceFormatter.menuBarText(
+                symbol: row.coin.symbol,
+                price: price.currentPrice,
+                changePercent: price.priceChangePercent24h,
+                currencyCode: viewModel.settings.vsCurrency,
+                style: viewModel.settings.menuBarDisplayStyle
+            )
+        }
+
+        return parts.isEmpty ? L10n.tr("app.name") : parts.joined(separator: " | ")
     }
 
     private var iconModeLabel: some View {

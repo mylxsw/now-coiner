@@ -101,6 +101,10 @@ public final class TickerViewModel: ObservableObject {
         defer { isLoading = false }
 
         settings = settingsStore.load()
+        if settings.vsCurrency.lowercased() != "usd" {
+            settings.vsCurrency = "usd"
+            settingsStore.save(settings)
+        }
         watchlist = watchlistStore.load()
         prices = cacheStore.loadPrices()
         sparklines = cacheStore.loadSparklines()
@@ -308,6 +312,8 @@ public final class TickerViewModel: ObservableObject {
         let previous = settings
         var next = settings
         update(&next)
+        // For now the app is USD-only. Keep this fixed even if a stale caller sets another currency.
+        next.vsCurrency = "usd"
         settings = next
         settingsStore.save(next)
 
@@ -365,6 +371,9 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public func applyWebSocketTick(_ tick: WebSocketTick) {
+        // Binance realtime ticks are USDT-priced; avoid overwriting non-USD quotes.
+        guard settings.vsCurrency.lowercased() == "usd" else { return }
+
         guard let coinID = coins.first(where: { $0.binanceSymbol?.uppercased() == tick.symbol.uppercased() })?.id else {
             return
         }
@@ -421,7 +430,9 @@ public final class TickerViewModel: ObservableObject {
         realtimeTask?.cancel()
         realtimeTask = nil
 
-        if settings.refreshInterval == .realtime {
+        let shouldUseRealtimeBinance = settings.refreshInterval == .realtime && settings.vsCurrency.lowercased() == "usd"
+
+        if shouldUseRealtimeBinance {
             let symbols = watchlist.compactMap { item in
                 coins.first(where: { $0.id == item.coinID })?.binanceSymbol
             }
