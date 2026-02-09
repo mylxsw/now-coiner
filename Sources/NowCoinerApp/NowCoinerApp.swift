@@ -6,9 +6,7 @@ import NowCoinerCore
 struct NowCoinerApp: App {
     @StateObject private var viewModel: TickerViewModel
 
-    @State private var shortcutMonitor: GlobalShortcutMonitor?
     @State private var statusBarRightClickMonitor: StatusBarRightClickMonitor?
-    @State private var floatingPanelController = FloatingPanelController()
     @State private var searchPanelController = AnchoredPanelController()
     @State private var settingsPanelController = AnchoredPanelController()
     @State private var didBootstrap = false
@@ -28,9 +26,6 @@ struct NowCoinerApp: App {
             .preferredColorScheme(preferredColorScheme)
             .task {
                 await bootstrapIfNeeded()
-            }
-            .onChange(of: viewModel.settings.globalShortcut) { _, newValue in
-                shortcutMonitor?.update(shortcutText: newValue)
             }
             .onChange(of: viewModel.settings.launchAtLogin) { _, newValue in
                 LaunchAtLoginManager.apply(enabled: newValue)
@@ -54,29 +49,8 @@ struct NowCoinerApp: App {
 
         await viewModel.load()
         L10n.setLanguage(viewModel.settings.appLanguage)
-        configureGlobalShortcut()
         configureStatusBarRightClick()
         LaunchAtLoginManager.apply(enabled: viewModel.settings.launchAtLogin)
-    }
-
-    private func configureGlobalShortcut() {
-        if let shortcutMonitor {
-            shortcutMonitor.update(shortcutText: viewModel.settings.globalShortcut)
-            return
-        }
-
-        let monitor = GlobalShortcutMonitor {
-            floatingPanelController.toggle {
-                ShortcutPanelRootView(
-                    viewModel: viewModel,
-                    onOpenSearch: openSearchFromMenu,
-                    onOpenSettings: openSettingsFromMenu
-                )
-            }
-        }
-        monitor.update(shortcutText: viewModel.settings.globalShortcut)
-        monitor.start()
-        self.shortcutMonitor = monitor
     }
 
     private func configureStatusBarRightClick() {
@@ -95,7 +69,6 @@ struct NowCoinerApp: App {
 
     private func openSearchFromMenu() {
         let anchor = MenuAnchorResolver.currentAnchor()
-        shortcutMonitor?.stop()
 
         MenuAnchorResolver.endMenuTracking()
         MenuAnchorResolver.closeAllAppWindows()
@@ -105,7 +78,6 @@ struct NowCoinerApp: App {
             searchPanelController.show(anchor: anchor, panelSize: CGSize(width: 300, height: 460)) {
                 SearchPanelView(viewModel: viewModel, onClose: {
                     searchPanelController.close()
-                    shortcutMonitor?.start()
                 })
                 .preferredColorScheme(preferredColorScheme)
             }
@@ -114,7 +86,6 @@ struct NowCoinerApp: App {
 
     private func openSettingsFromMenu() {
         let anchor = MenuAnchorResolver.currentAnchor()
-        shortcutMonitor?.stop()
 
         MenuAnchorResolver.endMenuTracking()
         MenuAnchorResolver.closeAllAppWindows()
@@ -124,7 +95,6 @@ struct NowCoinerApp: App {
             settingsPanelController.show(anchor: anchor, panelSize: CGSize(width: 340, height: 500)) {
                 SettingsView(viewModel: viewModel, onClose: {
                     settingsPanelController.close()
-                    shortcutMonitor?.start()
                 }, onQuit: terminateApp)
                 .preferredColorScheme(preferredColorScheme)
             }
@@ -142,14 +112,7 @@ struct NowCoinerApp: App {
     }
 
     private var preferredColorScheme: ColorScheme? {
-        switch viewModel.settings.appearanceMode {
-        case .light:
-            return .light
-        case .dark:
-            return .dark
-        case .system:
-            return nil
-        }
+        nil
     }
 }
 
@@ -449,13 +412,6 @@ private struct ShortcutPanelRootView: View {
     }
 
     private var preferredColorScheme: ColorScheme? {
-        switch viewModel.settings.appearanceMode {
-        case .light:
-            return .light
-        case .dark:
-            return .dark
-        case .system:
-            return nil
-        }
+        nil
     }
 }

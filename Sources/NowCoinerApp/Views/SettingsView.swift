@@ -24,6 +24,7 @@ struct SettingsView: View {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.vsCurrency },
                                 set: { value in
+                                    guard value != viewModel.settings.vsCurrency else { return }
                                     viewModel.updateSettings { $0.vsCurrency = value }
                                     Task { await viewModel.refreshMarketData(includeSparkline: true) }
                                 }
@@ -36,14 +37,8 @@ struct SettingsView: View {
                             }
                             .labelsHidden()
                             .frame(width: 130)
+                            .id("settings-currency-\(viewModel.settings.vsCurrency)")
                         }
-
-                        TextFieldRow(title: L10n.tr("settings.global_shortcut"), text: Binding(
-                            get: { viewModel.settings.globalShortcut },
-                            set: { value in
-                                viewModel.updateSettings { $0.globalShortcut = value }
-                            }
-                        ))
                     }
 
                     settingsSection(title: L10n.tr("settings.section.display")) {
@@ -86,21 +81,6 @@ struct SettingsView: View {
                             )) {
                                 Text(L10n.tr("settings.price_color.green_up_red_down")).tag(PriceColorScheme.greenUpRedDown)
                                 Text(L10n.tr("settings.price_color.red_up_green_down")).tag(PriceColorScheme.redUpGreenDown)
-                            }
-                            .labelsHidden()
-                            .frame(width: 140)
-                        }
-
-                        PickerRow(title: L10n.tr("settings.appearance_mode")) {
-                            Picker("", selection: Binding(
-                                get: { viewModel.settings.appearanceMode },
-                                set: { value in
-                                    viewModel.updateSettings { $0.appearanceMode = value }
-                                }
-                            )) {
-                                Text(L10n.tr("settings.appearance.light")).tag(AppearanceMode.light)
-                                Text(L10n.tr("settings.appearance.dark")).tag(AppearanceMode.dark)
-                                Text(L10n.tr("settings.appearance.system")).tag(AppearanceMode.system)
                             }
                             .labelsHidden()
                             .frame(width: 140)
@@ -169,7 +149,7 @@ struct SettingsView: View {
                 }
                 .padding(12)
             }
-            .id("settings-lang-\(viewModel.settings.appLanguage.rawValue)")
+            .id("settings-lang-\(viewModel.settings.appLanguage.rawValue)-\(viewModel.settings.vsCurrency)")
         }
     }
 
@@ -216,23 +196,6 @@ private struct PickerRow<Content: View>: View {
                 .font(.system(size: 14))
             Spacer()
             content()
-        }
-    }
-}
-
-private struct TextFieldRow: View {
-    let title: String
-    @Binding var text: String
-
-    var body: some View {
-        HStack {
-            Text(title)
-                .foregroundStyle(NowCoinerColors.textPrimary)
-                .font(.system(size: 14))
-            Spacer()
-            TextField(L10n.tr("settings.shortcut.placeholder"), text: $text)
-                .textFieldStyle(.roundedBorder)
-                .frame(width: 140)
         }
     }
 }

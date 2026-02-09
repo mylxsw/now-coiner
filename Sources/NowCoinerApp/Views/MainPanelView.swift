@@ -95,11 +95,7 @@ struct MainPanelView: View {
     }
 
     private var resolvedColorScheme: ColorScheme? {
-        switch viewModel.settings.appearanceMode {
-        case .light: return .light
-        case .dark: return .dark
-        case .system: return nil
-        }
+        nil
     }
 
     private var header: some View {

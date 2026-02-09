@@ -305,12 +305,20 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public func updateSettings(_ update: (inout AppSettings) -> Void) {
+        let previous = settings
         var next = settings
         update(&next)
         settings = next
         settingsStore.save(next)
-        Task { [weak self] in
-            await self?.configureRuntimeTasks()
+
+        let requiresRuntimeReconfigure =
+            previous.refreshInterval != next.refreshInterval ||
+            previous.defaultDataSource != next.defaultDataSource
+
+        if requiresRuntimeReconfigure {
+            Task { [weak self] in
+                await self?.configureRuntimeTasks()
+            }
         }
     }
 
