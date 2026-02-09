@@ -52,22 +52,17 @@ struct SearchPanelView: View {
 
     private func row(coin: Coin) -> some View {
         HStack(spacing: 12) {
-            Circle()
-                .fill(Color(hex: "3A3A3C"))
-                .frame(width: 32, height: 32)
-                .overlay(
-                    Text(String(coin.symbol.uppercased().prefix(1)))
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.white)
-                )
+            coinIconView(coin: coin)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(coin.name)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(NowCoinerColors.textPrimary)
+                    .lineLimit(1)
                 Text(coin.symbol.uppercased())
                     .font(.system(size: 11, weight: .regular))
                     .foregroundStyle(NowCoinerColors.textSecondary)
+                    .lineLimit(1)
             }
 
             Spacer()
@@ -99,5 +94,35 @@ struct SearchPanelView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
+    }
+
+    @ViewBuilder
+    private func coinIconView(coin: Coin) -> some View {
+        if let imageURL = coin.imageURL, let url = URL(string: imageURL) {
+            AsyncImage(url: url) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+            } placeholder: {
+                Circle()
+                    .fill(Color(hex: "3A3A3C"))
+                    .overlay(
+                        Text(String(coin.symbol.uppercased().prefix(1)))
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(.white)
+                    )
+            }
+            .frame(width: 32, height: 32)
+            .clipShape(Circle())
+        } else {
+            Circle()
+                .fill(Color(hex: "3A3A3C"))
+                .frame(width: 32, height: 32)
+                .overlay(
+                    Text(String(coin.symbol.uppercased().prefix(1)))
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.white)
+                )
+        }
     }
 }

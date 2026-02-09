@@ -111,7 +111,7 @@ public final class TickerViewModel: ObservableObject {
             coins = cachedCoins
         }
 
-        await refreshCoinListIfNeeded(force: cachedCoins.isEmpty)
+        await refreshCoinListIfNeeded(force: true)
 
         if watchlist.isEmpty {
             let defaults = ["bitcoin", "ethereum", "binancecoin", "solana", "uniswap", "cosmos", "algorand"]

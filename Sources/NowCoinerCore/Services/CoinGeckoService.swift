@@ -16,15 +16,25 @@ public struct CoinGeckoService: CoinGeckoServicing {
     }
 
     public func fetchCoinList() async throws -> [Coin] {
-        let request = try request(path: "/coins/list") { components in
+        let request = try request(path: "/coins/markets") { components in
             components.queryItems = [
-                URLQueryItem(name: "include_platform", value: "false")
+                URLQueryItem(name: "vs_currency", value: "usd"),
+                URLQueryItem(name: "order", value: "market_cap_desc"),
+                URLQueryItem(name: "sparkline", value: "false"),
+                URLQueryItem(name: "per_page", value: "250"),
+                URLQueryItem(name: "page", value: "1")
             ]
         }
 
-        let payload: [CoinListDTO] = try await decode(request, as: [CoinListDTO].self)
+        let payload: [CoinMarketDTO] = try await decode(request, as: [CoinMarketDTO].self)
         return payload.map {
-            Coin(id: $0.id, symbol: $0.symbol, name: $0.name)
+            Coin(
+                id: $0.id,
+                symbol: $0.symbol,
+                name: $0.name,
+                imageURL: $0.image,
+                binanceSymbol: $0.symbol.uppercased() + "USDT"
+            )
         }
     }
 
@@ -188,12 +198,6 @@ public struct CoinGeckoService: CoinGeckoServicing {
             throw NetworkError.decoding(error.localizedDescription)
         }
     }
-}
-
-private struct CoinListDTO: Codable {
-    let id: String
-    let symbol: String
-    let name: String
 }
 
 private struct CoinMarketDTO: Codable {
