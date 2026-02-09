@@ -91,27 +91,7 @@ struct CoinRowView: View {
     }
 
     private var iconView: some View {
-        Circle()
-            .fill(iconFill)
-            .frame(width: 32, height: 32)
-            .overlay(
-                Text(iconText)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.white)
-            )
-    }
-
-    private var iconFill: AnyShapeStyle {
-        if row.coin.symbol.lowercased() == "sol" {
-            return AnyShapeStyle(
-                LinearGradient(
-                    colors: [Color(hex: "9945FF"), Color(hex: "14F195")],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-        }
-        return AnyShapeStyle(iconColor)
+        CoinIconView(coin: row.coin, size: 32)
     }
 
     private var priceText: String {
@@ -155,25 +135,6 @@ struct CoinRowView: View {
         }
     }
 
-    private var iconColor: Color {
-        switch row.coin.symbol.lowercased() {
-        case "btc": return Color(hex: "F7931A")
-        case "eth": return Color(hex: "627EEA")
-        case "bnb": return Color(hex: "F3BA2F")
-        case "uni": return Color(hex: "FF007A")
-        case "atom": return Color(hex: "2E3148")
-        case "algo": return Color(hex: "000000")
-        default: return Color(hex: "3A3A3C")
-        }
-    }
-
-    private var iconText: String {
-        switch row.coin.symbol.lowercased() {
-        case "btc": return "₿"
-        case "eth": return "Ξ"
-        default: return String(row.coin.symbol.uppercased().prefix(1))
-        }
-    }
 }
 
 private struct MiniSparklineView: View {

@@ -89,6 +89,9 @@ struct MainPanelView: View {
             CoinDetailView(viewModel: viewModel, coinID: item.coinID)
                 .preferredColorScheme(resolvedColorScheme)
         }
+        .task(id: prefetchIdentity) {
+            await CoinIconCache.shared.prefetch(coins: viewModel.visibleRows.map(\.coin))
+        }
     }
 
     private var resolvedColorScheme: ColorScheme? {
@@ -122,6 +125,10 @@ struct MainPanelView: View {
                 .font(.system(size: 11))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var prefetchIdentity: String {
+        viewModel.visibleRows.map { "\($0.coin.id)|\($0.coin.imageURL ?? "")" }.joined(separator: ",")
     }
 
     private func handleMoveCommand(_ direction: MoveCommandDirection) {
