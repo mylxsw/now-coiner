@@ -65,18 +65,18 @@ struct CoinRowView: View {
         .onTapGesture(perform: onTap)
         .onHover { isHovered = $0 }
         .contextMenu {
-            Button(row.isPinned ? "Unpin" : "Pin", action: onPinToggle)
-            Button("About \(row.coin.name)", action: onOpenDetail)
+            Button(row.isPinned ? L10n.tr("coin_row.unpin") : L10n.tr("coin_row.pin"), action: onPinToggle)
+            Button(L10n.tr("coin_row.about", row.coin.name), action: onOpenDetail)
             Divider()
-            Button("Move to top", action: onMoveTop)
-            Button("View on TradingView", action: onOpenTradingView)
-            Button("View on Exchange", action: onOpenExchange)
+            Button(L10n.tr("coin_row.move_top"), action: onMoveTop)
+            Button(L10n.tr("coin_row.view_tradingview"), action: onOpenTradingView)
+            Button(L10n.tr("coin_row.view_exchange"), action: onOpenExchange)
             Divider()
-            Button("Remove from List", role: .destructive, action: onRemove)
+            Button(L10n.tr("coin_row.remove"), role: .destructive, action: onRemove)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilitySummary)
-        .accessibilityHint("Press Return to open detail, Delete to remove when selected")
+        .accessibilityHint(L10n.tr("coin_row.accessibility.hint"))
     }
 
     private var backgroundFill: Color {
@@ -109,17 +109,17 @@ struct CoinRowView: View {
         if let currentPrice = row.price?.currentPrice {
             price = PriceFormatter.currency(currentPrice, code: currencyCode)
         } else {
-            price = "Unknown price"
+            price = L10n.tr("coin_row.unknown_price")
         }
 
         let change: String
         if let currentChange = row.price?.priceChangePercent24h {
             change = PriceFormatter.percent(currentChange)
         } else {
-            change = "Unknown change"
+            change = L10n.tr("coin_row.unknown_change")
         }
 
-        return "\(row.coin.name), symbol \(row.coin.symbol.uppercased()), price \(price), change \(change)"
+        return L10n.tr("coin_row.accessibility.summary", row.coin.name, row.coin.symbol.uppercased(), price, change)
     }
 
     private var changeColor: Color {

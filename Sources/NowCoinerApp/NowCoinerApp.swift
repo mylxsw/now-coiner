@@ -53,6 +53,7 @@ struct NowCoinerApp: App {
         didBootstrap = true
 
         await viewModel.load()
+        L10n.setLanguage(viewModel.settings.appLanguage)
         configureGlobalShortcut()
         configureStatusBarRightClick()
         LaunchAtLoginManager.apply(enabled: viewModel.settings.launchAtLogin)
@@ -179,7 +180,7 @@ private struct MenuBarTickerView: View {
             if let combinedImage {
                 Image(nsImage: combinedImage)
             } else {
-                Text("NowCoiner")
+                Text(L10n.tr("app.name"))
                     .font(.system(size: 12, weight: .regular))
             }
         }
@@ -372,7 +373,7 @@ private struct MenuBarTickerTextView: View {
     var body: some View {
         Group {
             if rows.isEmpty {
-                Text("NowCoiner")
+                Text(L10n.tr("app.name"))
             } else {
                 HStack(spacing: 0) {
                     ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in

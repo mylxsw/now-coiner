@@ -30,12 +30,12 @@ final class StatusBarRightClickMonitor {
 
         let menu = NSMenu()
 
-        let settingsItem = NSMenuItem(title: "设置", action: #selector(ActionTarget.openSettings), keyEquivalent: "")
+        let settingsItem = NSMenuItem(title: L10n.tr("status_menu.settings"), action: #selector(ActionTarget.openSettings), keyEquivalent: "")
         settingsItem.target = actionTarget
         menu.addItem(settingsItem)
         menu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: "退出", action: #selector(ActionTarget.quitApp), keyEquivalent: "")
+        let quitItem = NSMenuItem(title: L10n.tr("status_menu.quit"), action: #selector(ActionTarget.quitApp), keyEquivalent: "")
         quitItem.target = actionTarget
         menu.addItem(quitItem)
 

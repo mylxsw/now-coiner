@@ -17,7 +17,10 @@ let package = Package(
         ),
         .executableTarget(
             name: "NowCoinerApp",
-            dependencies: ["NowCoinerCore"]
+            dependencies: ["NowCoinerCore"],
+            resources: [
+                .process("Resources")
+            ]
         ),
         .testTarget(
             name: "NowCoinerCoreTests",

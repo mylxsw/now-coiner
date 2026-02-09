@@ -15,7 +15,7 @@ struct CoinDetailView: View {
             titleBar
 
             if isLoading {
-                ProgressView("加载中...")
+                ProgressView(L10n.tr("common.loading"))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let detail {
                 ScrollView {
@@ -29,7 +29,7 @@ struct CoinDetailView: View {
                     .padding(12)
                 }
             } else {
-                Text("加载失败")
+                Text(L10n.tr("common.load_failed"))
                     .foregroundStyle(NowCoinerColors.textSecondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -43,11 +43,11 @@ struct CoinDetailView: View {
 
     private var titleBar: some View {
         HStack {
-            Text("币种详情")
+            Text(L10n.tr("detail.title"))
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(NowCoinerColors.textPrimary)
             Spacer()
-            Button("关闭") { dismiss() }
+            Button(L10n.tr("common.close")) { dismiss() }
                 .buttonStyle(.plain)
                 .foregroundStyle(NowCoinerColors.textSecondary)
         }
@@ -78,7 +78,7 @@ struct CoinDetailView: View {
 
     private var sparklineCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("7 天走势")
+            Text(L10n.tr("detail.sparkline_7d"))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(NowCoinerColors.textPrimary)
 
@@ -96,7 +96,7 @@ struct CoinDetailView: View {
                 .chartYAxis(.hidden)
                 .frame(height: 120)
             } else {
-                Text("暂无图表数据")
+                Text(L10n.tr("detail.no_chart_data"))
                     .font(.system(size: 12))
                     .foregroundStyle(NowCoinerColors.textSecondary)
             }
@@ -108,14 +108,14 @@ struct CoinDetailView: View {
 
     private func marketCard(detail: CoinDetail) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("市场数据")
+            Text(L10n.tr("detail.market_data"))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(NowCoinerColors.textPrimary)
-            keyValue("市值", PriceFormatter.currency(detail.marketCap, code: viewModel.settings.vsCurrency))
-            keyValue("排名", "#\(detail.marketCapRank)")
-            keyValue("24h 交易量", PriceFormatter.currency(detail.totalVolume, code: viewModel.settings.vsCurrency))
-            keyValue("24h 高", PriceFormatter.currency(detail.high24h, code: viewModel.settings.vsCurrency))
-            keyValue("24h 低", PriceFormatter.currency(detail.low24h, code: viewModel.settings.vsCurrency))
+            keyValue(L10n.tr("detail.market_cap"), PriceFormatter.currency(detail.marketCap, code: viewModel.settings.vsCurrency))
+            keyValue(L10n.tr("detail.rank"), "#\(detail.marketCapRank)")
+            keyValue(L10n.tr("detail.volume_24h"), PriceFormatter.currency(detail.totalVolume, code: viewModel.settings.vsCurrency))
+            keyValue(L10n.tr("detail.high_24h"), PriceFormatter.currency(detail.high24h, code: viewModel.settings.vsCurrency))
+            keyValue(L10n.tr("detail.low_24h"), PriceFormatter.currency(detail.low24h, code: viewModel.settings.vsCurrency))
         }
         .padding(12)
         .background(NowCoinerColors.secondaryPanel)
@@ -124,11 +124,11 @@ struct CoinDetailView: View {
 
     private func linksCard(detail: CoinDetail) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("外部链接")
+            Text(L10n.tr("detail.links"))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(NowCoinerColors.textPrimary)
-            linkRow("官网", detail.homepage)
-            linkRow("白皮书", detail.whitepaper)
+            linkRow(L10n.tr("detail.website"), detail.homepage)
+            linkRow(L10n.tr("detail.whitepaper"), detail.whitepaper)
             linkRow("Reddit", detail.subredditURL)
             linkRow("GitHub", detail.githubRepos.first)
         }
@@ -139,12 +139,12 @@ struct CoinDetailView: View {
 
     private func developerCard(detail: CoinDetail) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("开发者数据")
+            Text(L10n.tr("detail.developer_data"))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(NowCoinerColors.textPrimary)
             keyValue("Stars", detail.githubStars.map(String.init) ?? "--")
             keyValue("Forks", detail.githubForks.map(String.init) ?? "--")
-            keyValue("近四周提交", detail.commitCount4Weeks.map(String.init) ?? "--")
+            keyValue(L10n.tr("detail.commits_4w"), detail.commitCount4Weeks.map(String.init) ?? "--")
         }
         .padding(12)
         .background(NowCoinerColors.secondaryPanel)

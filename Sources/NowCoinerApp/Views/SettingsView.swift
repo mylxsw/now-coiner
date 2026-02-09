@@ -8,19 +8,19 @@ struct SettingsView: View {
 
     var body: some View {
         PanelSurface(width: 340, height: 500) {
-            PanelHeader(title: "设置", onClose: onClose)
+            PanelHeader(title: L10n.tr("settings.title"), onClose: onClose)
 
             ScrollView {
                 VStack(spacing: 12) {
-                    settingsSection(title: "通用") {
-                        ToggleRow(title: "开机自启动", isOn: Binding(
+                    settingsSection(title: L10n.tr("settings.section.general")) {
+                        ToggleRow(title: L10n.tr("settings.launch_at_login"), isOn: Binding(
                             get: { viewModel.settings.launchAtLogin },
                             set: { value in
                                 viewModel.updateSettings { $0.launchAtLogin = value }
                             }
                         ))
 
-                        PickerRow(title: "计价货币") {
+                        PickerRow(title: L10n.tr("settings.currency")) {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.vsCurrency },
                                 set: { value in
@@ -38,7 +38,7 @@ struct SettingsView: View {
                             .frame(width: 130)
                         }
 
-                        TextFieldRow(title: "全局快捷键", text: Binding(
+                        TextFieldRow(title: L10n.tr("settings.global_shortcut"), text: Binding(
                             get: { viewModel.settings.globalShortcut },
                             set: { value in
                                 viewModel.updateSettings { $0.globalShortcut = value }
@@ -46,8 +46,8 @@ struct SettingsView: View {
                         ))
                     }
 
-                    settingsSection(title: "显示") {
-                        PickerRow(title: "菜单栏样式") {
+                    settingsSection(title: L10n.tr("settings.section.display")) {
+                        PickerRow(title: L10n.tr("settings.menu_bar_style")) {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.menuBarDisplayStyle },
                                 set: { value in
@@ -55,14 +55,14 @@ struct SettingsView: View {
                                 }
                             )) {
                                 ForEach(MenuBarStyle.allCases, id: \.self) { item in
-                                    Text(item.title).tag(item)
+                                    Text(localizedMenuBarStyle(item)).tag(item)
                                 }
                             }
                             .labelsHidden()
                             .frame(width: 160)
                         }
 
-                        PickerRow(title: "币种显示") {
+                        PickerRow(title: L10n.tr("settings.coin_display_mode")) {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.menuBarCoinDisplayMode },
                                 set: { value in
@@ -70,71 +70,87 @@ struct SettingsView: View {
                                 }
                             )) {
                                 ForEach(MenuBarCoinDisplayMode.allCases, id: \.self) { item in
-                                    Text(item.title).tag(item)
+                                    Text(localizedCoinDisplayMode(item)).tag(item)
                                 }
                             }
                             .labelsHidden()
                             .frame(width: 120)
                         }
 
-                        PickerRow(title: "涨跌颜色") {
+                        PickerRow(title: L10n.tr("settings.price_color_scheme")) {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.priceColorScheme },
                                 set: { value in
                                     viewModel.updateSettings { $0.priceColorScheme = value }
                                 }
                             )) {
-                                Text("绿涨红跌").tag(PriceColorScheme.greenUpRedDown)
-                                Text("红涨绿跌").tag(PriceColorScheme.redUpGreenDown)
+                                Text(L10n.tr("settings.price_color.green_up_red_down")).tag(PriceColorScheme.greenUpRedDown)
+                                Text(L10n.tr("settings.price_color.red_up_green_down")).tag(PriceColorScheme.redUpGreenDown)
                             }
                             .labelsHidden()
                             .frame(width: 140)
                         }
 
-                        PickerRow(title: "外观模式") {
+                        PickerRow(title: L10n.tr("settings.appearance_mode")) {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.appearanceMode },
                                 set: { value in
                                     viewModel.updateSettings { $0.appearanceMode = value }
                                 }
                             )) {
-                                Text("浅色").tag(AppearanceMode.light)
-                                Text("深色").tag(AppearanceMode.dark)
-                                Text("跟随系统").tag(AppearanceMode.system)
+                                Text(L10n.tr("settings.appearance.light")).tag(AppearanceMode.light)
+                                Text(L10n.tr("settings.appearance.dark")).tag(AppearanceMode.dark)
+                                Text(L10n.tr("settings.appearance.system")).tag(AppearanceMode.system)
+                            }
+                            .labelsHidden()
+                            .frame(width: 140)
+                        }
+
+                        PickerRow(title: L10n.tr("settings.language")) {
+                            Picker("", selection: Binding(
+                                get: { viewModel.settings.appLanguage },
+                                set: { value in
+                                    L10n.setLanguage(value)
+                                    viewModel.updateSettings { $0.appLanguage = value }
+                                }
+                            )) {
+                                ForEach(AppLanguage.allCases, id: \.self) { item in
+                                    Text(localizedAppLanguage(item)).tag(item)
+                                }
                             }
                             .labelsHidden()
                             .frame(width: 140)
                         }
                     }
 
-                    settingsSection(title: "数据") {
-                        PickerRow(title: "刷新间隔") {
+                    settingsSection(title: L10n.tr("settings.section.data")) {
+                        PickerRow(title: L10n.tr("settings.refresh_interval")) {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.refreshInterval },
                                 set: { value in
                                     viewModel.updateSettings { $0.refreshInterval = value }
                                 }
                             )) {
-                                Text("实时").tag(RefreshInterval.realtime)
-                                Text("10 秒").tag(RefreshInterval.seconds10)
-                                Text("30 秒").tag(RefreshInterval.seconds30)
-                                Text("1 分钟").tag(RefreshInterval.minute1)
-                                Text("5 分钟").tag(RefreshInterval.minutes5)
+                                Text(L10n.tr("settings.refresh.realtime")).tag(RefreshInterval.realtime)
+                                Text(L10n.tr("settings.refresh.seconds10")).tag(RefreshInterval.seconds10)
+                                Text(L10n.tr("settings.refresh.seconds30")).tag(RefreshInterval.seconds30)
+                                Text(L10n.tr("settings.refresh.minute1")).tag(RefreshInterval.minute1)
+                                Text(L10n.tr("settings.refresh.minutes5")).tag(RefreshInterval.minutes5)
                             }
                             .labelsHidden()
                             .frame(width: 130)
                         }
 
-                        PickerRow(title: "默认交易所") {
+                        PickerRow(title: L10n.tr("settings.default_exchange")) {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.defaultExchange },
                                 set: { value in
                                     viewModel.updateSettings { $0.defaultExchange = value }
                                 }
                             )) {
-                                Text("Binance").tag(Exchange.binance)
-                                Text("Coinbase").tag(Exchange.coinbase)
-                                Text("OKX").tag(Exchange.okx)
+                                Text(localizedExchange(.binance)).tag(Exchange.binance)
+                                Text(localizedExchange(.coinbase)).tag(Exchange.coinbase)
+                                Text(localizedExchange(.okx)).tag(Exchange.okx)
                             }
                             .labelsHidden()
                             .frame(width: 130)
@@ -142,7 +158,7 @@ struct SettingsView: View {
                     }
 
                     Button(action: onQuit) {
-                        Text("退出应用")
+                        Text(L10n.tr("settings.quit_app"))
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(Color.white)
                             .frame(maxWidth: .infinity, minHeight: 36)
@@ -153,6 +169,7 @@ struct SettingsView: View {
                 }
                 .padding(12)
             }
+            .id("settings-lang-\(viewModel.settings.appLanguage.rawValue)")
         }
     }
 
@@ -213,9 +230,53 @@ private struct TextFieldRow: View {
                 .foregroundStyle(NowCoinerColors.textPrimary)
                 .font(.system(size: 14))
             Spacer()
-            TextField("⌘⇧C", text: $text)
+            TextField(L10n.tr("settings.shortcut.placeholder"), text: $text)
                 .textFieldStyle(.roundedBorder)
                 .frame(width: 140)
         }
+    }
+}
+
+private func localizedMenuBarStyle(_ style: MenuBarStyle) -> String {
+    switch style {
+    case .priceOnly:
+        return L10n.tr("settings.menu_bar_style.price_only")
+    case .symbolAndPrice:
+        return L10n.tr("settings.menu_bar_style.symbol_and_price")
+    case .symbolAndChange:
+        return L10n.tr("settings.menu_bar_style.symbol_and_change")
+    case .full:
+        return L10n.tr("settings.menu_bar_style.full")
+    }
+}
+
+private func localizedCoinDisplayMode(_ mode: MenuBarCoinDisplayMode) -> String {
+    switch mode {
+    case .text:
+        return L10n.tr("settings.coin_display.text")
+    case .icon:
+        return L10n.tr("settings.coin_display.icon")
+    }
+}
+
+private func localizedExchange(_ exchange: Exchange) -> String {
+    switch exchange {
+    case .binance:
+        return L10n.tr("settings.exchange.binance")
+    case .coinbase:
+        return L10n.tr("settings.exchange.coinbase")
+    case .okx:
+        return L10n.tr("settings.exchange.okx")
+    }
+}
+
+private func localizedAppLanguage(_ language: AppLanguage) -> String {
+    switch language {
+    case .followSystem:
+        return L10n.tr("settings.language.follow_system")
+    case .zhHans:
+        return "中文"
+    case .en:
+        return "English"
     }
 }

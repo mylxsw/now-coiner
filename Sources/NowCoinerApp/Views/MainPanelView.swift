@@ -56,7 +56,7 @@ struct MainPanelView: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 8)
                     }
-                    .accessibilityLabel("Crypto Watchlist")
+                    .accessibilityLabel(L10n.tr("main.watchlist.accessibility"))
                 }
             }
 
@@ -81,7 +81,7 @@ struct MainPanelView: View {
             }
         }
         .background {
-            Button("Open Selected Detail", action: openSelectedDetail)
+            Button(L10n.tr("main.open_selected_detail"), action: openSelectedDetail)
                 .keyboardShortcut(.return, modifiers: [])
                 .hidden()
         }
@@ -103,13 +103,13 @@ struct MainPanelView: View {
     }
 
     private var header: some View {
-        PanelHeader(title: "NowCoiner") {
+        PanelHeader(title: L10n.tr("app.name")) {
             HStack(spacing: 8) {
                 PanelIconButton(systemName: "plus", action: onOpenSearch)
-                .accessibilityLabel("Add Coin")
+                .accessibilityLabel(L10n.tr("main.add_coin.accessibility"))
 
                 PanelIconButton(systemName: "gearshape", action: onOpenSettings)
-                .accessibilityLabel("Open Settings")
+                .accessibilityLabel(L10n.tr("main.open_settings.accessibility"))
             }
         }
         .accessibilityAddTraits(.isHeader)
@@ -117,10 +117,10 @@ struct MainPanelView: View {
 
     private var emptyView: some View {
         VStack(spacing: 10) {
-            Text("暂无币种")
+            Text(L10n.tr("main.empty.title"))
                 .foregroundStyle(NowCoinerColors.textPrimary)
                 .font(.system(size: 14, weight: .semibold))
-            Text("点击右上角 + 添加你关注的币种")
+            Text(L10n.tr("main.empty.subtitle"))
                 .foregroundStyle(NowCoinerColors.textSecondary)
                 .font(.system(size: 11))
         }
@@ -183,18 +183,18 @@ private struct PinLimitOverlay: View {
                 }
 
             VStack(alignment: .leading, spacing: 14) {
-                Text("置顶数量已达上限")
+                Text(L10n.tr("pin_limit.title"))
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(NowCoinerColors.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                Text("最多只能置顶 \(maxPinnedCount) 个币种，请先取消其他币种的置顶")
+                Text(L10n.tr("pin_limit.message", maxPinnedCount))
                     .font(.system(size: 11, weight: .regular))
                     .foregroundStyle(NowCoinerColors.textPrimary.opacity(0.95))
                     .fixedSize(horizontal: false, vertical: true)
 
                 Button(action: onConfirm) {
-                    Text("确定")
+                    Text(L10n.tr("common.ok"))
                         .font(.system(size: 13, weight: .semibold))
                         .frame(maxWidth: .infinity, minHeight: 38)
                         .background(Color.white.opacity(0.12))

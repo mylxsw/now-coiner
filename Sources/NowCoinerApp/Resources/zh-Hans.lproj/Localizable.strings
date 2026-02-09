@@ -1,0 +1,90 @@
+"app.name" = "NowCoiner";
+"common.ok" = "确定";
+"common.close" = "关闭";
+"common.loading" = "加载中...";
+"common.load_failed" = "加载失败";
+
+"main.watchlist.accessibility" = "加密货币观察列表";
+"main.open_selected_detail" = "打开选中详情";
+"main.add_coin.accessibility" = "添加币种";
+"main.open_settings.accessibility" = "打开设置";
+"main.empty.title" = "暂无币种";
+"main.empty.subtitle" = "点击右上角 + 添加你关注的币种";
+
+"pin_limit.title" = "置顶数量已达上限";
+"pin_limit.message" = "最多只能置顶 %d 个币种，请先取消其他币种的置顶。";
+
+"settings.title" = "设置";
+"settings.section.general" = "通用";
+"settings.section.display" = "显示";
+"settings.section.data" = "数据";
+"settings.launch_at_login" = "开机自启动";
+"settings.currency" = "计价货币";
+"settings.global_shortcut" = "全局快捷键";
+"settings.shortcut.placeholder" = "⌘⇧C";
+"settings.menu_bar_style" = "菜单栏样式";
+"settings.coin_display_mode" = "币种显示";
+"settings.price_color_scheme" = "涨跌颜色";
+"settings.appearance_mode" = "外观模式";
+"settings.language" = "语言";
+"settings.refresh_interval" = "刷新间隔";
+"settings.default_exchange" = "默认交易所";
+"settings.quit_app" = "退出应用";
+
+"settings.menu_bar_style.price_only" = "仅价格";
+"settings.menu_bar_style.symbol_and_price" = "符号 + 价格";
+"settings.menu_bar_style.symbol_and_change" = "符号 + 涨跌幅";
+"settings.menu_bar_style.full" = "完整";
+"settings.coin_display.text" = "文字";
+"settings.coin_display.icon" = "图标";
+"settings.price_color.green_up_red_down" = "绿涨红跌";
+"settings.price_color.red_up_green_down" = "红涨绿跌";
+"settings.appearance.light" = "浅色";
+"settings.appearance.dark" = "深色";
+"settings.appearance.system" = "跟随系统";
+"settings.language.follow_system" = "跟随系统";
+"settings.language.zh_hans" = "中文";
+"settings.language.en" = "英文";
+"settings.refresh.realtime" = "实时";
+"settings.refresh.seconds10" = "10 秒";
+"settings.refresh.seconds30" = "30 秒";
+"settings.refresh.minute1" = "1 分钟";
+"settings.refresh.minutes5" = "5 分钟";
+"settings.exchange.binance" = "Binance";
+"settings.exchange.coinbase" = "Coinbase";
+"settings.exchange.okx" = "OKX";
+
+"search.title" = "添加币种";
+"search.placeholder" = "搜索币种名称或代号";
+"search.added" = "已添加";
+"search.add" = "添加";
+
+"detail.title" = "币种详情";
+"detail.sparkline_7d" = "7 天走势";
+"detail.no_chart_data" = "暂无图表数据";
+"detail.market_data" = "市场数据";
+"detail.market_cap" = "市值";
+"detail.rank" = "排名";
+"detail.volume_24h" = "24h 交易量";
+"detail.high_24h" = "24h 高";
+"detail.low_24h" = "24h 低";
+"detail.links" = "外部链接";
+"detail.website" = "官网";
+"detail.whitepaper" = "白皮书";
+"detail.developer_data" = "开发者数据";
+"detail.commits_4w" = "近四周提交";
+
+"coin_row.pin" = "置顶";
+"coin_row.unpin" = "取消置顶";
+"coin_row.about" = "%@ 详情";
+"coin_row.move_top" = "移动到顶部";
+"coin_row.view_tradingview" = "在 TradingView 查看";
+"coin_row.view_exchange" = "在交易所查看";
+"coin_row.remove" = "从列表移除";
+"coin_row.accessibility.hint" = "按回车打开详情，选中时按 Delete 移除";
+"coin_row.unknown_price" = "未知价格";
+"coin_row.unknown_change" = "未知涨跌";
+"coin_row.accessibility.summary" = "%@，代码 %@，价格 %@，涨跌 %@";
+
+"status_menu.settings" = "设置";
+"status_menu.quit" = "退出";

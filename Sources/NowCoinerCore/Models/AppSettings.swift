@@ -7,6 +7,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var menuBarDisplayStyle: MenuBarStyle
     public var menuBarCoinDisplayMode: MenuBarCoinDisplayMode
     public var appearanceMode: AppearanceMode
+    public var appLanguage: AppLanguage
     public var priceColorScheme: PriceColorScheme
     public var refreshInterval: RefreshInterval
     public var defaultDataSource: DataSource
@@ -19,6 +20,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         menuBarDisplayStyle: MenuBarStyle = .symbolAndPrice,
         menuBarCoinDisplayMode: MenuBarCoinDisplayMode = .text,
         appearanceMode: AppearanceMode = .system,
+        appLanguage: AppLanguage = .followSystem,
         priceColorScheme: PriceColorScheme = .greenUpRedDown,
         refreshInterval: RefreshInterval = .realtime,
         defaultDataSource: DataSource = .coinGecko,
@@ -30,6 +32,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.menuBarDisplayStyle = menuBarDisplayStyle
         self.menuBarCoinDisplayMode = menuBarCoinDisplayMode
         self.appearanceMode = appearanceMode
+        self.appLanguage = appLanguage
         self.priceColorScheme = priceColorScheme
         self.refreshInterval = refreshInterval
         self.defaultDataSource = defaultDataSource
@@ -45,6 +48,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         case menuBarDisplayStyle
         case menuBarCoinDisplayMode
         case appearanceMode
+        case appLanguage
         case priceColorScheme
         case refreshInterval
         case defaultDataSource
@@ -60,6 +64,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         menuBarDisplayStyle = try container.decodeIfPresent(MenuBarStyle.self, forKey: .menuBarDisplayStyle) ?? .symbolAndPrice
         menuBarCoinDisplayMode = try container.decodeIfPresent(MenuBarCoinDisplayMode.self, forKey: .menuBarCoinDisplayMode) ?? .text
         appearanceMode = try container.decodeIfPresent(AppearanceMode.self, forKey: .appearanceMode) ?? .system
+        appLanguage = try container.decodeIfPresent(AppLanguage.self, forKey: .appLanguage) ?? .followSystem
         priceColorScheme = try container.decodeIfPresent(PriceColorScheme.self, forKey: .priceColorScheme) ?? .greenUpRedDown
         refreshInterval = try container.decodeIfPresent(RefreshInterval.self, forKey: .refreshInterval) ?? .realtime
         defaultDataSource = try container.decodeIfPresent(DataSource.self, forKey: .defaultDataSource) ?? .coinGecko
@@ -99,6 +104,12 @@ public enum AppearanceMode: String, Codable, CaseIterable, Sendable {
     case light
     case dark
     case system
+}
+
+public enum AppLanguage: String, Codable, CaseIterable, Sendable {
+    case followSystem
+    case zhHans
+    case en
 }
 
 public enum PriceColorScheme: String, Codable, CaseIterable, Sendable {

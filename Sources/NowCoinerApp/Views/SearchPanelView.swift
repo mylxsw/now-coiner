@@ -14,7 +14,7 @@ struct SearchPanelView: View {
 
     var body: some View {
         PanelSurface(width: 300, height: 460) {
-            PanelHeader(title: "添加币种", onClose: onClose)
+            PanelHeader(title: L10n.tr("search.title"), onClose: onClose)
 
             VStack(spacing: 0) {
                 HStack(spacing: 8) {
@@ -24,7 +24,7 @@ struct SearchPanelView: View {
 
                     AppKitTextField(
                         text: $searchVM.query,
-                        placeholder: "搜索币种名称或代号",
+                        placeholder: L10n.tr("search.placeholder"),
                         onTextChanged: {
                             searchVM.handleQueryChange()
                         }
@@ -68,7 +68,7 @@ struct SearchPanelView: View {
             Spacer()
 
             if searchVM.isAdded(coin.id, watchlist: viewModel.watchlist) {
-                Text("已添加")
+                Text(L10n.tr("search.added"))
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(NowCoinerColors.textSecondary)
                     .padding(.horizontal, 10)
@@ -81,7 +81,7 @@ struct SearchPanelView: View {
                         await viewModel.addCoin(coin)
                     }
                 } label: {
-                    Text("Add")
+                    Text(L10n.tr("search.add"))
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 12)

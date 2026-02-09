@@ -1,0 +1,90 @@
+"app.name" = "NowCoiner";
+"common.ok" = "OK";
+"common.close" = "Close";
+"common.loading" = "Loading...";
+"common.load_failed" = "Failed to load";
+
+"main.watchlist.accessibility" = "Crypto Watchlist";
+"main.open_selected_detail" = "Open Selected Detail";
+"main.add_coin.accessibility" = "Add Coin";
+"main.open_settings.accessibility" = "Open Settings";
+"main.empty.title" = "No coins yet";
+"main.empty.subtitle" = "Click + in the top-right corner to add coins you follow";
+
+"pin_limit.title" = "Pin limit reached";
+"pin_limit.message" = "You can pin at most %d coins. Please unpin another coin first.";
+
+"settings.title" = "Settings";
+"settings.section.general" = "General";
+"settings.section.display" = "Display";
+"settings.section.data" = "Data";
+"settings.launch_at_login" = "Launch at login";
+"settings.currency" = "Quote currency";
+"settings.global_shortcut" = "Global shortcut";
+"settings.shortcut.placeholder" = "⌘⇧C";
+"settings.menu_bar_style" = "Menu bar style";
+"settings.coin_display_mode" = "Coin display";
+"settings.price_color_scheme" = "Price color";
+"settings.appearance_mode" = "Appearance";
+"settings.language" = "Language";
+"settings.refresh_interval" = "Refresh interval";
+"settings.default_exchange" = "Default exchange";
+"settings.quit_app" = "Quit App";
+
+"settings.menu_bar_style.price_only" = "Price only";
+"settings.menu_bar_style.symbol_and_price" = "Symbol + Price";
+"settings.menu_bar_style.symbol_and_change" = "Symbol + Change";
+"settings.menu_bar_style.full" = "Full";
+"settings.coin_display.text" = "Text";
+"settings.coin_display.icon" = "Icon";
+"settings.price_color.green_up_red_down" = "Green up, Red down";
+"settings.price_color.red_up_green_down" = "Red up, Green down";
+"settings.appearance.light" = "Light";
+"settings.appearance.dark" = "Dark";
+"settings.appearance.system" = "Follow System";
+"settings.language.follow_system" = "Follow System";
+"settings.language.zh_hans" = "Chinese";
+"settings.language.en" = "English";
+"settings.refresh.realtime" = "Realtime";
+"settings.refresh.seconds10" = "10 sec";
+"settings.refresh.seconds30" = "30 sec";
+"settings.refresh.minute1" = "1 min";
+"settings.refresh.minutes5" = "5 min";
+"settings.exchange.binance" = "Binance";
+"settings.exchange.coinbase" = "Coinbase";
+"settings.exchange.okx" = "OKX";
+
+"search.title" = "Add Coin";
+"search.placeholder" = "Search coin name or symbol";
+"search.added" = "Added";
+"search.add" = "Add";
+
+"detail.title" = "Coin Detail";
+"detail.sparkline_7d" = "7-day trend";
+"detail.no_chart_data" = "No chart data";
+"detail.market_data" = "Market Data";
+"detail.market_cap" = "Market Cap";
+"detail.rank" = "Rank";
+"detail.volume_24h" = "24h Volume";
+"detail.high_24h" = "24h High";
+"detail.low_24h" = "24h Low";
+"detail.links" = "External Links";
+"detail.website" = "Website";
+"detail.whitepaper" = "Whitepaper";
+"detail.developer_data" = "Developer Data";
+"detail.commits_4w" = "Commits (4w)";
+
+"coin_row.pin" = "Pin";
+"coin_row.unpin" = "Unpin";
+"coin_row.about" = "About %@";
+"coin_row.move_top" = "Move to top";
+"coin_row.view_tradingview" = "View on TradingView";
+"coin_row.view_exchange" = "View on Exchange";
+"coin_row.remove" = "Remove from List";
+"coin_row.accessibility.hint" = "Press Return to open detail, Delete to remove when selected";
+"coin_row.unknown_price" = "Unknown price";
+"coin_row.unknown_change" = "Unknown change";
+"coin_row.accessibility.summary" = "%@, symbol %@, price %@, change %@";
+
+"status_menu.settings" = "Settings";
+"status_menu.quit" = "Quit";
