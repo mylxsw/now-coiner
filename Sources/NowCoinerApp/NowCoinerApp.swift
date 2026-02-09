@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 import NowCoinerCore
 
 @main
@@ -6,6 +7,7 @@ struct NowCoinerApp: App {
     @StateObject private var viewModel: TickerViewModel
 
     @State private var shortcutMonitor: GlobalShortcutMonitor?
+    @State private var statusBarRightClickMonitor: StatusBarRightClickMonitor?
     @State private var floatingPanelController = FloatingPanelController()
     @State private var searchPanelController = AnchoredPanelController()
     @State private var settingsPanelController = AnchoredPanelController()
@@ -49,6 +51,7 @@ struct NowCoinerApp: App {
 
         await viewModel.load()
         configureGlobalShortcut()
+        configureStatusBarRightClick()
         LaunchAtLoginManager.apply(enabled: viewModel.settings.launchAtLogin)
     }
 
@@ -70,6 +73,20 @@ struct NowCoinerApp: App {
         monitor.update(shortcutText: viewModel.settings.globalShortcut)
         monitor.start()
         self.shortcutMonitor = monitor
+    }
+
+    private func configureStatusBarRightClick() {
+        if let statusBarRightClickMonitor {
+            statusBarRightClickMonitor.start()
+            return
+        }
+
+        let monitor = StatusBarRightClickMonitor(
+            onOpenSettings: openSettingsFromMenu,
+            onQuit: terminateApp
+        )
+        monitor.start()
+        self.statusBarRightClickMonitor = monitor
     }
 
     private func openSearchFromMenu() {
@@ -104,10 +121,18 @@ struct NowCoinerApp: App {
                 SettingsView(viewModel: viewModel, onClose: {
                     settingsPanelController.close()
                     shortcutMonitor?.start()
-                })
+                }, onQuit: terminateApp)
                 .preferredColorScheme(preferredColorScheme)
             }
         }
+    }
+
+    private func terminateApp() {
+        searchPanelController.close()
+        settingsPanelController.close()
+        MenuAnchorResolver.endMenuTracking()
+        MenuAnchorResolver.closeAllAppWindows()
+        NSApp.terminate(nil)
     }
 
     private var preferredColorScheme: ColorScheme? {

@@ -13,63 +13,41 @@ struct SearchPanelView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            titleBar
+        PanelSurface(width: 300, height: 460) {
+            PanelHeader(title: "添加币种", onClose: onClose)
 
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(NowCoinerColors.textSecondary)
+            VStack(spacing: 0) {
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(NowCoinerColors.textSecondary)
 
-                AppKitTextField(
-                    text: $searchVM.query,
-                    placeholder: "搜索币种名称或代号",
-                    onTextChanged: {
-                        searchVM.handleQueryChange()
-                    }
-                )
-                .frame(height: 22)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(NowCoinerColors.secondaryPanel)
-
-            ScrollView {
-                LazyVStack(spacing: 0) {
-                    ForEach(searchVM.results.prefix(120), id: \.id) { coin in
-                        row(coin: coin)
-                        Divider()
-                            .overlay(NowCoinerColors.divider.opacity(0.35))
-                            .padding(.leading, 56)
-                    }
+                    AppKitTextField(
+                        text: $searchVM.query,
+                        placeholder: "搜索币种名称或代号",
+                        onTextChanged: {
+                            searchVM.handleQueryChange()
+                        }
+                    )
+                    .frame(height: 22)
                 }
-                .padding(.vertical, 8)
-            }
-        }
-        .frame(width: 300, height: 460)
-        .background(NowCoinerColors.panel)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(NowCoinerColors.secondaryPanel)
 
-    private var titleBar: some View {
-        HStack {
-            Text("添加币种")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(NowCoinerColors.textPrimary)
-            Spacer()
-            Button(action: onClose) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(NowCoinerColors.textSecondary)
-                    .frame(width: 20, height: 20)
-                    .background(NowCoinerColors.secondaryPanel)
-                    .clipShape(Circle())
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        ForEach(searchVM.results.prefix(120), id: \.id) { coin in
+                            row(coin: coin)
+                            Divider()
+                                .overlay(NowCoinerColors.divider.opacity(0.35))
+                                .padding(.leading, 56)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
             }
-            .buttonStyle(.plain)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(NowCoinerColors.secondaryPanel)
     }
 
     private func row(coin: Coin) -> some View {

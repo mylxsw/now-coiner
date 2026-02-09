@@ -1,6 +1,6 @@
 import Foundation
 
-public actor SettingsStore {
+public final class SettingsStore: @unchecked Sendable {
     private let fileStore: JSONFileStore<AppSettings>
 
     public init(url: URL) {
@@ -12,11 +12,15 @@ public actor SettingsStore {
     }
 
     public func save(_ settings: AppSettings) {
-        try? fileStore.save(settings)
+        do {
+            try fileStore.save(settings)
+        } catch {
+            NSLog("NowCoiner: failed to save settings: %@", error.localizedDescription)
+        }
     }
 }
 
-public actor WatchlistStore {
+public final class WatchlistStore: @unchecked Sendable {
     private let fileStore: JSONFileStore<[WatchlistItem]>
 
     public init(url: URL) {
@@ -29,7 +33,11 @@ public actor WatchlistStore {
     }
 
     public func save(_ items: [WatchlistItem]) {
-        try? fileStore.save(items)
+        do {
+            try fileStore.save(items)
+        } catch {
+            NSLog("NowCoiner: failed to save watchlist: %@", error.localizedDescription)
+        }
     }
 }
 
@@ -43,7 +51,7 @@ public struct DetailCacheEntry: Codable, Equatable, Sendable {
     }
 }
 
-public actor CoinCacheStore {
+public final class CoinCacheStore: @unchecked Sendable {
     private let coinStore: JSONFileStore<[Coin]>
     private let priceStore: JSONFileStore<[String: CoinPrice]>
     private let sparklineStore: JSONFileStore<[String: SparklineData]>
@@ -61,7 +69,11 @@ public actor CoinCacheStore {
     }
 
     public func saveCoins(_ coins: [Coin]) {
-        try? coinStore.save(coins)
+        do {
+            try coinStore.save(coins)
+        } catch {
+            NSLog("NowCoiner: failed to save coins cache: %@", error.localizedDescription)
+        }
     }
 
     public func loadPrices() -> [String: CoinPrice] {
@@ -69,7 +81,11 @@ public actor CoinCacheStore {
     }
 
     public func savePrices(_ prices: [String: CoinPrice]) {
-        try? priceStore.save(prices)
+        do {
+            try priceStore.save(prices)
+        } catch {
+            NSLog("NowCoiner: failed to save prices cache: %@", error.localizedDescription)
+        }
     }
 
     public func loadSparklines() -> [String: SparklineData] {
@@ -77,7 +93,11 @@ public actor CoinCacheStore {
     }
 
     public func saveSparklines(_ values: [String: SparklineData]) {
-        try? sparklineStore.save(values)
+        do {
+            try sparklineStore.save(values)
+        } catch {
+            NSLog("NowCoiner: failed to save sparklines cache: %@", error.localizedDescription)
+        }
     }
 
     public func loadDetails() -> [String: DetailCacheEntry] {
@@ -85,6 +105,10 @@ public actor CoinCacheStore {
     }
 
     public func saveDetails(_ values: [String: DetailCacheEntry]) {
-        try? detailStore.save(values)
+        do {
+            try detailStore.save(values)
+        } catch {
+            NSLog("NowCoiner: failed to save details cache: %@", error.localizedDescription)
+        }
     }
 }

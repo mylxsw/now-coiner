@@ -100,13 +100,13 @@ public final class TickerViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
-        settings = await settingsStore.load()
-        watchlist = await watchlistStore.load()
-        prices = await cacheStore.loadPrices()
-        sparklines = await cacheStore.loadSparklines()
-        detailCache = await cacheStore.loadDetails()
+        settings = settingsStore.load()
+        watchlist = watchlistStore.load()
+        prices = cacheStore.loadPrices()
+        sparklines = cacheStore.loadSparklines()
+        detailCache = cacheStore.loadDetails()
 
-        let cachedCoins = await cacheStore.loadCoins()
+        let cachedCoins = cacheStore.loadCoins()
         if !cachedCoins.isEmpty {
             coins = cachedCoins
         }
@@ -118,7 +118,7 @@ public final class TickerViewModel: ObservableObject {
             watchlist = defaults.enumerated().map { idx, id in
                 WatchlistItem(coinID: id, sortOrder: idx, isPinned: idx < 3)
             }
-            await watchlistStore.save(watchlist)
+            watchlistStore.save(watchlist)
         }
 
         if selectedCoinID == nil {
@@ -159,9 +159,9 @@ public final class TickerViewModel: ObservableObject {
                 }
             }
             coins = nextCoins
-            await cacheStore.saveCoins(nextCoins)
-            await cacheStore.savePrices(prices)
-            await cacheStore.saveSparklines(sparklines)
+            cacheStore.saveCoins(nextCoins)
+            cacheStore.savePrices(prices)
+            cacheStore.saveSparklines(sparklines)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -187,7 +187,7 @@ public final class TickerViewModel: ObservableObject {
                 current.lastUpdated = Date()
                 prices[coinID] = current
             }
-            await cacheStore.savePrices(prices)
+            cacheStore.savePrices(prices)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -214,7 +214,7 @@ public final class TickerViewModel: ObservableObject {
                 current.lastUpdated = Date()
                 prices[id] = current
             }
-            await cacheStore.savePrices(prices)
+            cacheStore.savePrices(prices)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -228,7 +228,7 @@ public final class TickerViewModel: ObservableObject {
         do {
             let detail = try await coinGecko.fetchDetail(coinID: coinID, vsCurrency: settings.vsCurrency)
             detailCache[coinID] = DetailCacheEntry(detail: detail, fetchedAt: Date())
-            await cacheStore.saveDetails(detailCache)
+            cacheStore.saveDetails(detailCache)
             return detail
         } catch {
             errorMessage = error.localizedDescription
@@ -239,13 +239,13 @@ public final class TickerViewModel: ObservableObject {
     public func addCoin(_ coin: Coin) async {
         if !coins.contains(where: { $0.id == coin.id }) {
             coins.append(coin)
-            await cacheStore.saveCoins(coins)
+            cacheStore.saveCoins(coins)
         }
 
         guard !watchlist.contains(where: { $0.coinID == coin.id }) else { return }
         let item = WatchlistItem(coinID: coin.id, sortOrder: watchlist.count)
         watchlist.append(item)
-        await watchlistStore.save(watchlist)
+        watchlistStore.save(watchlist)
         if selectedCoinID == nil {
             selectedCoinID = coin.id
         }
@@ -259,7 +259,7 @@ public final class TickerViewModel: ObservableObject {
         if selectedCoinID == coinID {
             selectedCoinID = watchlist.first?.coinID
         }
-        await watchlistStore.save(watchlist)
+        watchlistStore.save(watchlist)
         await configureRuntimeTasks()
     }
 
@@ -268,36 +268,38 @@ public final class TickerViewModel: ObservableObject {
         let item = watchlist.remove(at: index)
         watchlist.insert(item, at: 0)
         reindexWatchlist()
-        await watchlistStore.save(watchlist)
+        watchlistStore.save(watchlist)
     }
 
     public func moveCoin(from source: IndexSet, to destination: Int) async {
         watchlist = movedArray(watchlist, from: source, to: destination)
         reindexWatchlist()
-        await watchlistStore.save(watchlist)
+        watchlistStore.save(watchlist)
     }
 
     public static let maxPinnedCount = 3
 
     /// Toggle pin for a coin. Returns `false` if the pin limit is reached.
     @discardableResult
-    public func togglePin(coinID: String) async -> Bool {
+    public func togglePin(coinID: String) -> Bool {
         guard let index = watchlist.firstIndex(where: { $0.coinID == coinID }) else { return false }
         if !watchlist[index].isPinned {
             let currentPinned = watchlist.filter(\.isPinned).count
             if currentPinned >= Self.maxPinnedCount { return false }
         }
         watchlist[index].isPinned.toggle()
-        await watchlistStore.save(watchlist)
+        watchlistStore.save(watchlist)
         return true
     }
 
-    public func updateSettings(_ update: (inout AppSettings) -> Void) async {
+    public func updateSettings(_ update: (inout AppSettings) -> Void) {
         var next = settings
         update(&next)
         settings = next
-        await settingsStore.save(next)
-        await configureRuntimeTasks()
+        settingsStore.save(next)
+        Task { [weak self] in
+            await self?.configureRuntimeTasks()
+        }
     }
 
     public func selectionToggle(coinID: String) {
@@ -364,7 +366,7 @@ public final class TickerViewModel: ObservableObject {
         do {
             let values = try await coinGecko.fetchCoinList()
             coins = values
-            await cacheStore.saveCoins(values)
+            cacheStore.saveCoins(values)
         } catch {
             errorMessage = error.localizedDescription
         }

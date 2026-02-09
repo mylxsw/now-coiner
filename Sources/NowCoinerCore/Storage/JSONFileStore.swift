@@ -23,6 +23,8 @@ public struct JSONFileStore<Value: Codable & Sendable>: Sendable {
     }
 
     public func save(_ value: Value) throws {
+        let dir = url.deletingLastPathComponent()
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let data = try encoder.encode(value)
         try data.write(to: url, options: .atomic)
     }

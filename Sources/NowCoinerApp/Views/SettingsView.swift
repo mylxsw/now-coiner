@@ -4,28 +4,11 @@ import NowCoinerCore
 struct SettingsView: View {
     @ObservedObject var viewModel: TickerViewModel
     let onClose: () -> Void
+    let onQuit: () -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text("设置")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(NowCoinerColors.textPrimary)
-                Spacer()
-                Button(action: onClose) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(NowCoinerColors.textSecondary)
-                        .frame(width: 20, height: 20)
-                        .background(NowCoinerColors.secondaryPanel)
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-
-            Divider().overlay(NowCoinerColors.divider)
+        PanelSurface(width: 340, height: 500) {
+            PanelHeader(title: "设置", onClose: onClose)
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -33,7 +16,7 @@ struct SettingsView: View {
                         ToggleRow(title: "开机自启动", isOn: Binding(
                             get: { viewModel.settings.launchAtLogin },
                             set: { value in
-                                Task { await viewModel.updateSettings { $0.launchAtLogin = value } }
+                                viewModel.updateSettings { $0.launchAtLogin = value }
                             }
                         ))
 
@@ -41,7 +24,7 @@ struct SettingsView: View {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.vsCurrency },
                                 set: { value in
-                                    Task { await viewModel.updateSettings { $0.vsCurrency = value } }
+                                    viewModel.updateSettings { $0.vsCurrency = value }
                                     Task { await viewModel.refreshMarketData(includeSparkline: true) }
                                 }
                             )) {
@@ -58,7 +41,7 @@ struct SettingsView: View {
                         TextFieldRow(title: "全局快捷键", text: Binding(
                             get: { viewModel.settings.globalShortcut },
                             set: { value in
-                                Task { await viewModel.updateSettings { $0.globalShortcut = value } }
+                                viewModel.updateSettings { $0.globalShortcut = value }
                             }
                         ))
                     }
@@ -68,7 +51,7 @@ struct SettingsView: View {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.menuBarDisplayStyle },
                                 set: { value in
-                                    Task { await viewModel.updateSettings { $0.menuBarDisplayStyle = value } }
+                                    viewModel.updateSettings { $0.menuBarDisplayStyle = value }
                                 }
                             )) {
                                 ForEach(MenuBarStyle.allCases, id: \.self) { item in
@@ -83,7 +66,7 @@ struct SettingsView: View {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.priceColorScheme },
                                 set: { value in
-                                    Task { await viewModel.updateSettings { $0.priceColorScheme = value } }
+                                    viewModel.updateSettings { $0.priceColorScheme = value }
                                 }
                             )) {
                                 Text("绿涨红跌").tag(PriceColorScheme.greenUpRedDown)
@@ -97,7 +80,7 @@ struct SettingsView: View {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.appearanceMode },
                                 set: { value in
-                                    Task { await viewModel.updateSettings { $0.appearanceMode = value } }
+                                    viewModel.updateSettings { $0.appearanceMode = value }
                                 }
                             )) {
                                 Text("浅色").tag(AppearanceMode.light)
@@ -114,7 +97,7 @@ struct SettingsView: View {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.refreshInterval },
                                 set: { value in
-                                    Task { await viewModel.updateSettings { $0.refreshInterval = value } }
+                                    viewModel.updateSettings { $0.refreshInterval = value }
                                 }
                             )) {
                                 Text("实时").tag(RefreshInterval.realtime)
@@ -131,7 +114,7 @@ struct SettingsView: View {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.defaultExchange },
                                 set: { value in
-                                    Task { await viewModel.updateSettings { $0.defaultExchange = value } }
+                                    viewModel.updateSettings { $0.defaultExchange = value }
                                 }
                             )) {
                                 Text("Binance").tag(Exchange.binance)
@@ -142,17 +125,20 @@ struct SettingsView: View {
                             .frame(width: 130)
                         }
                     }
+
+                    Button(action: onQuit) {
+                        Text("退出应用")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color.white)
+                            .frame(maxWidth: .infinity, minHeight: 36)
+                            .background(NowCoinerColors.red.opacity(0.9))
+                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
                 }
                 .padding(12)
             }
         }
-        .frame(width: 340, height: 500)
-        .background(NowCoinerColors.panel)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(NowCoinerColors.divider.opacity(0.6), lineWidth: 1)
-        )
     }
 
     @ViewBuilder

@@ -40,7 +40,7 @@ final class TickerViewModelTests: XCTestCase {
         XCTAssertFalse(vm.watchlist.isEmpty)
 
         let pinBefore = vm.watchlist.first(where: { $0.coinID == "bitcoin" })?.isPinned ?? false
-        await vm.togglePin(coinID: "bitcoin")
+        _ = vm.togglePin(coinID: "bitcoin")
         let pinAfter = vm.watchlist.first(where: { $0.coinID == "bitcoin" })?.isPinned ?? false
         XCTAssertNotEqual(pinBefore, pinAfter)
 

@@ -13,7 +13,6 @@ struct MainPanelView: View {
         ZStack {
             VStack(spacing: 0) {
                 header
-                Divider().overlay(NowCoinerColors.divider)
 
                 if viewModel.visibleRows.isEmpty {
                     emptyView
@@ -33,10 +32,8 @@ struct MainPanelView: View {
                                         viewModel.selectionToggle(coinID: row.coin.id)
                                     },
                                     onPinToggle: {
-                                        Task {
-                                            let success = await viewModel.togglePin(coinID: row.coin.id)
-                                            if !success { showPinLimitNotice = true }
-                                        }
+                                        let success = viewModel.togglePin(coinID: row.coin.id)
+                                        if !success { showPinLimitNotice = true }
                                     },
                                     onOpenDetail: {
                                         detailCoinID = CoinDetailSheetItem(coinID: row.coin.id)
@@ -103,32 +100,16 @@ struct MainPanelView: View {
     }
 
     private var header: some View {
-        HStack(spacing: 8) {
-            Text("NowCoiner")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(NowCoinerColors.textPrimary)
-                .accessibilityAddTraits(.isHeader)
+        PanelHeader(title: "NowCoiner") {
+            HStack(spacing: 8) {
+                PanelIconButton(systemName: "plus", action: onOpenSearch)
+                .accessibilityLabel("Add Coin")
 
-            Spacer()
-
-            Button(action: onOpenSearch) {
-                Image(systemName: "plus")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(NowCoinerColors.textSecondary)
+                PanelIconButton(systemName: "gearshape", action: onOpenSettings)
+                .accessibilityLabel("Open Settings")
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Add Coin")
-
-            Button(action: onOpenSettings) {
-                Image(systemName: "gearshape")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(NowCoinerColors.textSecondary)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Open Settings")
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .accessibilityAddTraits(.isHeader)
     }
 
     private var emptyView: some View {
