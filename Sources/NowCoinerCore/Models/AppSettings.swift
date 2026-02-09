@@ -5,6 +5,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var globalShortcut: String
     public var vsCurrency: String
     public var menuBarDisplayStyle: MenuBarStyle
+    public var menuBarCoinDisplayMode: MenuBarCoinDisplayMode
     public var appearanceMode: AppearanceMode
     public var priceColorScheme: PriceColorScheme
     public var refreshInterval: RefreshInterval
@@ -16,6 +17,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         globalShortcut: String = "⌘⇧C",
         vsCurrency: String = "usd",
         menuBarDisplayStyle: MenuBarStyle = .symbolAndPrice,
+        menuBarCoinDisplayMode: MenuBarCoinDisplayMode = .text,
         appearanceMode: AppearanceMode = .system,
         priceColorScheme: PriceColorScheme = .greenUpRedDown,
         refreshInterval: RefreshInterval = .realtime,
@@ -26,6 +28,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
         self.globalShortcut = globalShortcut
         self.vsCurrency = vsCurrency
         self.menuBarDisplayStyle = menuBarDisplayStyle
+        self.menuBarCoinDisplayMode = menuBarCoinDisplayMode
         self.appearanceMode = appearanceMode
         self.priceColorScheme = priceColorScheme
         self.refreshInterval = refreshInterval
@@ -34,6 +37,34 @@ public struct AppSettings: Codable, Equatable, Sendable {
     }
 
     public static let `default` = AppSettings()
+
+    enum CodingKeys: String, CodingKey {
+        case launchAtLogin
+        case globalShortcut
+        case vsCurrency
+        case menuBarDisplayStyle
+        case menuBarCoinDisplayMode
+        case appearanceMode
+        case priceColorScheme
+        case refreshInterval
+        case defaultDataSource
+        case defaultExchange
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        launchAtLogin = try container.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? false
+        globalShortcut = try container.decodeIfPresent(String.self, forKey: .globalShortcut) ?? "⌘⇧C"
+        vsCurrency = try container.decodeIfPresent(String.self, forKey: .vsCurrency) ?? "usd"
+        menuBarDisplayStyle = try container.decodeIfPresent(MenuBarStyle.self, forKey: .menuBarDisplayStyle) ?? .symbolAndPrice
+        menuBarCoinDisplayMode = try container.decodeIfPresent(MenuBarCoinDisplayMode.self, forKey: .menuBarCoinDisplayMode) ?? .text
+        appearanceMode = try container.decodeIfPresent(AppearanceMode.self, forKey: .appearanceMode) ?? .system
+        priceColorScheme = try container.decodeIfPresent(PriceColorScheme.self, forKey: .priceColorScheme) ?? .greenUpRedDown
+        refreshInterval = try container.decodeIfPresent(RefreshInterval.self, forKey: .refreshInterval) ?? .realtime
+        defaultDataSource = try container.decodeIfPresent(DataSource.self, forKey: .defaultDataSource) ?? .coinGecko
+        defaultExchange = try container.decodeIfPresent(Exchange.self, forKey: .defaultExchange) ?? .binance
+    }
 }
 
 public enum MenuBarStyle: String, Codable, CaseIterable, Sendable {
@@ -48,6 +79,18 @@ public enum MenuBarStyle: String, Codable, CaseIterable, Sendable {
         case .symbolAndPrice: return "符号 + 价格"
         case .symbolAndChange: return "符号 + 涨跌幅"
         case .full: return "完整"
+        }
+    }
+}
+
+public enum MenuBarCoinDisplayMode: String, Codable, CaseIterable, Sendable {
+    case text
+    case icon
+
+    public var title: String {
+        switch self {
+        case .text: return "文字"
+        case .icon: return "图标"
         }
     }
 }

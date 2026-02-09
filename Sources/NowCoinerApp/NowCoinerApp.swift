@@ -154,13 +154,24 @@ struct NowCoinerApp: App {
 
 private struct MenuBarTickerView: View {
     @ObservedObject var viewModel: TickerViewModel
+    @State private var iconMap: [String: NSImage] = [:]
 
     var body: some View {
-        Text(labelText)
-            .font(.system(size: 12, weight: .regular))
-            .monospacedDigit()
-            .lineLimit(1)
-            .truncationMode(.tail)
+        Group {
+            if viewModel.settings.menuBarCoinDisplayMode == .icon {
+                iconModeLabel
+            } else {
+                Text(labelText)
+                    .font(.system(size: 12, weight: .regular))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+        }
+        .task(id: menuBarPrefetchIdentity) {
+            await CoinIconCache.shared.prefetch(coins: viewModel.menuBarRows.map(\.coin))
+            await refreshMenuBarIcons()
+        }
     }
 
     private var labelText: String {
@@ -181,6 +192,111 @@ private struct MenuBarTickerView: View {
         }
 
         return parts.isEmpty ? "NowCoiner" : parts.joined(separator: " | ")
+    }
+
+    private var iconModeLabel: some View {
+        let rows = Array(viewModel.menuBarRows.prefix(3))
+        let metrics = iconMetrics(for: rows.count)
+        return HStack(spacing: 3) {
+            if rows.isEmpty {
+                Text("NowCoiner")
+                    .font(.system(size: 12, weight: .regular))
+                    .lineLimit(1)
+            } else {
+                ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
+                    HStack(spacing: 1.5) {
+                        menuBarIcon(for: row.coin, size: metrics.iconSize, textSize: metrics.iconTextSize)
+                        Text(iconModeValueText(for: row.price))
+                            .font(.system(size: metrics.valueFontSize, weight: .regular))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                    }
+                    if index < rows.count - 1 {
+                        Text(" ")
+                            .font(.system(size: metrics.valueFontSize))
+                    }
+                }
+            }
+        }
+        .lineLimit(1)
+        .truncationMode(.tail)
+    }
+
+    private func iconModeValueText(for price: CoinPrice?) -> String {
+        guard let price else { return "--" }
+        let p = PriceFormatter.compactCurrency(price.currentPrice, code: viewModel.settings.vsCurrency)
+        let c = PriceFormatter.percent(price.priceChangePercent24h)
+
+        switch viewModel.settings.menuBarDisplayStyle {
+        case .priceOnly:
+            return p
+        case .symbolAndPrice:
+            return p
+        case .symbolAndChange:
+            return c
+        case .full:
+            return "\(p) \(c)"
+        }
+    }
+
+    private var menuBarPrefetchIdentity: String {
+        viewModel.menuBarRows.map { "\($0.coin.id)|\($0.coin.imageURL ?? "")" }.joined(separator: ",")
+    }
+
+    @MainActor
+    private func refreshMenuBarIcons() async {
+        var next: [String: NSImage] = [:]
+        let size = iconMetrics(for: min(viewModel.menuBarRows.count, 3)).iconSize
+        for row in viewModel.menuBarRows.prefix(3) {
+            guard let data = await CoinIconCache.shared.imageData(coinID: row.coin.id, imageURL: row.coin.imageURL),
+                  let image = NSImage(data: data) else { continue }
+            next[row.coin.id] = resizedMenuBarImage(from: image, size: size)
+        }
+        iconMap = next
+    }
+
+    @ViewBuilder
+    private func menuBarIcon(for coin: Coin, size: CGFloat, textSize: CGFloat) -> some View {
+        if let image = iconMap[coin.id] {
+            Image(nsImage: image)
+                .frame(width: size, height: size)
+                .clipShape(Circle())
+        } else {
+            Circle()
+                .fill(Color(hex: "3A3A3C"))
+                .frame(width: size, height: size)
+                .overlay(
+                    Text(String(coin.symbol.uppercased().prefix(1)))
+                        .font(.system(size: textSize, weight: .bold))
+                        .foregroundStyle(.white)
+                )
+        }
+    }
+
+    private func resizedMenuBarImage(from source: NSImage, size: CGFloat) -> NSImage {
+        let targetSize = NSSize(width: size, height: size)
+        let output = NSImage(size: targetSize)
+        output.lockFocus()
+        NSGraphicsContext.current?.imageInterpolation = .high
+
+        let sourceRect = NSRect(origin: .zero, size: source.size)
+        let destinationRect = NSRect(origin: .zero, size: targetSize)
+        source.draw(in: destinationRect, from: sourceRect, operation: .sourceOver, fraction: 1.0)
+
+        output.unlockFocus()
+        output.isTemplate = false
+        return output
+    }
+
+    private func iconMetrics(for count: Int) -> (iconSize: CGFloat, iconTextSize: CGFloat, valueFontSize: CGFloat) {
+        switch count {
+        case 3...:
+            return (iconSize: 11, iconTextSize: 7, valueFontSize: 8.5)
+        case 2:
+            return (iconSize: 12, iconTextSize: 7.5, valueFontSize: 9)
+        default:
+            return (iconSize: 13, iconTextSize: 8, valueFontSize: 10)
+        }
     }
 }
 

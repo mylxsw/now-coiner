@@ -62,6 +62,21 @@ struct SettingsView: View {
                             .frame(width: 160)
                         }
 
+                        PickerRow(title: "币种显示") {
+                            Picker("", selection: Binding(
+                                get: { viewModel.settings.menuBarCoinDisplayMode },
+                                set: { value in
+                                    viewModel.updateSettings { $0.menuBarCoinDisplayMode = value }
+                                }
+                            )) {
+                                ForEach(MenuBarCoinDisplayMode.allCases, id: \.self) { item in
+                                    Text(item.title).tag(item)
+                                }
+                            }
+                            .labelsHidden()
+                            .frame(width: 120)
+                        }
+
                         PickerRow(title: "涨跌颜色") {
                             Picker("", selection: Binding(
                                 get: { viewModel.settings.priceColorScheme },

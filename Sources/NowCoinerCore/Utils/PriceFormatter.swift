@@ -26,6 +26,28 @@ public enum PriceFormatter {
         return "\(shortSymbol)\(number)"
     }
 
+    /// Abbreviated compact currency for space-limited contexts (e.g. "$2.1K", "$87.3", "$0.096").
+    public static func abbreviatedCurrency(_ value: Double, code: String) -> String {
+        let shortSymbol = currencyShortSymbol(for: code)
+        let absValue = abs(value)
+        let sign = value < 0 ? "-" : ""
+
+        let formatted: String
+        if absValue >= 1_000_000_000 {
+            formatted = String(format: "%.1fB", absValue / 1_000_000_000)
+        } else if absValue >= 1_000_000 {
+            formatted = String(format: "%.1fM", absValue / 1_000_000)
+        } else if absValue >= 1_000 {
+            formatted = String(format: "%.1fK", absValue / 1_000)
+        } else if absValue >= 1 {
+            formatted = String(format: "%.1f", absValue)
+        } else {
+            formatted = String(format: "%.3f", absValue)
+        }
+
+        return "\(sign)\(shortSymbol)\(formatted)"
+    }
+
     private static func currencyShortSymbol(for code: String) -> String {
         switch code.lowercased() {
         case "usd": return "$"

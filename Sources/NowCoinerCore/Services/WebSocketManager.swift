@@ -46,6 +46,19 @@ public enum WebSocketMessageParser {
 }
 
 public actor BinanceWebSocketManager: WebSocketManaging {
+    private final class ResumeGate: @unchecked Sendable {
+        private let lock = NSLock()
+        private var resumed = false
+
+        func claim() -> Bool {
+            lock.lock()
+            defer { lock.unlock() }
+            guard !resumed else { return false }
+            resumed = true
+            return true
+        }
+    }
+
     private let session: URLSession
     private let baseURL: String
     private let backoff: ExponentialBackoff
@@ -160,7 +173,11 @@ public actor BinanceWebSocketManager: WebSocketManaging {
 
     private func sendPing(task: URLSessionWebSocketTask) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            let gate = ResumeGate()
+
             task.sendPing { error in
+                guard gate.claim() else { return }
+
                 if let error {
                     continuation.resume(throwing: error)
                 } else {
