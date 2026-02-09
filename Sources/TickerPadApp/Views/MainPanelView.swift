@@ -7,6 +7,7 @@ struct MainPanelView: View {
     let onOpenSearch: () -> Void
     let onOpenSettings: () -> Void
     @State private var detailCoinID: CoinDetailSheetItem?
+    @State private var showPinLimitAlert = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -27,7 +28,10 @@ struct MainPanelView: View {
                                     viewModel.selectionToggle(coinID: row.coin.id)
                                 },
                                 onPinToggle: {
-                                    Task { await viewModel.togglePin(coinID: row.coin.id) }
+                                    Task {
+                                        let success = await viewModel.togglePin(coinID: row.coin.id)
+                                        if !success { showPinLimitAlert = true }
+                                    }
                                 },
                                 onOpenDetail: {
                                     detailCoinID = CoinDetailSheetItem(coinID: row.coin.id)
@@ -68,6 +72,11 @@ struct MainPanelView: View {
         .popover(item: $detailCoinID, arrowEdge: .top) { item in
             CoinDetailView(viewModel: viewModel, coinID: item.coinID)
                 .preferredColorScheme(resolvedColorScheme)
+        }
+        .alert("置顶数量已达上限", isPresented: $showPinLimitAlert) {
+            Button("确定", role: .cancel) {}
+        } message: {
+            Text("最多只能置顶 \(TickerViewModel.maxPinnedCount) 个币种，请先取消其他币种的置顶")
         }
     }
 

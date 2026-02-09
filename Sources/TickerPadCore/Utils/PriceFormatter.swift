@@ -15,6 +15,29 @@ public enum PriceFormatter {
         return String(format: "%@ %.2f%%", sign, abs(value))
     }
 
+    /// Compact currency string using the short symbol (e.g. "$" instead of "US$").
+    public static func compactCurrency(_ value: Double, code: String) -> String {
+        let shortSymbol = currencyShortSymbol(for: code)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = value >= 1000 ? 2 : 6
+        formatter.minimumFractionDigits = value >= 1000 ? 2 : 2
+        let number = formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+        return "\(shortSymbol)\(number)"
+    }
+
+    private static func currencyShortSymbol(for code: String) -> String {
+        switch code.lowercased() {
+        case "usd": return "$"
+        case "eur": return "€"
+        case "gbp": return "£"
+        case "cny": return "¥"
+        case "jpy": return "¥"
+        default:
+            return code.uppercased() + " "
+        }
+    }
+
     public static func menuBarText(
         symbol: String,
         price: Double,
@@ -23,7 +46,7 @@ public enum PriceFormatter {
         style: MenuBarStyle
     ) -> String {
         let s = symbol.uppercased()
-        let p = currency(price, code: currencyCode)
+        let p = compactCurrency(price, code: currencyCode)
         let c = percent(changePercent)
 
         switch style {

@@ -93,7 +93,7 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public var menuBarRows: [CoinRowState] {
-        Array(visibleRows.filter(\.isPinned).prefix(5))
+        Array(visibleRows.filter(\.isPinned).prefix(Self.maxPinnedCount))
     }
 
     public func load() async {
@@ -277,10 +277,19 @@ public final class TickerViewModel: ObservableObject {
         await watchlistStore.save(watchlist)
     }
 
-    public func togglePin(coinID: String) async {
-        guard let index = watchlist.firstIndex(where: { $0.coinID == coinID }) else { return }
+    public static let maxPinnedCount = 3
+
+    /// Toggle pin for a coin. Returns `false` if the pin limit is reached.
+    @discardableResult
+    public func togglePin(coinID: String) async -> Bool {
+        guard let index = watchlist.firstIndex(where: { $0.coinID == coinID }) else { return false }
+        if !watchlist[index].isPinned {
+            let currentPinned = watchlist.filter(\.isPinned).count
+            if currentPinned >= Self.maxPinnedCount { return false }
+        }
         watchlist[index].isPinned.toggle()
         await watchlistStore.save(watchlist)
+        return true
     }
 
     public func updateSettings(_ update: (inout AppSettings) -> Void) async {

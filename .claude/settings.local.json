@@ -8,7 +8,8 @@
       "WebFetch(domain:algotrading101.com)",
       "Bash(swift build:*)",
       "WebSearch",
-      "Bash(swift test:*)"
+      "Bash(swift test:*)",
+      "Bash(swift:*)"
     ]
   }
 }
