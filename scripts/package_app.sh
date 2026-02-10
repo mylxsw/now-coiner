@@ -11,7 +11,7 @@ VERSION="${VERSION:-1.0.0}"
 BUILD_NUMBER="${BUILD_NUMBER:-$(date +%Y%m%d%H%M)}"
 MIN_SYSTEM_VERSION="${MIN_SYSTEM_VERSION:-14.0}"
 OUTPUT_DIR="${OUTPUT_DIR:-$HOME/Downloads}"
-SIGN_MODE="${SIGN_MODE:-adhoc}"  # adhoc | none
+SIGN_MODE="${SIGN_MODE:-none}"  # none | adhoc
 
 swift build -c release --product "$EXECUTABLE_NAME"
 
@@ -37,10 +37,11 @@ mkdir -p "$MACOS_PATH" "$RESOURCES_PATH"
 
 install -m 755 "$BIN_PATH" "$MACOS_PATH/$EXECUTABLE_NAME"
 
-# Copy SwiftPM resource bundle (Bundle.module payload)
+# Copy SwiftPM resource bundle (Bundle.module payload).
+# SwiftPM accessor checks: Bundle.main.bundleURL/<bundle-name>, i.e. app root.
 RESOURCE_BUNDLE="$(find "$BIN_DIR" -maxdepth 1 -type d -name "*_NowCoinerApp.bundle" | head -n 1 || true)"
 if [[ -n "$RESOURCE_BUNDLE" ]]; then
-  cp -R "$RESOURCE_BUNDLE" "$RESOURCES_PATH/"
+  cp -R "$RESOURCE_BUNDLE" "$APP_PATH/"
 else
   echo "Warning: SwiftPM resource bundle not found under $BIN_DIR" >&2
 fi
@@ -90,17 +91,24 @@ ${ICON_PLIST_LINE}
 </plist>
 PLIST
 
-if [[ "$SIGN_MODE" == "adhoc" ]]; then
-  if command -v codesign >/dev/null 2>&1; then
-    codesign --force --deep --sign - "$APP_PATH"
-  else
-    echo "Warning: codesign not found, skip signing" >&2
-  fi
-fi
-
-if command -v codesign >/dev/null 2>&1; then
-  codesign --verify --deep --strict --verbose=2 "$APP_PATH" >/dev/null || true
-fi
+case "$SIGN_MODE" in
+  none)
+    ;;
+  adhoc)
+    if command -v codesign >/dev/null 2>&1; then
+      # Note: SwiftPM executable resources are loaded from app root by default.
+      # Ad-hoc signing may fail with "unsealed contents present in the bundle root".
+      codesign --force --deep --sign - "$APP_PATH"
+      codesign --verify --deep --strict --verbose=2 "$APP_PATH" >/dev/null
+    else
+      echo "Warning: codesign not found, skip signing" >&2
+    fi
+    ;;
+  *)
+    echo "Invalid SIGN_MODE: $SIGN_MODE (expected: none or adhoc)" >&2
+    exit 1
+    ;;
+esac
 
 echo "Packaged app: $APP_PATH"
 echo "Bundle ID: $BUNDLE_ID"
