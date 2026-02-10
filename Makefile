@@ -5,4 +5,7 @@ run:
 icon:
 	./scripts/generate_app_icon.sh "$(SOURCE)" Sources/NowCoinerApp/Resources
 
-.PHONY: run icon
+package:
+	./scripts/package_app.sh
+
+.PHONY: run icon package
