@@ -34,6 +34,11 @@ struct NowCoinerApp: App {
             .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
                 viewModel.persistStateSnapshot()
             }
+            .onReceive(NotificationCenter.default.publisher(for: NSWorkspace.didWakeNotification)) { _ in
+                Task {
+                    await viewModel.handleSystemWake()
+                }
+            }
         } label: {
             MenuBarTickerView(viewModel: viewModel)
                 .task {

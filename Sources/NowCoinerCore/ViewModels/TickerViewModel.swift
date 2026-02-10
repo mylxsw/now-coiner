@@ -133,6 +133,12 @@ public final class TickerViewModel: ObservableObject {
         await configureRuntimeTasks()
     }
 
+    /// Called when the system wakes from sleep to restore all connections.
+    public func handleSystemWake() async {
+        await webSocketManager.forceReconnect()
+        await refreshSimplePrices()
+    }
+
     public func shutdown() async {
         persistStateSnapshot()
 
