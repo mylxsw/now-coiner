@@ -34,8 +34,8 @@ rm -rf "$ICONSET_DIR"
 mkdir -p "$ICONSET_DIR"
 
 # Tune this ratio if the source has lots of white margin.
-# 0.62 means: center-crop to 62% of the shorter edge before resizing.
-CROP_RATIO="${ICON_CROP_RATIO:-0.62}"
+# 0.80 means: center-crop to 80% of the shorter edge before resizing.
+CROP_RATIO="${ICON_CROP_RATIO:-0.80}"
 
 WIDTH="$(sips -g pixelWidth "$SOURCE_IMAGE" | awk '/pixelWidth/ {print $2}')"
 HEIGHT="$(sips -g pixelHeight "$SOURCE_IMAGE" | awk '/pixelHeight/ {print $2}')"
