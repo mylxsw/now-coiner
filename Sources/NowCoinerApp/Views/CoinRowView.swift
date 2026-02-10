@@ -23,16 +23,16 @@ struct CoinRowView: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
                     Text(row.coin.symbol.uppercased())
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.headline)
                         .foregroundStyle(NowCoinerColors.textPrimary)
                     if row.isPinned {
                         Image(systemName: "pin.fill")
-                            .font(.system(size: 9))
+                            .font(.caption2)
                             .foregroundStyle(NowCoinerColors.textSecondary)
                     }
                 }
                 Text(row.coin.name)
-                    .font(.system(size: 11, weight: .regular))
+                    .font(.caption)
                     .foregroundStyle(NowCoinerColors.textSecondary)
                     .lineLimit(1)
             }
@@ -40,11 +40,11 @@ struct CoinRowView: View {
 
             VStack(alignment: .trailing, spacing: 3) {
                 Text(priceText)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.headline)
                     .foregroundStyle(NowCoinerColors.textPrimary)
 
                 Text(changeText)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.caption)
                     .foregroundStyle(changeColor)
 
                 if let sparkline = row.sparkline?.prices, sparkline.count >= 2 {
@@ -53,15 +53,15 @@ struct CoinRowView: View {
                 }
             }
         }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 12)
+        .padding(.vertical, 9)
+        .padding(.horizontal, 10)
         .background(backgroundFill)
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(borderColor, lineWidth: row.isSelected ? 1 : 0.5)
+            RoundedRectangle(cornerRadius: 7)
+                .stroke(borderColor, lineWidth: row.isSelected ? 1 : 0)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .contentShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: 7))
+        .contentShape(RoundedRectangle(cornerRadius: 7))
         .onTapGesture(perform: onTap)
         .onHover { isHovered = $0 }
         .contextMenu {
@@ -83,11 +83,11 @@ struct CoinRowView: View {
         if row.isSelected {
             return NowCoinerColors.selectionFill
         }
-        return isHovered ? NowCoinerColors.secondaryPanel.opacity(0.45) : Color.clear
+        return isHovered ? Color.white.opacity(0.08) : Color.clear
     }
 
     private var borderColor: Color {
-        row.isSelected ? NowCoinerColors.selectionStroke : NowCoinerColors.divider.opacity(0.15)
+        row.isSelected ? NowCoinerColors.selectionStroke : Color.clear
     }
 
     private var iconView: some View {

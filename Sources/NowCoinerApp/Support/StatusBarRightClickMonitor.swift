@@ -29,8 +29,9 @@ final class StatusBarRightClickMonitor {
         guard windowClassName.contains("StatusBar") else { return event }
 
         let menu = NSMenu()
+        menu.showsStateColumn = false
 
-        let settingsItem = NSMenuItem(title: L10n.tr("status_menu.settings"), action: #selector(ActionTarget.openSettings), keyEquivalent: "")
+        let settingsItem = NSMenuItem(title: L10n.tr("status_menu.app_settings"), action: #selector(ActionTarget.openSettings), keyEquivalent: "")
         settingsItem.target = actionTarget
         menu.addItem(settingsItem)
         menu.addItem(.separator())

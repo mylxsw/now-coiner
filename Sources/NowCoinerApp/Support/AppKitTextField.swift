@@ -6,7 +6,7 @@ struct AppKitTextField: NSViewRepresentable {
     let placeholder: String
     var onTextChanged: (() -> Void)? = nil
 
-    final class Coordinator: NSObject, NSTextFieldDelegate {
+    final class Coordinator: NSObject, NSSearchFieldDelegate {
         var parent: AppKitTextField
 
         init(parent: AppKitTextField) {
@@ -25,14 +25,10 @@ struct AppKitTextField: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSTextField {
-        let field = NSTextField(string: text)
+        let field = NSSearchField(string: text)
         field.placeholderString = placeholder
         field.delegate = context.coordinator
-        field.isBordered = false
-        field.drawsBackground = false
-        field.focusRingType = .none
-        field.textColor = NSColor.white
-        field.font = NSFont.systemFont(ofSize: 14, weight: .regular)
+        field.font = NSFont.systemFont(ofSize: 13, weight: .regular)
 
         // Retry until the window is key and accepts first responder.
         // The panel may not be key yet when makeNSView runs.

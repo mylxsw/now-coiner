@@ -17,31 +17,24 @@ struct SearchPanelView: View {
             PanelHeader(title: L10n.tr("search.title"), onClose: onClose)
 
             VStack(spacing: 0) {
-                HStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(NowCoinerColors.textSecondary)
-
-                    AppKitTextField(
-                        text: $searchVM.query,
-                        placeholder: L10n.tr("search.placeholder"),
-                        onTextChanged: {
-                            searchVM.handleQueryChange()
-                        }
-                    )
-                    .frame(height: 22)
-                }
+                AppKitTextField(
+                    text: $searchVM.query,
+                    placeholder: L10n.tr("search.placeholder"),
+                    onTextChanged: {
+                        searchVM.handleQueryChange()
+                    }
+                )
+                .frame(height: 28)
                 .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(NowCoinerColors.secondaryPanel)
+                .padding(.vertical, 8)
+
+                Divider()
 
                 ScrollView {
                     LazyVStack(spacing: 0) {
                         ForEach(searchVM.results.prefix(120), id: \.id) { coin in
                             row(coin: coin)
-                            Divider()
-                                .overlay(NowCoinerColors.divider.opacity(0.35))
-                                .padding(.leading, 56)
+                            Divider().padding(.leading, 56)
                         }
                     }
                     .padding(.vertical, 8)
@@ -56,11 +49,11 @@ struct SearchPanelView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(coin.name)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.body.weight(.medium))
                     .foregroundStyle(NowCoinerColors.textPrimary)
                     .lineLimit(1)
                 Text(coin.symbol.uppercased())
-                    .font(.system(size: 11, weight: .regular))
+                    .font(.caption)
                     .foregroundStyle(NowCoinerColors.textSecondary)
                     .lineLimit(1)
             }
@@ -69,11 +62,11 @@ struct SearchPanelView: View {
 
             if searchVM.isAdded(coin.id, watchlist: viewModel.watchlist) {
                 Text(L10n.tr("search.added"))
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.caption)
                     .foregroundStyle(NowCoinerColors.textSecondary)
                     .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(NowCoinerColors.secondaryPanel)
+                    .padding(.vertical, 5)
+                    .background(Color.white.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 6))
             } else {
                 Button {
@@ -82,17 +75,12 @@ struct SearchPanelView: View {
                     }
                 } label: {
                     Text(L10n.tr("search.add"))
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(NowCoinerColors.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.vertical, 9)
     }
 }

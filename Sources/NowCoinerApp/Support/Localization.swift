@@ -32,7 +32,7 @@ enum L10n {
 
         guard let targetCode,
               let bundle = bundle(forLanguageCode: targetCode) else {
-            return Bundle.module
+            return Bundle.main
         }
         return bundle
     }
@@ -59,15 +59,15 @@ enum L10n {
 
     private static func bundle(forLanguageCode code: String) -> Bundle? {
         let normalizedTarget = normalizeLanguageCode(code)
-        let available = Bundle.module.localizations
+        let available = Bundle.main.localizations
 
         if let matched = available.first(where: { normalizeLanguageCode($0) == normalizedTarget }),
-           let path = Bundle.module.path(forResource: matched, ofType: "lproj"),
+           let path = Bundle.main.path(forResource: matched, ofType: "lproj"),
            let bundle = Bundle(path: path) {
             return bundle
         }
 
-        if let path = Bundle.module.path(forResource: code, ofType: "lproj"),
+        if let path = Bundle.main.path(forResource: code, ofType: "lproj"),
            let bundle = Bundle(path: path) {
             return bundle
         }

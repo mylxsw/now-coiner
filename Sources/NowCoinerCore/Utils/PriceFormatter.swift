@@ -26,6 +26,31 @@ public enum PriceFormatter {
         return "\(shortSymbol)\(number)"
     }
 
+    /// Compact currency string with fixed fraction digits (pads with trailing zeros).
+    public static func compactCurrency(_ value: Double, code: String, fractionDigits: Int) -> String {
+        let shortSymbol = currencyShortSymbol(for: code)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = max(0, fractionDigits)
+        formatter.maximumFractionDigits = max(0, fractionDigits)
+        let number = formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+        return "\(shortSymbol)\(number)"
+    }
+
+    /// Recommended compact fraction digits based on current compact display rules.
+    /// Values >= 1000 are fixed to 2 decimals; others follow current compact output.
+    public static func compactFractionDigits(for value: Double) -> Int {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = value >= 1000 ? 2 : 6
+        formatter.minimumFractionDigits = value >= 1000 ? 2 : 2
+
+        let text = formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+        let separator = formatter.decimalSeparator ?? "."
+        guard let range = text.range(of: separator) else { return 0 }
+        return text.distance(from: range.upperBound, to: text.endIndex)
+    }
+
     /// Abbreviated compact currency for space-limited contexts (e.g. "$2.1K", "$87.3", "$0.096").
     public static func abbreviatedCurrency(_ value: Double, code: String) -> String {
         let shortSymbol = currencyShortSymbol(for: code)

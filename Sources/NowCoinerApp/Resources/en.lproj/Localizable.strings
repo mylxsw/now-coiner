@@ -87,5 +87,5 @@
 "coin_row.unknown_change" = "Unknown change";
 "coin_row.accessibility.summary" = "%@, symbol %@, price %@, change %@";
 
-"status_menu.settings" = "Settings";
+"status_menu.app_settings" = "App Settings";
 "status_menu.quit" = "Quit";
