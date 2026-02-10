@@ -13,6 +13,7 @@ public struct WebSocketTick: Equatable, Sendable {
 public protocol WebSocketManaging: Sendable {
     func connect(symbols: [String]) async
     func disconnect() async
+    func forceReconnect() async
     var ticks: AsyncStream<WebSocketTick> { get }
 }
 
@@ -68,8 +69,11 @@ public actor BinanceWebSocketManager: WebSocketManaging {
     private var receiveTask: Task<Void, Never>?
     private var pingTask: Task<Void, Never>?
     private var reconnectTask: Task<Void, Never>?
+    private var staleCheckTask: Task<Void, Never>?
     private var shouldRun = false
     private var reconnectAttempt = 0
+    private var lastTickTime: Date = .distantPast
+    private let staleTimeout: TimeInterval
 
     private let stream: AsyncStream<WebSocketTick>
     private let continuation: AsyncStream<WebSocketTick>.Continuation
@@ -81,11 +85,13 @@ public actor BinanceWebSocketManager: WebSocketManaging {
     public init(
         session: URLSession = .shared,
         baseURL: String = "wss://stream.binance.com:9443",
-        backoff: ExponentialBackoff = ExponentialBackoff()
+        backoff: ExponentialBackoff = ExponentialBackoff(),
+        staleTimeout: TimeInterval = 30
     ) {
         self.session = session
         self.baseURL = baseURL
         self.backoff = backoff
+        self.staleTimeout = staleTimeout
 
         var localContinuation: AsyncStream<WebSocketTick>.Continuation?
         self.stream = AsyncStream<WebSocketTick> { continuation in
@@ -114,6 +120,9 @@ public actor BinanceWebSocketManager: WebSocketManaging {
         reconnectTask?.cancel()
         reconnectTask = nil
 
+        staleCheckTask?.cancel()
+        staleCheckTask = nil
+
         pingTask?.cancel()
         pingTask = nil
 
@@ -134,12 +143,17 @@ public actor BinanceWebSocketManager: WebSocketManaging {
         let task = session.webSocketTask(with: requestURL)
         socketTask = task
         task.resume()
+        lastTickTime = Date()
 
         startPingLoop(using: task)
         startReceiveLoop(using: task)
+        startStaleCheckLoop()
     }
 
     private func stopCurrentSocket() async {
+        staleCheckTask?.cancel()
+        staleCheckTask = nil
+
         pingTask?.cancel()
         pingTask = nil
 
@@ -193,6 +207,7 @@ public actor BinanceWebSocketManager: WebSocketManaging {
                 do {
                     let message = try await task.receive()
                     reconnectAttempt = 0
+                    lastTickTime = Date()
 
                     switch message {
                     case .string(let text):
@@ -213,6 +228,27 @@ public actor BinanceWebSocketManager: WebSocketManaging {
                 }
             }
         }
+    }
+
+    private func startStaleCheckLoop() {
+        staleCheckTask?.cancel()
+        staleCheckTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(staleTimeout))
+                guard !Task.isCancelled, shouldRun else { return }
+                if Date().timeIntervalSince(lastTickTime) >= staleTimeout {
+                    await handleDisconnect()
+                    return
+                }
+            }
+        }
+    }
+
+    /// Force reconnect. Called externally when the system wakes from sleep.
+    public func forceReconnect() async {
+        guard shouldRun, !subscribedSymbols.isEmpty else { return }
+        reconnectAttempt = 0
+        await establishConnection()
     }
 
     private func handleDisconnect() async {
@@ -252,6 +288,8 @@ public actor StubWebSocketManager: WebSocketManaging {
     }
 
     public func disconnect() async {}
+
+    public func forceReconnect() async {}
 
     public func emit(_ tick: WebSocketTick) {
         continuation.yield(tick)

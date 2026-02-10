@@ -2,6 +2,10 @@
 run:
 	swift run NowCoinerApp
 
+run-after-build:
+	./scripts/package_app.sh
+	open ~/Downloads/NowCoiner.app
+
 icon:
 	./scripts/generate_app_icon.sh "$(SOURCE)" Sources/NowCoinerApp/Resources
 
@@ -14,4 +18,4 @@ preflight:
 release:
 	./scripts/release_notarize.sh
 
-.PHONY: run icon package preflight release
+.PHONY: run run-after-build icon package preflight release
