@@ -37,13 +37,14 @@ mkdir -p "$MACOS_PATH" "$RESOURCES_PATH"
 
 install -m 755 "$BIN_PATH" "$MACOS_PATH/$EXECUTABLE_NAME"
 
-# Copy SwiftPM resource bundle (Bundle.module payload).
-# SwiftPM accessor checks: Bundle.main.bundleURL/<bundle-name>, i.e. app root.
-RESOURCE_BUNDLE="$(find "$BIN_DIR" -maxdepth 1 -type d -name "*_NowCoinerApp.bundle" | head -n 1 || true)"
-if [[ -n "$RESOURCE_BUNDLE" ]]; then
-  cp -R "$RESOURCE_BUNDLE" "$APP_PATH/"
+# Copy localizations into standard app resources layout.
+RESOURCE_SRC_DIR="$ROOT_DIR/Sources/NowCoinerApp/Resources"
+if [[ -d "$RESOURCE_SRC_DIR" ]]; then
+  while IFS= read -r -d '' lproj_dir; do
+    cp -R "$lproj_dir" "$RESOURCES_PATH/"
+  done < <(find "$RESOURCE_SRC_DIR" -maxdepth 1 -type d -name "*.lproj" -print0)
 else
-  echo "Warning: SwiftPM resource bundle not found under $BIN_DIR" >&2
+  echo "Warning: resource source dir not found: $RESOURCE_SRC_DIR" >&2
 fi
 
 # Optional icon file for Finder / app metadata

@@ -8,4 +8,10 @@ icon:
 package:
 	./scripts/package_app.sh
 
-.PHONY: run icon package
+preflight:
+	./scripts/release_preflight.sh
+
+release:
+	./scripts/release_notarize.sh
+
+.PHONY: run icon package preflight release
