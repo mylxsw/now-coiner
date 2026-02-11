@@ -1,87 +1,212 @@
-# NowCoiner
+<p align="center">
+  <img src="Sources/NowCoinerApp/Resources/AppIcon.iconset/icon_128x128@2x.png" width="128" height="128" alt="NowCoiner Icon">
+</p>
 
-NowCoiner 是一个基于 macOS 菜单栏的加密货币价格追踪应用实现，按 `REQUIREMENTS.md` 的 MVVM 架构落地。
+<h1 align="center">NowCoiner</h1>
 
-## 模块结构
+<p align="center">
+  A lightweight macOS menu bar app for tracking cryptocurrency prices in real time.
+</p>
 
-```text
-Sources/
-  NowCoinerCore/
-    Models/      # 领域模型
-    Services/    # CoinGecko / Binance / WebSocket
-    Storage/     # JSON 持久化仓储
-    Utils/       # 格式化、搜索、URL、退避
-    ViewModels/  # 核心状态与业务编排
-  NowCoinerApp/
-    Support/     # 应用容器、快捷键、浮动面板、开机自启
-    Views/       # 主面板、搜索、设置、详情、行视图
-Tests/
-  NowCoinerCoreTests/
-```
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-macOS%2014%2B-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/swift-6.2-orange" alt="Swift">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+</p>
 
-## 已实现功能
+<!--
+TODO: Add screenshots here
+<p align="center">
+  <img src="docs/screenshots/menu-bar.png" width="600" alt="Menu Bar">
+</p>
+-->
 
-- 菜单栏多币种 ticker 文本展示（样式可配置）。
-- 主面板币种列表、选中态、拖拽排序、Pin/Unpin、删除、置顶。
-- 主面板键盘导航：`↑/↓` 选择、`Return` 打开详情、`Delete` 删除选中项。
-- 搜索面板：300ms 防抖、本地过滤、添加币种。
-- 币种详情页：基础信息、7 天图表、市场数据、外链、开发者数据。
-- 币种详情 10 分钟 TTL 缓存（内存 + 本地落盘）。
-- 行内 Sparkline（Swift Charts）。
-- 右键菜单：Pin、About、Move to top、TradingView、Exchange、Remove。
-- 实时更新链路：
-  - Binance WebSocket `miniTicker`（支持断线重连 + 指数退避 + ping）。
-  - CoinGecko `simple/price` 周期性刷新补充字段。
-  - CoinGecko `coins/markets` 每 5 分钟刷新 Sparkline。
-- 设置项：
-  - 开机自启
-  - 全局快捷键
-  - 计价货币
-  - 菜单栏样式
-  - 外观模式（浅色/深色/系统）
-  - 涨跌配色
-  - 刷新间隔
-  - 默认数据源
-  - 默认交易所
-- 全局快捷键唤起/隐藏浮动主面板。
-- 本地持久化：`settings/watchlist/cache(coins/prices/sparklines/details)`。
+## Features
 
-## 测试覆盖
+**Menu Bar Ticker**
+- Display pinned coin prices directly in the macOS menu bar
+- Multiple display styles: price only, symbol + price, symbol + change, or full
+- Text or icon display mode with optional price coloring
 
-`NowCoinerCoreTests` 包含 13 个测试：
+**Real-Time Updates**
+- Sub-second price updates via Binance WebSocket (`miniTicker` stream)
+- Automatic reconnection with exponential backoff
+- CoinGecko REST polling for supplementary market data (24h change, market cap)
+- Sparkline data refreshed every 5 minutes
 
-- `PriceFormatterTests`
-- `ExchangeURLBuilderTests`
-- `SearchFilterTests`
-- `ExponentialBackoffTests`
-- `JSONFileStoreTests`
-- `TickerViewModelTests`
-- `TickerRealtimeTests`
-- `WebSocketMessageParserTests`
-- `TickerDetailCacheTests`
+**Watchlist Management**
+- Add coins from a searchable catalog (CoinGecko-sourced)
+- Drag-to-reorder, pin/unpin (up to 3), move to top, remove
+- Keyboard navigation: arrow keys to browse, Return to open detail, Delete to remove
 
-## 运行与测试
+**Coin Detail View**
+- 7-day sparkline chart (Swift Charts)
+- Market data: market cap, rank, 24h volume, high/low
+- Links to website, whitepaper, Reddit, GitHub
+- Developer stats: stars, forks, recent commits
+- 10-minute local cache with TTL
+
+**Customizable Settings**
+- Launch at login
+- Global shortcut (default `⌘⇧C`) to summon a floating panel
+- Quote currency selection
+- Appearance: light / dark / system
+- Price color scheme: green-up-red-down or inverted
+- Refresh interval: realtime, 10s, 30s, 1m, 5m
+- Default exchange: Binance, Coinbase, OKX
+
+**Other**
+- Context menu with quick links to TradingView and exchange pages
+- Bilingual UI: English and Simplified Chinese
+- Zero external dependencies — pure Swift / SwiftUI / AppKit
+- Runs as an LSUIElement (menu bar only, no Dock icon)
+
+## Requirements
+
+- macOS 14.0 (Sonoma) or later
+- Swift 6.2+ toolchain (Xcode 26 or matching swift.org toolchain)
+
+## Installation
+
+### Build from Source
 
 ```bash
-swift test
-swift run NowCoinerApp
+git clone https://github.com/mylxsw/NowCoiner.git
+cd NowCoiner
+swift build -c release
 ```
 
-## 环境变量
+The built binary is at `.build/release/NowCoinerApp`. To create a distributable `.app` bundle:
 
-- `COINGECKO_API_KEY`（可选）：设置后自动作为 `x-cg-demo-api-key` 请求头发送。
+```bash
+./scripts/package_app.sh
+```
 
-## 数据目录
+### Download
 
-运行后会写入：
+Pre-built binaries are available on the [Releases](https://github.com/mylxsw/NowCoiner/releases) page.
 
-```text
+## Usage
+
+Launch NowCoiner and it appears as a ticker in your menu bar — no Dock icon, no main window. Click the ticker to open the watchlist panel.
+
+| Action | How |
+|---|---|
+| Open watchlist | Click the menu bar ticker |
+| Search & add coins | Click the search icon in the panel |
+| Open settings | Click the gear icon in the panel |
+| Summon floating panel | Press `⌘⇧C` (configurable) |
+| Navigate list | `↑` / `↓` arrow keys |
+| Open coin detail | `Return` |
+| Remove coin | `Delete` or right-click → Remove |
+| Reorder coins | Drag and drop |
+
+## Configuration
+
+All settings are persisted as JSON under:
+
+```
 ~/Library/Application Support/NowCoiner/
-  settings.json
-  watchlist.json
-  cache/
-    coins_list.json
-    prices.json
-    sparklines.json
-    details.json
+├── settings.json
+├── watchlist.json
+└── cache/
+    ├── coins_list.json
+    ├── prices.json
+    ├── sparklines.json
+    └── details.json
 ```
+
+### Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `COINGECKO_API_KEY` | No | Sent as `x-cg-demo-api-key` header on CoinGecko requests. Useful if you hit rate limits. |
+
+## Architecture
+
+NowCoiner is a two-target Swift Package (no Xcode project file):
+
+```
+Sources/
+├── NowCoinerCore/          # Library — all testable logic
+│   ├── Models/             # Coin, CoinDetail, AppSettings
+│   ├── Services/           # CoinGecko, Binance, WebSocket
+│   ├── Storage/            # JSON file persistence
+│   ├── Utils/              # Formatting, search, URL building
+│   └── ViewModels/         # TickerViewModel, SearchViewModel
+└── NowCoinerApp/           # Executable — UI layer
+    ├── Views/              # SwiftUI views
+    ├── Support/            # AppKit integration, panels, shortcuts
+    └── Resources/          # App icon, localization strings
+```
+
+The app follows MVVM with protocol-driven services:
+
+```
+Views (SwiftUI)
+  └─ TickerViewModel (@MainActor, ObservableObject)
+       ├─ CoinGeckoServicing  → REST API client
+       ├─ BinanceServicing    → REST API client
+       ├─ WebSocketManaging   → Real-time price stream
+       └─ Storage             → SettingsStore / WatchlistStore / CoinCacheStore
+```
+
+All service dependencies are defined as protocols, making them easy to mock in tests. `AppContainer` wires everything together at launch.
+
+### Data Flow
+
+1. **Binance WebSocket** pushes `miniTicker` events → `TickerViewModel` applies ticks in real time
+2. **CoinGecko polling** (every 60s) supplements 24h change and market cap
+3. **Sparkline refresh** (every 5 min) updates 7-day chart data
+4. WebSocket auto-reconnects with exponential backoff; system wake triggers immediate reconnection
+
+## Development
+
+```bash
+# Build
+swift build
+
+# Run
+swift run NowCoinerApp
+
+# Test
+swift test
+
+# Run a specific test suite
+swift test --filter PriceFormatterTests
+```
+
+### Testing
+
+Tests live in `NowCoinerCoreTests` and cover:
+
+- Price formatting (`PriceFormatterTests`)
+- Exchange URL generation (`ExchangeURLBuilderTests`)
+- Search filtering (`SearchFilterTests`)
+- Exponential backoff logic (`ExponentialBackoffTests`)
+- JSON persistence (`JSONFileStoreTests`)
+- ViewModel state management (`TickerViewModelTests`)
+- Real-time tick processing (`TickerRealtimeTests`)
+- WebSocket message parsing (`WebSocketMessageParserTests`)
+- Detail cache TTL (`TickerDetailCacheTests`)
+
+Each test creates mock services and temporary file-backed stores — no network calls, no side effects.
+
+## Contributing
+
+Contributions are welcome! Please open an issue first to discuss what you'd like to change.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [CoinGecko API](https://www.coingecko.com/en/api) — coin metadata and market data
+- [Binance WebSocket API](https://binance-docs.github.io/apidocs/spot/en/) — real-time price streaming
