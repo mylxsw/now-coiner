@@ -37,9 +37,9 @@ mkdir -p "$MACOS_PATH" "$RESOURCES_PATH"
 
 install -m 755 "$BIN_PATH" "$MACOS_PATH/$EXECUTABLE_NAME"
 
-# Copy SwiftPM resource bundles so the executable can find them at runtime.
+# Copy SwiftPM resource bundles into app root (where Bundle.main.bundleURL points).
 while IFS= read -r -d '' bundle_dir; do
-  cp -R "$bundle_dir" "$MACOS_PATH/"
+  cp -R "$bundle_dir" "$APP_PATH/"
 done < <(find "$BIN_DIR" -maxdepth 1 -type d -name "*.bundle" -print0)
 
 # Copy localizations into standard app resources layout.
