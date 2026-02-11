@@ -37,6 +37,11 @@ mkdir -p "$MACOS_PATH" "$RESOURCES_PATH"
 
 install -m 755 "$BIN_PATH" "$MACOS_PATH/$EXECUTABLE_NAME"
 
+# Copy SwiftPM resource bundles so the executable can find them at runtime.
+while IFS= read -r -d '' bundle_dir; do
+  cp -R "$bundle_dir" "$MACOS_PATH/"
+done < <(find "$BIN_DIR" -maxdepth 1 -type d -name "*.bundle" -print0)
+
 # Copy localizations into standard app resources layout.
 RESOURCE_SRC_DIR="$ROOT_DIR/Sources/NowCoinerApp/Resources"
 if [[ -d "$RESOURCE_SRC_DIR" ]]; then
