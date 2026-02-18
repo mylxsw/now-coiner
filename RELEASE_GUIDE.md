@@ -8,6 +8,7 @@
 - Apple 开发者账号：已加入 Apple Developer Program
 - 证书：Keychain 中已有 `Developer ID Application` 证书
 - 公证工具：`xcrun notarytool` 可用
+- Entitlements：项目根目录已有 `NowCoiner.entitlements`（已内置，按需修改）
 
 可用命令检查：
 
@@ -21,7 +22,7 @@ xcrun notarytool --help
 如果你要更新图标，先执行：
 
 ```bash
-cd /Users/mylxsw/Workspace/codes/vibe/crypto-menubar
+cd <项目根目录>
 make icon SOURCE="/绝对路径/你的大图.png"
 ```
 
@@ -34,7 +35,7 @@ make icon SOURCE="/绝对路径/你的大图.png"
 ## 2. 本地打包 App
 
 ```bash
-cd /Users/mylxsw/Workspace/codes/vibe/crypto-menubar
+cd <项目根目录>
 make package
 ```
 
@@ -45,7 +46,7 @@ make package
 可选参数示例：
 
 ```bash
-cd /Users/mylxsw/Workspace/codes/vibe/crypto-menubar
+cd <项目根目录>
 APP_NAME="NowCoiner" \
 BUNDLE_ID="com.yourcompany.nowcoiner" \
 VERSION="1.0.0" \
@@ -59,10 +60,10 @@ make package
 - `SIGN_MODE=none`：仅打包，不签名（默认）
 - `SIGN_MODE=adhoc`：本地 ad-hoc 签名，便于验证包结构
 
-## 3. 发布前预检（必须）
+## 3. 发布前预检（可选单独运行）
 
 ```bash
-cd /Users/mylxsw/Workspace/codes/vibe/crypto-menubar
+cd <项目根目录>
 make preflight
 ```
 
@@ -75,7 +76,7 @@ make preflight
 - `codesign` 验证
 - `spctl` 评估（未公证前失败是常见现象）
 
-如果预检失败，先修复再进入发布。
+> **注意**：`make release`（Step 5）内部会自动运行一次预检，此步骤可用于提前排查问题，不是必须单独执行的步骤。如果预检失败，先修复再进入发布。
 
 ## 4. 配置 notarytool 凭据（一次性）
 
@@ -93,21 +94,29 @@ xcrun notarytool store-credentials "notary-profile" \
 执行：
 
 ```bash
-cd /Users/mylxsw/Workspace/codes/vibe/crypto-menubar
+cd <项目根目录>
 DEVELOPER_ID_APP="Developer ID Application: Your Name (TEAMID)" \
 NOTARY_PROFILE="notary-profile" \
 make release
 ```
 
+`DEVELOPER_ID_APP` 的完整字符串可通过以下命令查看：
+
+```bash
+security find-identity -v -p codesigning
+```
+
 该步骤会自动：
 
-1. 运行发布门禁预检  
-2. 对 `.app` 做 Developer ID 签名（Hardened Runtime + timestamp）  
-3. 生成 DMG  
-4. 对 DMG 签名  
-5. 提交公证并等待结果  
-6. 对 `.app` 和 `.dmg` 做 `staple`  
+1. 运行发布门禁预检
+2. 从内到外对 `.app` 做 Developer ID 签名（Hardened Runtime + entitlements + timestamp）
+3. 生成 DMG
+4. 对 DMG 签名
+5. 提交公证并等待结果
+6. 对 `.app` 和 `.dmg` 做 `staple`
 7. 验证 `staple` 结果
+
+> **关于 Entitlements**：签名时自动使用项目根目录的 `NowCoiner.entitlements`。当前 app 仅需出站网络连接（WebSocket/HTTPS），Hardened Runtime 默认允许，无需额外权限声明。若将来新增麦克风、位置等系统权限，在该文件中补充对应 key 即可。
 
 默认产物：
 

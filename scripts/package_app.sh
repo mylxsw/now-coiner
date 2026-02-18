@@ -6,7 +6,7 @@ cd "$ROOT_DIR"
 
 APP_NAME="${APP_NAME:-NowCoiner}"
 EXECUTABLE_NAME="${EXECUTABLE_NAME:-NowCoinerApp}"
-BUNDLE_ID="${BUNDLE_ID:-com.mylxsw.nowcoiner}"
+BUNDLE_ID="${BUNDLE_ID:-ai.gulu.app.nowcoiner}"
 VERSION="${VERSION:-1.0.0}"
 BUILD_NUMBER="${BUILD_NUMBER:-$(date +%Y%m%d%H%M)}"
 MIN_SYSTEM_VERSION="${MIN_SYSTEM_VERSION:-14.0}"
@@ -37,9 +37,9 @@ mkdir -p "$MACOS_PATH" "$RESOURCES_PATH"
 
 install -m 755 "$BIN_PATH" "$MACOS_PATH/$EXECUTABLE_NAME"
 
-# Copy SwiftPM resource bundles into app root (where Bundle.main.bundleURL points).
+# Copy SwiftPM resource bundles into Contents/Resources (where Bundle.main.resourceURL points).
 while IFS= read -r -d '' bundle_dir; do
-  cp -R "$bundle_dir" "$APP_PATH/"
+  cp -R "$bundle_dir" "$RESOURCES_PATH/"
 done < <(find "$BIN_DIR" -maxdepth 1 -type d -name "*.bundle" -print0)
 
 # Copy localizations into standard app resources layout.
@@ -102,8 +102,7 @@ case "$SIGN_MODE" in
     ;;
   adhoc)
     if command -v codesign >/dev/null 2>&1; then
-      # Note: SwiftPM executable resources are loaded from app root by default.
-      # Ad-hoc signing may fail with "unsealed contents present in the bundle root".
+      # Resource bundles are in Contents/Resources, so --deep ad-hoc signing works correctly.
       codesign --force --deep --sign - "$APP_PATH"
       codesign --verify --deep --strict --verbose=2 "$APP_PATH" >/dev/null
     else
