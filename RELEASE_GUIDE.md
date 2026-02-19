@@ -1,8 +1,14 @@
 # NowCoiner 正式发布指南（macOS）
 
-本文档基于当前项目脚本，给出一套从本地打包到签名、公证、产出 DMG 的完整流程。
+本文档涵盖两种发布渠道：**直接分发（Developer ID + DMG）** 和 **Mac App Store**。
 
-## 0. 先决条件
+---
+
+## 渠道一：Developer ID 直接分发（DMG）
+
+适合从官网/GitHub 下载安装的场景，无 Apple 审核。
+
+### 先决条件
 
 - 系统：macOS（已安装 Xcode Command Line Tools）
 - Apple 开发者账号：已加入 Apple Developer Program
@@ -10,45 +16,32 @@
 - 公证工具：`xcrun notarytool` 可用
 - Entitlements：项目根目录已有 `NowCoiner.entitlements`（已内置，按需修改）
 
-可用命令检查：
-
 ```bash
 security find-identity -v -p codesigning
 xcrun notarytool --help
 ```
 
-## 1. 生成 App 图标（可选）
-
-如果你要更新图标，先执行：
+### 1. 生成 App 图标（可选）
 
 ```bash
 cd <项目根目录>
 make icon SOURCE="/绝对路径/你的大图.png"
 ```
 
-产物会放在：
+产物：`Sources/NowCoinerApp/Resources/AppIcon.icns`
 
-- `Sources/NowCoinerApp/Resources/AppIcon-1024.png`
-- `Sources/NowCoinerApp/Resources/AppIcon.iconset`
-- `Sources/NowCoinerApp/Resources/AppIcon.icns`
-
-## 2. 本地打包 App
+### 2. 本地打包 App
 
 ```bash
 cd <项目根目录>
 make package
 ```
 
-默认输出：
-
-- `~/Downloads/NowCoiner.app`
-
-可选参数示例：
+默认输出 `~/Downloads/NowCoiner.app`。可选参数：
 
 ```bash
-cd <项目根目录>
 APP_NAME="NowCoiner" \
-BUNDLE_ID="com.yourcompany.nowcoiner" \
+BUNDLE_ID="ai.gulu.app.nowcoiner" \
 VERSION="1.0.0" \
 BUILD_NUMBER="100" \
 SIGN_MODE=adhoc \
@@ -56,31 +49,19 @@ make package
 ```
 
 说明：
-
 - `SIGN_MODE=none`：仅打包，不签名（默认）
 - `SIGN_MODE=adhoc`：本地 ad-hoc 签名，便于验证包结构
 
-## 3. 发布前预检（可选单独运行）
+### 3. 发布前预检（可选单独运行）
 
 ```bash
 cd <项目根目录>
 make preflight
 ```
 
-预检项包括：
+> `make release` 内部会自动运行预检，此步骤可用于提前排查问题。
 
-- `.app` 基本结构
-- `Info.plist` 合法性与关键字段
-- `AppIcon.icns` 是否存在
-- 是否存在阻塞签名的根目录 `.bundle`
-- `codesign` 验证
-- `spctl` 评估（未公证前失败是常见现象）
-
-> **注意**：`make release`（Step 5）内部会自动运行一次预检，此步骤可用于提前排查问题，不是必须单独执行的步骤。如果预检失败，先修复再进入发布。
-
-## 4. 配置 notarytool 凭据（一次性）
-
-先在本机保存 notary profile：
+### 4. 配置 notarytool 凭据（一次性）
 
 ```bash
 xcrun notarytool store-credentials "notary-profile" \
@@ -89,9 +70,9 @@ xcrun notarytool store-credentials "notary-profile" \
   --password "APP_SPECIFIC_PASSWORD"
 ```
 
-## 5. 正式签名 + 公证 + 生成 DMG
+`APP_SPECIFIC_PASSWORD` 是 App 专用密码，在 [appleid.apple.com](https://appleid.apple.com) → 登录和安全性 → App 专用密码 中生成。
 
-执行：
+### 5. 正式签名 + 公证 + 生成 DMG
 
 ```bash
 cd <项目根目录>
@@ -100,73 +81,118 @@ NOTARY_PROFILE="notary-profile" \
 make release
 ```
 
-`DEVELOPER_ID_APP` 的完整字符串可通过以下命令查看：
+`DEVELOPER_ID_APP` 完整字符串通过以下命令查看：
 
 ```bash
 security find-identity -v -p codesigning
 ```
 
-该步骤会自动：
-
-1. 运行发布门禁预检
+该步骤自动完成：
+1. 运行预检
 2. 从内到外对 `.app` 做 Developer ID 签名（Hardened Runtime + entitlements + timestamp）
-3. 生成 DMG
-4. 对 DMG 签名
-5. 提交公证并等待结果
-6. 对 `.app` 和 `.dmg` 做 `staple`
-7. 验证 `staple` 结果
+3. 生成 DMG 并签名
+4. 提交公证并等待结果
+5. 对 `.app` 和 `.dmg` 做 staple 并验证
 
-> **关于 Entitlements**：签名时自动使用项目根目录的 `NowCoiner.entitlements`。当前 app 仅需出站网络连接（WebSocket/HTTPS），Hardened Runtime 默认允许，无需额外权限声明。若将来新增麦克风、位置等系统权限，在该文件中补充对应 key 即可。
+默认产物：`~/Downloads/NowCoiner.app`、`~/Downloads/NowCoiner.dmg`
 
-默认产物：
+> **关于 Entitlements**：使用 `NowCoiner.entitlements`，当前 app 仅需出站网络连接，无需额外声明。若将来新增麦克风、位置等系统权限，在该文件补充对应 key 即可。
 
-- `~/Downloads/NowCoiner.app`
-- `~/Downloads/NowCoiner.dmg`
+---
 
-## 6. 发布前最终检查清单
+## 渠道二：Mac App Store 发布
+
+### 先决条件
+
+- Apple 开发者账号：已加入 Apple Developer Program
+- 证书（在 [developer.apple.com](https://developer.apple.com) → Certificates 中申请）：
+  - `Apple Distribution`（用于签名 `.app`）
+  - `3rd Party Mac Developer Installer`（用于签名 `.pkg`）
+- 已在 [App Store Connect](https://appstoreconnect.apple.com) 创建好 App 记录
+- 已安装 [Transporter](https://apps.apple.com/app/transporter/id1450874784)
+
+```bash
+security find-identity -v -p codesigning
+```
+
+### 1. 打包 App
+
+与直接分发相同，先打包：
+
+```bash
+cd <项目根目录>
+make package
+```
+
+### 2. 签名 + 生成 .pkg
+
+```bash
+cd <项目根目录>
+APPLE_DISTRIBUTION="Apple Distribution: Your Name (TEAMID)" \
+MAS_INSTALLER="3rd Party Mac Developer Installer: Your Name (TEAMID)" \
+make mas-release
+```
+
+该步骤自动完成：
+1. 运行预检
+2. 从内到外对 `.app` 做 Apple Distribution 签名（Hardened Runtime + App Sandbox entitlements）
+3. 用 `productbuild` 打包为 `.pkg` 并用 Installer 证书签名
+
+默认产物：`~/Downloads/NowCoiner.pkg`
+
+> **关于沙盒 Entitlements**：MAS 版本使用 `NowCoiner-mas.entitlements`，已包含 `app-sandbox` 和 `network.client`。若将来新增系统权限，在该文件补充即可。
+
+### 3. 用 Transporter 上传
+
+1. 打开 Transporter，登录 Apple ID
+2. 点击「Add App or Asset Pack」，选择 `~/Downloads/NowCoiner.pkg`
+3. 点击「Deliver」，等待上传完成
+4. 前往 App Store Connect → TestFlight / 版本发布，选择刚上传的构建版本
+
+### 4. 发布前最终检查清单
 
 - `swift test` 全部通过
 - `make preflight` 通过
 - 在非开发机安装并启动正常
-- 首次启动网络权限、开机自启、快捷键正常
+- 网络权限弹窗（首次）正常、开机自启正常
 - 关键功能验证：添加/删除币种、排序、实时价格更新、设置持久化
 
-## 7. 常见问题排查
+---
+
+## 常见问题排查
 
 ### 问题：启动崩溃，提示找不到 resource bundle
 
-原因：
-
-- 旧打包结构把资源放错位置，或仍依赖非标准路径
-
 处理：
-
-1. 使用当前 `scripts/package_app.sh` 重新打包  
-2. 确认 `Localizable.strings` 在 `Contents/Resources/*.lproj`  
+1. 使用当前 `scripts/package_app.sh` 重新打包
+2. 确认 `Localizable.strings` 在 `Contents/Resources/*.lproj`
 3. 重新运行 `make preflight`
 
 ### 问题：`codesign` 失败，提示 bundle 根目录内容未封装
 
-原因：
-
-- `.app` 根目录存在不规范资源（例如根目录 `.bundle`）
-
 处理：
-
-1. 删除非标准根目录资源  
-2. 资源统一放入 `Contents/Resources`  
+1. 删除非标准根目录资源
+2. 资源统一放入 `Contents/Resources`
 3. 重新打包并预检
 
 ### 问题：`spctl` 失败
 
-说明：
+说明：未公证前常见，公证 + staple 后应通过。MAS 版本无需公证，由 Apple 审核替代。
 
-- 未公证前常见，公证 + staple 后应通过
+### 问题：MAS 签名失败，提示 entitlements 不匹配
 
-## 8. 相关脚本
+处理：确认使用的是 `NowCoiner-mas.entitlements`（含 `app-sandbox`），而不是 `NowCoiner.entitlements`。
 
-- 打包：`scripts/package_app.sh`
-- 预检：`scripts/release_preflight.sh`
-- 发布：`scripts/release_notarize.sh`
-- 图标：`scripts/generate_app_icon.sh`
+---
 
+## 相关脚本和文件
+
+| 用途 | 文件 |
+|---|---|
+| 打包 | `scripts/package_app.sh` |
+| 预检 | `scripts/release_preflight.sh` |
+| Developer ID 发布 | `scripts/release_notarize.sh` |
+| Mac App Store 发布 | `scripts/release_mas.sh` |
+| 图标生成 | `scripts/generate_app_icon.sh` |
+| Developer ID Entitlements | `NowCoiner.entitlements` |
+| Mac App Store Entitlements | `NowCoiner-mas.entitlements` |
