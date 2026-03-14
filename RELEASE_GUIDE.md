@@ -106,8 +106,8 @@ security find-identity -v -p codesigning
 
 - Apple 开发者账号：已加入 Apple Developer Program
 - 证书（在 [developer.apple.com](https://developer.apple.com) → Certificates 中申请）：
-  - `Apple Distribution`（用于签名 `.app`）
-  - `3rd Party Mac Developer Installer`（用于签名 `.pkg`）
+  - `Mac App Distribution`（用于签名 `.app`）
+  - `Mac Installer Distribution`（用于签名 `.pkg`）
 - 已在 [App Store Connect](https://appstoreconnect.apple.com) 创建好 App 记录
 - 已安装 [Transporter](https://apps.apple.com/app/transporter/id1450874784)
 
@@ -128,14 +128,14 @@ make package
 
 ```bash
 cd <项目根目录>
-APPLE_DISTRIBUTION="Apple Distribution: Your Name (TEAMID)" \
-MAS_INSTALLER="3rd Party Mac Developer Installer: Your Name (TEAMID)" \
+APPLE_DISTRIBUTION="Mac App Distribution: Your Name (TEAMID)" \
+MAS_INSTALLER="Mac Installer Distribution: Your Name (TEAMID)" \
 make mas-release
 ```
 
 该步骤自动完成：
 1. 运行预检
-2. 从内到外对 `.app` 做 Apple Distribution 签名（Hardened Runtime + App Sandbox entitlements）
+2. 从内到外对 `.app` 做 Mac App Distribution 签名（Hardened Runtime + App Sandbox entitlements）
 3. 用 `productbuild` 打包为 `.pkg` 并用 Installer 证书签名
 
 默认产物：`~/Downloads/NowCoiner.pkg`
@@ -182,6 +182,15 @@ make mas-release
 ### 问题：MAS 签名失败，提示 entitlements 不匹配
 
 处理：确认使用的是 `NowCoiner-mas.entitlements`（含 `app-sandbox`），而不是 `NowCoiner.entitlements`。
+
+### 问题：`codesign` 报 `no identity found`
+
+处理：
+1. 先运行 `security find-identity -v -p codesigning`
+2. 如果输出是 `0 valid identities found`，说明本机钥匙串里没有可用的签名身份，或者证书缺少对应私钥
+3. 在 Apple Developer 后台申请并下载 `Mac App Distribution` 和 `Mac Installer Distribution` 证书
+4. 确保这两张证书是用当前 Mac 上生成的 CSR 申请的，并已双击导入到登录钥匙串
+5. 重新执行 `make mas-release`
 
 ---
 

@@ -31,13 +31,15 @@ pass "Info.plist is valid"
 BUNDLE_ID="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PATH/Contents/Info.plist" 2>/dev/null || true)"
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Contents/Info.plist" 2>/dev/null || true)"
 BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP_PATH/Contents/Info.plist" 2>/dev/null || true)"
+APP_CATEGORY="$(/usr/libexec/PlistBuddy -c 'Print :LSApplicationCategoryType' "$APP_PATH/Contents/Info.plist" 2>/dev/null || true)"
 LSUIELEMENT="$(/usr/libexec/PlistBuddy -c 'Print :LSUIElement' "$APP_PATH/Contents/Info.plist" 2>/dev/null || true)"
 
 [[ -n "$BUNDLE_ID" ]] || fail "CFBundleIdentifier is empty"
 [[ -n "$VERSION" ]] || fail "CFBundleShortVersionString is empty"
 [[ -n "$BUILD" ]] || fail "CFBundleVersion is empty"
+[[ -n "$APP_CATEGORY" ]] || fail "LSApplicationCategoryType is empty"
 [[ "$LSUIELEMENT" == "true" ]] || warn "LSUIElement is not true (not a pure menu bar app)"
-pass "Plist required keys exist (id/version/build)"
+pass "Plist required keys exist (id/version/build/category)"
 
 if [[ -f "$APP_PATH/Contents/Resources/AppIcon.icns" ]]; then
   pass "AppIcon.icns exists"
@@ -54,6 +56,20 @@ if find "$APP_PATH" -maxdepth 1 -type d -name '*.bundle' | grep -q .; then
   fi
 else
   pass "No root-level .bundle payload"
+fi
+
+while IFS= read -r -d '' bundle_plist; do
+  bundle_id="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$bundle_plist" 2>/dev/null || true)"
+  [[ -n "$bundle_id" ]] || fail "Nested bundle missing CFBundleIdentifier: $bundle_plist"
+done < <(find "$APP_PATH/Contents" -path '*/Contents/*' -prune -o -type f -path '*/Resources/*.bundle/Info.plist' -print0)
+pass "Nested resource bundles include bundle identifiers"
+
+if command -v xattr >/dev/null 2>&1; then
+  if xattr -lr "$APP_PATH" 2>/dev/null | grep -q 'com.apple.quarantine'; then
+    fail "App bundle still contains com.apple.quarantine extended attributes"
+  else
+    pass "No com.apple.quarantine attributes remain"
+  fi
 fi
 
 if command -v codesign >/dev/null 2>&1; then

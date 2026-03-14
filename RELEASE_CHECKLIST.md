@@ -4,6 +4,7 @@
 
 - 设定 `CFBundleIdentifier`（例如 `com.yourorg.nowcoiner`）。
 - 设定版本号：`CFBundleShortVersionString`（如 `1.0.0`）和 `CFBundleVersion`（如 `100`）。
+- 设定 `LSApplicationCategoryType`（例如 `public.app-category.finance`）。
 - 确认 `LSUIElement = true`（菜单栏应用，无 Dock 图标）。
 - 准备 `Info.plist` 并在最终 `.app` 的 `Contents/Info.plist` 生效。
 
@@ -40,4 +41,3 @@
 - `swift test`
 - `swift run NowCoinerApp`
 - 验证核心流程：添加币种、排序、删除、WebSocket 实时更新、设置持久化。
-
