@@ -182,14 +182,6 @@ APP_PATH="$APP_PATH" EXECUTABLE_NAME="$EXECUTABLE_NAME" REQUIRE_SIGNABLE_LAYOUT=
 SIGNING_ENTITLEMENTS="$(mktemp /tmp/nowcoiner-app-entitlements.XXXXXX)"
 build_signing_entitlements "$PROVISIONING_PROFILE" "$ENTITLEMENTS" "$SIGNING_ENTITLEMENTS"
 
-# Sign inside-out: nested bundles first, then the app itself.
-echo "Signing nested bundles for Mac App Store..."
-while IFS= read -r -d '' bundle; do
-  codesign --force --options runtime --timestamp \
-    --sign "$APPLE_DISTRIBUTION" \
-    "$bundle"
-done < <(find "$APP_PATH/Contents" -type d -name "*.bundle" -print0)
-
 echo "Signing app for Mac App Store..."
 codesign --force --options runtime --timestamp \
   --sign "$APPLE_DISTRIBUTION" \

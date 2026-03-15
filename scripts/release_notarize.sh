@@ -37,16 +37,6 @@ USAGE
 # Release gate: this must pass before signing/notarization.
 APP_PATH="$APP_PATH" EXECUTABLE_NAME="$EXECUTABLE_NAME" REQUIRE_SIGNABLE_LAYOUT=1 ./scripts/release_preflight.sh
 
-# Sign inside-out: nested bundles first, then the app itself.
-# Using --deep is not recommended as it may sign components in the wrong order.
-echo "Signing nested bundles..."
-while IFS= read -r -d '' bundle; do
-  codesign --force --options runtime --timestamp \
-    --sign "$DEVELOPER_ID_APP" \
-    --entitlements "$ENTITLEMENTS" \
-    "$bundle"
-done < <(find "$APP_PATH/Contents" -type d -name "*.bundle" -print0)
-
 echo "Signing app with Developer ID..."
 codesign --force --options runtime --timestamp \
   --sign "$DEVELOPER_ID_APP" \

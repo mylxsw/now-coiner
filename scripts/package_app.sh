@@ -17,6 +17,40 @@ SIGN_MODE="${SIGN_MODE:-none}"  # none | adhoc
 swift build -c release --product "$EXECUTABLE_NAME"
 
 BIN_DIR="$(swift build --show-bin-path -c release)"
+RESOURCE_ACCESSOR_PATH="$(find "$BIN_DIR" -path "*/${EXECUTABLE_NAME}.build/DerivedSources/resource_bundle_accessor.swift" -print -quit)"
+if [[ -n "$RESOURCE_ACCESSOR_PATH" ]] && ! grep -q 'Contents/Resources' "$RESOURCE_ACCESSOR_PATH"; then
+  python3 - "$RESOURCE_ACCESSOR_PATH" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+text = path.read_text()
+old = '        let mainPath = Bundle.main.bundleURL.appendingPathComponent("NowCoiner_NowCoinerApp.bundle").path\n'
+new = (
+    '        let mainPath = Bundle.main.bundleURL.appendingPathComponent("NowCoiner_NowCoinerApp.bundle").path\n'
+    '        let resourcesPath = Bundle.main.resourceURL?.appendingPathComponent("NowCoiner_NowCoinerApp.bundle").path\n'
+)
+if old in text and 'resourcesPath' not in text:
+    text = text.replace(old, new, 1)
+    text = text.replace(
+        '        let preferredBundle = Bundle(path: mainPath)\n\n'
+        '        guard let bundle = preferredBundle ?? Bundle(path: buildPath) else {\n',
+        '        let preferredBundle = Bundle(path: mainPath)\n'
+        '        let resourcesBundle = resourcesPath.flatMap(Bundle.init(path:))\n\n'
+        '        guard let bundle = preferredBundle ?? resourcesBundle ?? Bundle(path: buildPath) else {\n',
+        1,
+    )
+    text = text.replace(
+        '            Swift.fatalError("could not load resource bundle: from \\(mainPath) or \\(buildPath)")\n',
+        '            Swift.fatalError("could not load resource bundle: from \\(mainPath), \\(resourcesPath ?? "nil"), or \\(buildPath)")\n',
+        1,
+    )
+    path.write_text(text)
+PY
+  swift build -c release --product "$EXECUTABLE_NAME"
+  BIN_DIR="$(swift build --show-bin-path -c release)"
+fi
+
 BIN_PATH="$BIN_DIR/$EXECUTABLE_NAME"
 if [[ ! -x "$BIN_PATH" ]]; then
   echo "Release binary not found: $BIN_PATH" >&2
@@ -38,10 +72,16 @@ mkdir -p "$MACOS_PATH" "$RESOURCES_PATH"
 
 install -m 755 "$BIN_PATH" "$MACOS_PATH/$EXECUTABLE_NAME"
 
-# Copy SwiftPM resource bundles into Contents/Resources (where Bundle.main.resourceURL points).
+# Copy SwiftPM resource bundles into standard app resources location.
 while IFS= read -r -d '' bundle_dir; do
   cp -R "$bundle_dir" "$RESOURCES_PATH/"
 done < <(find "$BIN_DIR" -maxdepth 1 -type d -name "*.bundle" -print0)
+
+# Resource bundles should be sealed by the parent app signature rather than
+# carrying their own nested code signature.
+while IFS= read -r -d '' bundle_signature_dir; do
+  rm -rf "$bundle_signature_dir"
+done < <(find "$RESOURCES_PATH" -type d -path "*.bundle/_CodeSignature" -print0)
 
 # SwiftPM resource bundles only contain a minimal Info.plist. App Store validation
 # requires each nested bundle to have its own identifier and basic bundle metadata.
