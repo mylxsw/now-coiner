@@ -29,6 +29,7 @@ struct MainPanelView: View {
                                         row: row,
                                         currencyCode: viewModel.settings.vsCurrency,
                                         colorScheme: viewModel.settings.priceColorScheme,
+                                        watchlistEditingEnabled: viewModel.canEditWatchlist,
                                         onTap: {
                                             viewModel.selectionToggle(coinID: row.coin.id)
                                         },
@@ -59,6 +60,11 @@ struct MainPanelView: View {
                         }
                         .accessibilityLabel(L10n.tr("main.watchlist.accessibility"))
                     }
+
+                    TrialModeFooterView(
+                        isVisible: viewModel.isTrialMode,
+                        message: L10n.tr("trial.footer.main")
+                    )
                 }
 
                 if showPinLimitNotice {

@@ -33,6 +33,11 @@ struct CoinDetailView: View {
                     .foregroundStyle(NowCoinerColors.textSecondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+
+            TrialModeFooterView(
+                isVisible: viewModel.isTrialMode,
+                message: L10n.tr("trial.footer.detail")
+            )
         }
         .frame(width: 360, height: 520)
         .background(NowCoinerColors.panel)

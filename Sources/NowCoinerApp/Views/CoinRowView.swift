@@ -6,6 +6,7 @@ struct CoinRowView: View {
     let row: CoinRowState
     let currencyCode: String
     let colorScheme: PriceColorScheme
+    let watchlistEditingEnabled: Bool
     let onTap: () -> Void
     let onPinToggle: () -> Void
     let onOpenDetail: () -> Void
@@ -66,13 +67,16 @@ struct CoinRowView: View {
         .onHover { isHovered = $0 }
         .contextMenu {
             Button(row.isPinned ? L10n.tr("coin_row.unpin") : L10n.tr("coin_row.pin"), action: onPinToggle)
+                .disabled(!watchlistEditingEnabled)
             Button(L10n.tr("coin_row.about", row.coin.name), action: onOpenDetail)
             Divider()
             Button(L10n.tr("coin_row.move_top"), action: onMoveTop)
+                .disabled(!watchlistEditingEnabled)
             Button(L10n.tr("coin_row.view_tradingview"), action: onOpenTradingView)
             Button(L10n.tr("coin_row.view_exchange"), action: onOpenExchange)
             Divider()
             Button(L10n.tr("coin_row.remove"), role: .destructive, action: onRemove)
+                .disabled(!watchlistEditingEnabled)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilitySummary)

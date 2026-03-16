@@ -33,6 +33,7 @@ public final class TickerViewModel: ObservableObject {
     @Published public private(set) var watchlist: [WatchlistItem] = []
     @Published public private(set) var prices: [String: CoinPrice] = [:]
     @Published public private(set) var sparklines: [String: SparklineData] = [:]
+    @Published public private(set) var licenseState: AppLicenseState = .checking
     @Published public var selectedCoinID: String?
     @Published public private(set) var isLoading = false
     @Published public private(set) var errorMessage: String?
@@ -43,6 +44,7 @@ public final class TickerViewModel: ObservableObject {
     private let settingsStore: SettingsStore
     private let watchlistStore: WatchlistStore
     private let cacheStore: CoinCacheStore
+    private let purchaseValidator: any PurchaseValidating
 
     private var realtimeTask: Task<Void, Never>?
     private var simpleRefreshTask: Task<Void, Never>?
@@ -56,7 +58,8 @@ public final class TickerViewModel: ObservableObject {
         webSocketManager: WebSocketManaging,
         settingsStore: SettingsStore,
         watchlistStore: WatchlistStore,
-        cacheStore: CoinCacheStore
+        cacheStore: CoinCacheStore,
+        purchaseValidator: any PurchaseValidating = StaticPurchaseValidator(state: .purchased)
     ) {
         self.coinGecko = coinGecko
         self.binance = binance
@@ -64,6 +67,7 @@ public final class TickerViewModel: ObservableObject {
         self.settingsStore = settingsStore
         self.watchlistStore = watchlistStore
         self.cacheStore = cacheStore
+        self.purchaseValidator = purchaseValidator
         self.settings = .default
     }
 
@@ -93,7 +97,39 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public var menuBarRows: [CoinRowState] {
-        Array(visibleRows.filter(\.isPinned).prefix(Self.maxPinnedCount))
+        let pinnedRows = visibleRows.filter(\.isPinned)
+        if !hasUnlockedFullAccess {
+            return Array((pinnedRows.isEmpty ? visibleRows : pinnedRows).prefix(1))
+        }
+        return Array(pinnedRows.prefix(Self.maxPinnedCount))
+    }
+
+    public var isTrialMode: Bool {
+        licenseState == .trial
+    }
+
+    public var hasUnlockedFullAccess: Bool {
+        licenseState == .purchased
+    }
+
+    public var canEditWatchlist: Bool {
+        hasUnlockedFullAccess
+    }
+
+    public var canChangeMenuBarStyle: Bool {
+        hasUnlockedFullAccess
+    }
+
+    public var canChangeCoinDisplayMode: Bool {
+        hasUnlockedFullAccess
+    }
+
+    public var canChangePriceColorScheme: Bool {
+        hasUnlockedFullAccess
+    }
+
+    public var canChangeMenuBarPriceColor: Bool {
+        hasUnlockedFullAccess
     }
 
     public func load() async {
@@ -129,6 +165,7 @@ public final class TickerViewModel: ObservableObject {
             selectedCoinID = watchlist.first?.coinID
         }
 
+        await refreshLicenseState()
         await refreshMarketData(includeSparkline: true)
         await configureRuntimeTasks()
     }
@@ -259,6 +296,7 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public func addCoin(_ coin: Coin) async {
+        guard canEditWatchlist else { return }
         if !coins.contains(where: { $0.id == coin.id }) {
             coins.append(coin)
             cacheStore.saveCoins(coins)
@@ -276,6 +314,7 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public func removeCoin(coinID: String) async {
+        guard canEditWatchlist else { return }
         watchlist.removeAll { $0.coinID == coinID }
         reindexWatchlist()
         if selectedCoinID == coinID {
@@ -286,6 +325,7 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public func moveCoinToTop(coinID: String) async {
+        guard canEditWatchlist else { return }
         guard let index = watchlist.firstIndex(where: { $0.coinID == coinID }) else { return }
         let item = watchlist.remove(at: index)
         watchlist.insert(item, at: 0)
@@ -294,6 +334,7 @@ public final class TickerViewModel: ObservableObject {
     }
 
     public func moveCoin(from source: IndexSet, to destination: Int) async {
+        guard canEditWatchlist else { return }
         watchlist = movedArray(watchlist, from: source, to: destination)
         reindexWatchlist()
         watchlistStore.save(watchlist)
@@ -304,6 +345,7 @@ public final class TickerViewModel: ObservableObject {
     /// Toggle pin for a coin. Returns `false` if the pin limit is reached.
     @discardableResult
     public func togglePin(coinID: String) -> Bool {
+        guard canEditWatchlist else { return false }
         guard let index = watchlist.firstIndex(where: { $0.coinID == coinID }) else { return false }
         if !watchlist[index].isPinned {
             let currentPinned = watchlist.filter(\.isPinned).count
@@ -318,8 +360,7 @@ public final class TickerViewModel: ObservableObject {
         let previous = settings
         var next = settings
         update(&next)
-        // For now the app is USD-only. Keep this fixed even if a stale caller sets another currency.
-        next.vsCurrency = "usd"
+        next = normalizedSettings(next, preservingLockedValuesFrom: previous)
         settings = next
         settingsStore.save(next)
 
@@ -374,6 +415,17 @@ public final class TickerViewModel: ObservableObject {
 
     public func selectedCoinForDetail() -> String? {
         selectedCoinID
+    }
+
+    public func refreshLicenseState() async {
+        licenseState = .checking
+        let nextState = await purchaseValidator.validatePurchase()
+        licenseState = nextState
+        let normalized = normalizedSettings(settings, preservingLockedValuesFrom: settings)
+        if normalized != settings {
+            settings = normalized
+            settingsStore.save(normalized)
+        }
     }
 
     public func applyWebSocketTick(_ tick: WebSocketTick) {
@@ -463,6 +515,21 @@ public final class TickerViewModel: ObservableObject {
         for index in watchlist.indices {
             watchlist[index].sortOrder = index
         }
+    }
+
+    private func normalizedSettings(_ candidate: AppSettings, preservingLockedValuesFrom current: AppSettings) -> AppSettings {
+        var next = candidate
+        // For now the app is USD-only. Keep this fixed even if a stale caller sets another currency.
+        next.vsCurrency = "usd"
+
+        if isTrialMode {
+            next.menuBarDisplayStyle = current.menuBarDisplayStyle
+            next.menuBarCoinDisplayMode = current.menuBarCoinDisplayMode
+            next.priceColorScheme = current.priceColorScheme
+            next.menuBarUsePriceColor = current.menuBarUsePriceColor
+        }
+
+        return next
     }
 
     private func movedArray(_ array: [WatchlistItem], from source: IndexSet, to destination: Int) -> [WatchlistItem] {

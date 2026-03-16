@@ -26,7 +26,8 @@ struct AppContainer {
             webSocketManager: BinanceWebSocketManager(),
             settingsStore: settingsStore,
             watchlistStore: watchlistStore,
-            cacheStore: cacheStore
+            cacheStore: cacheStore,
+            purchaseValidator: AppStorePurchaseValidator()
         )
 
         return AppContainer(viewModel: viewModel)

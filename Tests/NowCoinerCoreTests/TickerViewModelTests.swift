@@ -174,6 +174,120 @@ final class TickerViewModelTests: XCTestCase {
 
         try FileManager.default.removeItem(at: dir)
     }
+
+    func testTrialModeLimitsMenuBarToSingleCoin() async {
+        let coins = [
+            Coin(id: "bitcoin", symbol: "btc", name: "Bitcoin", binanceSymbol: "BTCUSDT"),
+            Coin(id: "ethereum", symbol: "eth", name: "Ethereum", binanceSymbol: "ETHUSDT"),
+            Coin(id: "solana", symbol: "sol", name: "Solana", binanceSymbol: "SOLUSDT")
+        ]
+        let markets = coins.map { coin in
+            CoinMarket(
+                coin: coin,
+                price: CoinPrice(coinID: coin.id, currentPrice: 100, priceChange24h: 1, priceChangePercent24h: 1)
+            )
+        }
+
+        let vm = makeViewModel(
+            coins: coins,
+            markets: markets,
+            purchaseValidator: StaticPurchaseValidator(state: .trial)
+        )
+
+        await vm.load()
+
+        XCTAssertTrue(vm.isTrialMode)
+        XCTAssertEqual(vm.menuBarRows.count, 1)
+    }
+
+    func testTrialModePreventsWatchlistEdits() async {
+        let coin = Coin(id: "dogecoin", symbol: "doge", name: "Dogecoin", binanceSymbol: "DOGEUSDT")
+        let existingCoins = [
+            Coin(id: "bitcoin", symbol: "btc", name: "Bitcoin", binanceSymbol: "BTCUSDT"),
+            Coin(id: "ethereum", symbol: "eth", name: "Ethereum", binanceSymbol: "ETHUSDT")
+        ]
+        let markets = existingCoins.map { coin in
+            CoinMarket(
+                coin: coin,
+                price: CoinPrice(coinID: coin.id, currentPrice: 100, priceChange24h: 1, priceChangePercent24h: 1)
+            )
+        }
+
+        let vm = makeViewModel(
+            coins: existingCoins + [coin],
+            markets: markets,
+            purchaseValidator: StaticPurchaseValidator(state: .trial)
+        )
+
+        await vm.load()
+        let originalWatchlist = vm.watchlist
+
+        await vm.addCoin(coin)
+        XCTAssertEqual(vm.watchlist, originalWatchlist)
+
+        XCTAssertFalse(vm.togglePin(coinID: "ethereum"))
+        XCTAssertEqual(vm.watchlist, originalWatchlist)
+
+        await vm.removeCoin(coinID: "ethereum")
+        XCTAssertEqual(vm.watchlist, originalWatchlist)
+    }
+
+    func testTrialModePreventsLockedDisplaySettingsChanges() async {
+        let coin = Coin(id: "bitcoin", symbol: "btc", name: "Bitcoin", binanceSymbol: "BTCUSDT")
+        let market = CoinMarket(
+            coin: coin,
+            price: CoinPrice(coinID: coin.id, currentPrice: 100, priceChange24h: 1, priceChangePercent24h: 1)
+        )
+
+        let vm = makeViewModel(
+            coins: [coin],
+            markets: [market],
+            purchaseValidator: StaticPurchaseValidator(state: .trial)
+        )
+
+        await vm.load()
+        let original = vm.settings
+
+        vm.updateSettings {
+            $0.menuBarDisplayStyle = .full
+            $0.menuBarCoinDisplayMode = .icon
+            $0.priceColorScheme = .redUpGreenDown
+            $0.menuBarUsePriceColor = true
+        }
+
+        XCTAssertEqual(vm.settings.menuBarDisplayStyle, original.menuBarDisplayStyle)
+        XCTAssertEqual(vm.settings.menuBarCoinDisplayMode, original.menuBarCoinDisplayMode)
+        XCTAssertEqual(vm.settings.priceColorScheme, original.priceColorScheme)
+        XCTAssertEqual(vm.settings.menuBarUsePriceColor, original.menuBarUsePriceColor)
+    }
+
+    private func makeViewModel(
+        coins: [Coin],
+        markets: [CoinMarket],
+        purchaseValidator: any PurchaseValidating = StaticPurchaseValidator(state: .purchased)
+    ) -> TickerViewModel {
+        let gecko = MockCoinGeckoService(coins: coins, markets: markets)
+        let binance = MockBinanceService(prices: [:])
+        let webSocket = StubWebSocketManager()
+
+        let dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+
+        return TickerViewModel(
+            coinGecko: gecko,
+            binance: binance,
+            webSocketManager: webSocket,
+            settingsStore: SettingsStore(url: dir.appendingPathComponent("settings.json")),
+            watchlistStore: WatchlistStore(url: dir.appendingPathComponent("watchlist.json")),
+            cacheStore: CoinCacheStore(
+                coinURL: dir.appendingPathComponent("coins.json"),
+                priceURL: dir.appendingPathComponent("prices.json"),
+                sparklineURL: dir.appendingPathComponent("sparklines.json"),
+                detailURL: dir.appendingPathComponent("details.json")
+            ),
+            purchaseValidator: purchaseValidator
+        )
+    }
 }
 
 private struct MockCoinGeckoService: CoinGeckoServicing {

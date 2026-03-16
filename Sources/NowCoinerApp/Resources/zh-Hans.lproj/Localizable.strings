@@ -60,6 +60,12 @@
 "search.added" = "已添加";
 "search.add" = "添加";
 
+"trial.badge" = "试用版";
+"trial.footer.main" = "当前为试用模式，观察列表编辑不可用。";
+"trial.footer.search" = "当前为试用模式，添加币种不可用。";
+"trial.footer.settings" = "当前为试用模式，外观自定义不可用。";
+"trial.footer.detail" = "当前为试用模式。";
+
 "detail.title" = "币种详情";
 "detail.sparkline_7d" = "7 天走势";
 "detail.no_chart_data" = "暂无图表数据";

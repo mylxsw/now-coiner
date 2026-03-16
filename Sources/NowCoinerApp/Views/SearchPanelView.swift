@@ -39,6 +39,11 @@ struct SearchPanelView: View {
                     }
                     .padding(.vertical, 8)
                 }
+
+                TrialModeFooterView(
+                    isVisible: viewModel.isTrialMode,
+                    message: L10n.tr("trial.footer.search")
+                )
             }
         }
     }
@@ -78,6 +83,8 @@ struct SearchPanelView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
+                .disabled(!viewModel.canEditWatchlist)
+                .opacity(viewModel.canEditWatchlist ? 1 : 0.55)
             }
         }
         .padding(.horizontal, 12)

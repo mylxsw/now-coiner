@@ -60,6 +60,12 @@
 "search.added" = "Added";
 "search.add" = "Add";
 
+"trial.badge" = "Trial";
+"trial.footer.main" = "Trial mode is active. Watchlist editing is unavailable.";
+"trial.footer.search" = "Trial mode is active. Adding coins is unavailable.";
+"trial.footer.settings" = "Trial mode is active. Appearance customization is unavailable.";
+"trial.footer.detail" = "Trial mode is active.";
+
 "detail.title" = "Coin Detail";
 "detail.sparkline_7d" = "7-day trend";
 "detail.no_chart_data" = "No chart data";

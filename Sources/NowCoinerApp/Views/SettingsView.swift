@@ -35,6 +35,8 @@ struct SettingsView: View {
                         }
                         .labelsHidden()
                         .frame(width: 160)
+                        .disabled(!viewModel.canChangeMenuBarStyle)
+                        .opacity(viewModel.canChangeMenuBarStyle ? 1 : 0.55)
                     }
 
                     PickerRow(title: L10n.tr("settings.coin_display_mode")) {
@@ -50,6 +52,8 @@ struct SettingsView: View {
                         }
                         .labelsHidden()
                         .frame(width: 120)
+                        .disabled(!viewModel.canChangeCoinDisplayMode)
+                        .opacity(viewModel.canChangeCoinDisplayMode ? 1 : 0.55)
                     }
 
                     PickerRow(title: L10n.tr("settings.price_color_scheme")) {
@@ -64,6 +68,8 @@ struct SettingsView: View {
                         }
                         .labelsHidden()
                         .frame(width: 140)
+                        .disabled(!viewModel.canChangePriceColorScheme)
+                        .opacity(viewModel.canChangePriceColorScheme ? 1 : 0.55)
                     }
 
                     ToggleRow(title: L10n.tr("settings.menu_bar_price_color_enabled"), isOn: Binding(
@@ -72,6 +78,8 @@ struct SettingsView: View {
                             viewModel.updateSettings { $0.menuBarUsePriceColor = value }
                         }
                     ))
+                    .disabled(!viewModel.canChangeMenuBarPriceColor)
+                    .opacity(viewModel.canChangeMenuBarPriceColor ? 1 : 0.55)
 
                     PickerRow(title: L10n.tr("settings.language")) {
                         Picker("", selection: Binding(
@@ -139,6 +147,11 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
+
+                TrialModeFooterView(
+                    isVisible: viewModel.isTrialMode,
+                    message: L10n.tr("trial.footer.settings")
+                )
             }
         }
     }
