@@ -2,7 +2,6 @@ import Foundation
 
 public struct AppSettings: Codable, Equatable, Sendable {
     public var launchAtLogin: Bool
-    public var globalShortcut: String
     public var vsCurrency: String
     public var menuBarDisplayStyle: MenuBarStyle
     public var menuBarCoinDisplayMode: MenuBarCoinDisplayMode
@@ -16,7 +15,6 @@ public struct AppSettings: Codable, Equatable, Sendable {
 
     public init(
         launchAtLogin: Bool = false,
-        globalShortcut: String = "⌘⇧C",
         vsCurrency: String = "usd",
         menuBarDisplayStyle: MenuBarStyle = .symbolAndPrice,
         menuBarCoinDisplayMode: MenuBarCoinDisplayMode = .text,
@@ -29,7 +27,6 @@ public struct AppSettings: Codable, Equatable, Sendable {
         defaultExchange: Exchange = .binance
     ) {
         self.launchAtLogin = launchAtLogin
-        self.globalShortcut = globalShortcut
         self.vsCurrency = vsCurrency
         self.menuBarDisplayStyle = menuBarDisplayStyle
         self.menuBarCoinDisplayMode = menuBarCoinDisplayMode
@@ -46,7 +43,6 @@ public struct AppSettings: Codable, Equatable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case launchAtLogin
-        case globalShortcut
         case vsCurrency
         case menuBarDisplayStyle
         case menuBarCoinDisplayMode
@@ -63,7 +59,6 @@ public struct AppSettings: Codable, Equatable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         launchAtLogin = try container.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? false
-        globalShortcut = try container.decodeIfPresent(String.self, forKey: .globalShortcut) ?? "⌘⇧C"
         vsCurrency = try container.decodeIfPresent(String.self, forKey: .vsCurrency) ?? "usd"
         menuBarDisplayStyle = try container.decodeIfPresent(MenuBarStyle.self, forKey: .menuBarDisplayStyle) ?? .symbolAndPrice
         menuBarCoinDisplayMode = try container.decodeIfPresent(MenuBarCoinDisplayMode.self, forKey: .menuBarCoinDisplayMode) ?? .text

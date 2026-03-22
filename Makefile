@@ -15,7 +15,10 @@ package:
 preflight:
 	./scripts/release_preflight.sh
 
-release:
+release: package
 	./scripts/release_notarize.sh
 
-.PHONY: run run-after-build icon package preflight release
+mas-release: package
+	./scripts/release_mas.sh
+
+.PHONY: run run-after-build icon package preflight release mas-release

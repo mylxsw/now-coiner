@@ -14,6 +14,7 @@ EXECUTABLE_NAME="${EXECUTABLE_NAME:-NowCoinerApp}"
 # Required for real release signing and notarization
 DEVELOPER_ID_APP="${DEVELOPER_ID_APP:-}"
 NOTARY_PROFILE="${NOTARY_PROFILE:-}"
+ENTITLEMENTS="${ENTITLEMENTS:-$ROOT_DIR/NowCoiner.entitlements}"
 
 usage() {
   cat <<USAGE
@@ -29,6 +30,7 @@ USAGE
 
 [[ -n "$DEVELOPER_ID_APP" ]] || { usage; echo "Missing DEVELOPER_ID_APP" >&2; exit 1; }
 [[ -n "$NOTARY_PROFILE" ]] || { usage; echo "Missing NOTARY_PROFILE" >&2; exit 1; }
+[[ -f "$ENTITLEMENTS" ]] || { echo "Entitlements file not found: $ENTITLEMENTS" >&2; exit 1; }
 
 [[ -d "$APP_PATH" ]] || { echo "App not found: $APP_PATH" >&2; exit 1; }
 
@@ -36,11 +38,14 @@ USAGE
 APP_PATH="$APP_PATH" EXECUTABLE_NAME="$EXECUTABLE_NAME" REQUIRE_SIGNABLE_LAYOUT=1 ./scripts/release_preflight.sh
 
 echo "Signing app with Developer ID..."
-codesign --force --deep --options runtime --timestamp --sign "$DEVELOPER_ID_APP" "$APP_PATH"
+codesign --force --options runtime --timestamp \
+  --sign "$DEVELOPER_ID_APP" \
+  --entitlements "$ENTITLEMENTS" \
+  "$APP_PATH"
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
 spctl -a -t exec -vv "$APP_PATH" || true
 
-TMP_DMG="$DMG_PATH.tmp"
+TMP_DMG="${DMG_PATH%.dmg}.tmp.dmg"
 rm -f "$TMP_DMG" "$DMG_PATH"
 
 echo "Creating DMG..."

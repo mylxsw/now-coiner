@@ -557,21 +557,3 @@ private struct MenuBarTickerView: View {
     }
 }
 
-private struct ShortcutPanelRootView: View {
-    @ObservedObject var viewModel: TickerViewModel
-    let onOpenSearch: () -> Void
-    let onOpenSettings: () -> Void
-
-    var body: some View {
-        MainPanelView(
-            viewModel: viewModel,
-            onOpenSearch: onOpenSearch,
-            onOpenSettings: onOpenSettings
-        )
-        .preferredColorScheme(preferredColorScheme)
-    }
-
-    private var preferredColorScheme: ColorScheme? {
-        nil
-    }
-}

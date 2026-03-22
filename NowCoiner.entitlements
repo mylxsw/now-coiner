@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      NowCoiner uses outbound-only network connections (WebSocket to Binance,
+      HTTPS to CoinGecko). Outbound client connections are permitted by default
+      under Hardened Runtime and require no explicit entitlement.
+
+      Add entitlements here only if new capabilities are needed, e.g.:
+        <key>com.apple.security.device.audio-input</key><true/>
+        <key>com.apple.security.personal-information.location</key><true/>
+    -->
+</dict>
+</plist>

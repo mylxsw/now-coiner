@@ -1,4 +1,4 @@
-# CLAUDE.md
+# [CLAUDE.md](http://CLAUDE.md)
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -46,8 +46,8 @@ Views (NowCoinerApp)
 ### Real-time Data Flow
 
 1. **Binance WebSocket** `miniTicker` stream → `TickerViewModel.applyWebSocketTick()` (sub-second updates)
-2. **CoinGecko `simple/price`** polling every 60s → supplements 24h change, market cap
-3. **CoinGecko `coins/markets`** every 5 min → refreshes sparkline data
+2. **CoinGecko** `simple/price` polling every 60s → supplements 24h change, market cap
+3. **CoinGecko** `coins/markets` every 5 min → refreshes sparkline data
 4. WebSocket reconnects with exponential backoff (`ExponentialBackoff` util)
 
 ### Storage
