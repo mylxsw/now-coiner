@@ -1,79 +1,78 @@
 # NowCoiner
 
-NowCoiner 是一个基于 macOS 菜单栏的加密货币价格追踪应用实现，按 `REQUIREMENTS.md` 的 MVVM 架构落地。
+NowCoiner is a macOS menu bar app for tracking cryptocurrency prices in real time. It is built with SwiftUI and AppKit, runs as an `LSUIElement` app, and keeps market data current through Binance WebSocket streams and CoinGecko polling.
 
-## 模块结构
+中文文档: [README.zh-CN.md](README.zh-CN.md)
+
+## Highlights
+
+- Real-time menu bar ticker with configurable display styles
+- Watchlist management with drag-and-drop sorting, pinning, removal, and move-to-top actions
+- Keyboard navigation in the main panel with `↑` / `↓`, `Return`, and `Delete`
+- Search panel with 300 ms debounce and local filtering
+- Coin detail view with market data, links, developer information, and a 7-day chart
+- Inline sparklines powered by Swift Charts
+- Floating panel support with a global shortcut
+- Persistent local storage for settings, watchlist data, prices, sparklines, and detail cache
+
+## Project Structure
 
 ```text
 Sources/
   NowCoinerCore/
-    Models/      # 领域模型
-    Services/    # CoinGecko / Binance / WebSocket
-    Storage/     # JSON 持久化仓储
-    Utils/       # 格式化、搜索、URL、退避
-    ViewModels/  # 核心状态与业务编排
+    Models/      # Domain models
+    Services/    # CoinGecko / Binance / WebSocket integrations
+    Storage/     # JSON-backed persistence
+    Utils/       # Formatting, search, URLs, backoff, parsing
+    ViewModels/  # Core state and runtime orchestration
   NowCoinerApp/
-    Support/     # 应用容器、快捷键、浮动面板、开机自启
-    Views/       # 主面板、搜索、设置、详情、行视图
+    Support/     # App container, shortcuts, floating panels, launch-at-login
+    Views/       # Main panel, search, settings, details, row views
 Tests/
   NowCoinerCoreTests/
 ```
 
-## 已实现功能
+## Architecture
 
-- 菜单栏多币种 ticker 文本展示（样式可配置）。
-- 主面板币种列表、选中态、拖拽排序、Pin/Unpin、删除、置顶。
-- 主面板键盘导航：`↑/↓` 选择、`Return` 打开详情、`Delete` 删除选中项。
-- 搜索面板：300ms 防抖、本地过滤、添加币种。
-- 币种详情页：基础信息、7 天图表、市场数据、外链、开发者数据。
-- 币种详情 10 分钟 TTL 缓存（内存 + 本地落盘）。
-- 行内 Sparkline（Swift Charts）。
-- 右键菜单：Pin、About、Move to top、TradingView、Exchange、Remove。
-- 实时更新链路：
-  - Binance WebSocket `miniTicker`（支持断线重连 + 指数退避 + ping）。
-  - CoinGecko `simple/price` 周期性刷新补充字段。
-  - CoinGecko `coins/markets` 每 5 分钟刷新 Sparkline。
-- 设置项：
-  - 开机自启
-  - 全局快捷键
-  - 计价货币
-  - 菜单栏样式
-  - 外观模式（浅色/深色/系统）
-  - 涨跌配色
-  - 刷新间隔
-  - 默认数据源
-  - 默认交易所
-- 全局快捷键唤起/隐藏浮动主面板。
-- 本地持久化：`settings/watchlist/cache(coins/prices/sparklines/details)`。
+The project is split into two Swift Package targets:
 
-## 测试覆盖
+- `NowCoinerCore`: models, services, storage, utilities, and view models
+- `NowCoinerApp`: SwiftUI views and AppKit integration for the menu bar experience
 
-`NowCoinerCoreTests` 包含 13 个测试：
+`TickerViewModel` is the central coordinator. It owns app state, manages runtime tasks such as WebSocket connections and polling, and exposes user-facing actions to the UI.
 
-- `PriceFormatterTests`
-- `ExchangeURLBuilderTests`
-- `SearchFilterTests`
-- `ExponentialBackoffTests`
-- `JSONFileStoreTests`
-- `TickerViewModelTests`
-- `TickerRealtimeTests`
-- `WebSocketMessageParserTests`
-- `TickerDetailCacheTests`
+## Data Flow
 
-## 运行与测试
+- Binance WebSocket `miniTicker` provides sub-second price updates
+- CoinGecko `simple/price` polling fills in supplemental fields such as 24-hour change and market data
+- CoinGecko `coins/markets` refreshes sparkline data every five minutes
+- Coin details are cached for 10 minutes in memory and on disk
+
+## Build and Run
 
 ```bash
-swift test
+swift build
 swift run NowCoinerApp
 ```
 
-## 环境变量
+Swift tools version: 6.2  
+Minimum deployment target: macOS 14.0
 
-- `COINGECKO_API_KEY`（可选）：设置后自动作为 `x-cg-demo-api-key` 请求头发送。
+## Testing
 
-## 数据目录
+```bash
+swift test
+```
 
-运行后会写入：
+The `NowCoinerCoreTests` target covers formatting, URL building, search filtering, backoff behavior, JSON storage, WebSocket parsing, detail caching, and the main view model flows.
+
+## Environment Variable
+
+- `COINGECKO_API_KEY` (optional): sent as the `x-cg-demo-api-key` header on CoinGecko requests
+
+## Local Data Directory
+
+NowCoiner stores application data under:
 
 ```text
 ~/Library/Application Support/NowCoiner/
@@ -85,3 +84,9 @@ swift run NowCoinerApp
     sparklines.json
     details.json
 ```
+
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0 or later. That means people can use, modify, compile, and redistribute NowCoiner, including in derivative products, but any distributed modified version must also remain open source under the same license terms.
+
+See [LICENSE](LICENSE) for the full text.
