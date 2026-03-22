@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Sources/NowCoinerApp/Resources/AppIcon.iconset/icon_128x128@2x.png" width="128" height="128" alt="NowCoiner Icon">
+  <img src="Sources/NowCoinerApp/Resources/AppIcon.iconset/icon_128x128@2x.png" width="128" height="128" alt="NowCoiner Icon" style="border-radius: 22px;">
 </p>
 
 <h1 align="center">NowCoiner</h1>
