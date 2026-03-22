@@ -20,12 +20,21 @@
   <a href="https://github.com/mylxsw/NowCoiner/releases">Releases</a>
 </p>
 
-<!--
-TODO: Add screenshots here
+## Screenshots
+
 <p align="center">
-  <img src="docs/screenshots/menu-bar.png" width="600" alt="Menu Bar">
+  <img src="assets/app-store-screenshot-1.png" width="400" alt="Screenshot 1">
+  <img src="assets/app-store-screenshot-2.png" width="400" alt="Screenshot 2">
 </p>
--->
+
+<p align="center">
+  <img src="assets/app-store-screenshot-3.png" width="400" alt="Screenshot 3">
+  <img src="assets/app-store-screenshot-4.png" width="400" alt="Screenshot 4">
+</p>
+
+<p align="center">
+  <img src="assets/app-store-screenshot-5.png" width="400" alt="Screenshot 5">
+</p>
 
 ## Features
 
