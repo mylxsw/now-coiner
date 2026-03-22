@@ -11,7 +11,13 @@
 <p align="center">
   <img src="https://img.shields.io/badge/platform-macOS%2014%2B-blue" alt="Platform">
   <img src="https://img.shields.io/badge/swift-6.2-orange" alt="Swift">
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+  <img src="https://img.shields.io/badge/license-AGPLv3-green" alt="License">
+</p>
+
+<p align="center">
+  <a href="https://now-coiner.gulu.ai">Homepage</a> ·
+  <a href="https://apps.apple.com/us/app/nowcoiner/id6759320009">App Store</a> ·
+  <a href="https://github.com/mylxsw/NowCoiner/releases">Releases</a>
 </p>
 
 <!--
@@ -82,9 +88,9 @@ The built binary is at `.build/release/NowCoinerApp`. To create a distributable 
 ./scripts/package_app.sh
 ```
 
-### Download
+### Install
 
-Pre-built binaries are available on the [Releases](https://github.com/mylxsw/NowCoiner/releases) page.
+You can install NowCoiner from the [Mac App Store](https://apps.apple.com/us/app/nowcoiner/id6759320009) for a direct, supported distribution. If you prefer not to use the App Store, build the app yourself from source using the steps above.
 
 ## Usage
 
@@ -100,6 +106,20 @@ Launch NowCoiner and it appears as a ticker in your menu bar — no Dock icon, n
 | Open coin detail | `Return` |
 | Remove coin | `Delete` or right-click → Remove |
 | Reorder coins | Drag and drop |
+
+## FAQ
+
+### Is NowCoiner open source and free?
+
+Yes. NowCoiner is open source, and you can build and use it yourself at no cost. If you want to support ongoing development, the App Store version is the same app and costs about the price of a cup of coffee.
+
+### How do I install NowCoiner?
+
+There are two supported paths: build it yourself from source, or install it from the [Mac App Store](https://apps.apple.com/us/app/nowcoiner/id6759320009).
+
+### Is it resource-heavy?
+
+No. NowCoiner is built natively in Swift and keeps updates lightweight. Actual usage depends on how many coins you pin and which refresh settings you choose.
 
 ## Configuration
 
