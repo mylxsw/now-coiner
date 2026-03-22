@@ -204,7 +204,9 @@ Contributions are welcome! Please open an issue first to discuss what you'd like
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU Affero General Public License v3.0 or later. That means people can use, modify, compile, and redistribute NowCoiner, including in derivative products, but any distributed modified version must also remain open source under the same license terms.
+
+See [LICENSE](LICENSE) for the full text.
 
 ## Acknowledgments
 
