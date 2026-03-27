@@ -33,13 +33,21 @@ public struct BinanceService: BinanceServicing {
 
         if symbols.count == 1 {
             let dto = try JSONDecoder().decode(TickerDTO.self, from: data)
-            return [dto.symbol: Double(dto.price) ?? 0]
+            guard let price = Double(dto.price), price.isFinite else {
+                throw NetworkError.decoding("Invalid price for symbol \(dto.symbol)")
+            }
+            return [dto.symbol: price]
         }
 
         let items = try JSONDecoder().decode([TickerDTO].self, from: data)
-        return items.reduce(into: [String: Double]()) { partial, item in
-            partial[item.symbol] = Double(item.price) ?? 0
+        let values = items.reduce(into: [String: Double]()) { partial, item in
+            guard let price = Double(item.price), price.isFinite else { return }
+            partial[item.symbol] = price
         }
+        guard !values.isEmpty else {
+            throw NetworkError.decoding("No valid ticker prices in response")
+        }
+        return values
     }
 }
 

@@ -20,12 +20,16 @@ public protocol WebSocketManaging: Sendable {
 public enum WebSocketMessageParser {
     public static func parseTick(from data: Data) -> WebSocketTick? {
         if let combined = try? JSONDecoder().decode(CombinedStreamPayload.self, from: data),
-           let tick = combined.data {
-            return WebSocketTick(symbol: tick.symbol.uppercased(), currentPrice: Double(tick.currentPrice) ?? 0)
+           let tick = combined.data,
+           let price = Double(tick.currentPrice),
+           price.isFinite {
+            return WebSocketTick(symbol: tick.symbol.uppercased(), currentPrice: price)
         }
 
-        if let direct = try? JSONDecoder().decode(MiniTickerPayload.self, from: data) {
-            return WebSocketTick(symbol: direct.symbol.uppercased(), currentPrice: Double(direct.currentPrice) ?? 0)
+        if let direct = try? JSONDecoder().decode(MiniTickerPayload.self, from: data),
+           let price = Double(direct.currentPrice),
+           price.isFinite {
+            return WebSocketTick(symbol: direct.symbol.uppercased(), currentPrice: price)
         }
 
         return nil
