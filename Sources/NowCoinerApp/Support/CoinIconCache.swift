@@ -6,25 +6,31 @@ actor CoinIconCache {
     static let shared = CoinIconCache()
 
     private let fileManager: FileManager
+    private let session: URLSession
     private let iconsDirectory: URL
     private let ttl: TimeInterval
+    private let maxIconBytes: Int
 
     private var memoryCache: [String: Data] = [:]
     private var inflight: [String: Task<Data?, Never>] = [:]
 
     init(
         fileManager: FileManager = .default,
+        session: URLSession = .nowCoinerIconSession,
         paths: AppStoragePaths = AppStoragePaths(),
-        ttl: TimeInterval = 24 * 60 * 60
+        ttl: TimeInterval = 24 * 60 * 60,
+        maxIconBytes: Int = 2_000_000
     ) {
         self.fileManager = fileManager
+        self.session = session
         self.iconsDirectory = paths.cacheDirectory.appendingPathComponent("icons", isDirectory: true)
         self.ttl = ttl
+        self.maxIconBytes = maxIconBytes
         try? fileManager.createDirectory(at: iconsDirectory, withIntermediateDirectories: true)
     }
 
     func imageData(coinID: String, imageURL: String?) async -> Data? {
-        guard let imageURL, let url = URL(string: imageURL) else { return nil }
+        guard let url = URLSafety.validatedIconURL(from: imageURL) else { return nil }
         let key = cacheKey(for: coinID)
 
         if let cached = memoryCache[key] {
@@ -70,8 +76,24 @@ actor CoinIconCache {
 
         let task = Task<Data?, Never> {
             do {
-                let (data, response) = try await URLSession.shared.data(from: remoteURL)
-                guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), !data.isEmpty else {
+                var request = URLRequest(url: remoteURL)
+                request.timeoutInterval = 15
+                request.cachePolicy = .reloadIgnoringLocalCacheData
+                request.setValue("image/*", forHTTPHeaderField: "Accept")
+
+                let (data, response) = try await session.data(for: request)
+                guard let http = response as? HTTPURLResponse,
+                      (200..<300).contains(http.statusCode),
+                      !data.isEmpty,
+                      data.count <= maxIconBytes else {
+                    return nil
+                }
+                if let mimeType = http.mimeType?.lowercased(),
+                   !mimeType.hasPrefix("image/") {
+                    return nil
+                }
+                if http.expectedContentLength > 0,
+                   http.expectedContentLength > Int64(maxIconBytes) {
                     return nil
                 }
                 return data
@@ -113,6 +135,17 @@ actor CoinIconCache {
 
     private func cacheKey(for coinID: String) -> String {
         coinID.lowercased().replacingOccurrences(of: "/", with: "_")
+    }
+}
+
+private extension URLSession {
+    static var nowCoinerIconSession: URLSession {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.urlCache = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.timeoutIntervalForRequest = 15
+        configuration.timeoutIntervalForResource = 20
+        return URLSession(configuration: configuration)
     }
 }
 

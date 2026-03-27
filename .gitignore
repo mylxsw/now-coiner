@@ -7,3 +7,6 @@ DerivedData/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
 *.local.json
+
+# Local-only tracking
+LOCAL_CHANGE_TRACKER.md

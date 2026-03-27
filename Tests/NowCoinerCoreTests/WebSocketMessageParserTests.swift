@@ -25,4 +25,15 @@ final class WebSocketMessageParserTests: XCTestCase {
         XCTAssertEqual(tick?.symbol, "ETHUSDT")
         XCTAssertEqual(tick?.currentPrice, 3250.45)
     }
+
+    func testRejectsPayloadWhenPriceIsInvalid() {
+        let json = """
+        {"s":"BTCUSDT","c":"invalid"}
+        """
+        let data = Data(json.utf8)
+
+        let tick = WebSocketMessageParser.parseTick(from: data)
+
+        XCTAssertNil(tick)
+    }
 }

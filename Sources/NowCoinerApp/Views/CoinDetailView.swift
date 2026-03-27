@@ -157,7 +157,7 @@ struct CoinDetailView: View {
 
     @ViewBuilder
     private func linkRow(_ title: String, _ value: String?) -> some View {
-        if let value, let url = URL(string: value), !value.isEmpty {
+        if let url = URLSafety.validatedExternalWebURL(from: value) {
             Link(title, destination: url)
                 .font(.subheadline.weight(.medium))
         }

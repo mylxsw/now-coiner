@@ -94,11 +94,16 @@ final class TickerViewModelTests: XCTestCase {
         vm.persistStateSnapshot()
 
         let savedSettingsData = try Data(contentsOf: settingsURL)
-        XCTAssertTrue(String(decoding: savedSettingsData, as: UTF8.self).contains("\"vsCurrency\" : \"usd\""))
+        XCTAssertTrue(FileCrypto.isEncryptedPayload(savedSettingsData))
 
         let savedWatchlistData = try Data(contentsOf: watchlistURL)
-        XCTAssertTrue(String(decoding: savedWatchlistData, as: UTF8.self).contains("\"coinID\" : \"solana\""))
-        XCTAssertTrue(String(decoding: savedWatchlistData, as: UTF8.self).contains("\"isPinned\" : true"))
+        XCTAssertTrue(FileCrypto.isEncryptedPayload(savedWatchlistData))
+
+        let persistedSettings = settings.load()
+        XCTAssertEqual(persistedSettings.vsCurrency, "usd")
+
+        let persistedWatchlist = watchlist.load()
+        XCTAssertTrue(persistedWatchlist.contains(where: { $0.coinID == "solana" && $0.isPinned }))
     }
 
     /// Simulate app restart: VM1 modifies data, VM2 loads from same files and verifies.
@@ -141,9 +146,8 @@ final class TickerViewModelTests: XCTestCase {
             XCTAssertTrue(result, "togglePin should succeed")
             XCTAssertFalse(vm.watchlist.first(where: { $0.coinID == "ethereum" })!.isPinned, "ethereum should now be unpinned")
 
-            // Verify file on disk
-            let raw = try String(contentsOf: watchlistURL, encoding: .utf8)
-            print("SESSION 1 - watchlist.json after togglePin:\n\(raw)")
+            let persisted = WatchlistStore(url: watchlistURL).load()
+            XCTAssertFalse(persisted.first(where: { $0.coinID == "ethereum" })?.isPinned ?? true)
 
             await vm.shutdown()
         }
@@ -160,8 +164,6 @@ final class TickerViewModelTests: XCTestCase {
                 cacheStore: CoinCacheStore(coinURL: coinsURL, priceURL: pricesURL, sparklineURL: sparklinesURL, detailURL: detailsURL)
             )
             await vm2.load()
-
-            print("SESSION 2 - watchlist after load: \(vm2.watchlist.map { "\($0.coinID):\($0.isPinned)" })")
 
             XCTAssertEqual(vm2.watchlist.count, 7, "Should still have 7 items after restart")
 
